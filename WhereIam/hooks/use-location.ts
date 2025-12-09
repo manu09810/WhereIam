@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import * as Location from "expo-location";
+import { useEffect, useState } from "react";
 
 export const useUserLocation = () => {
   const [isoCountryCode, setIsoCountryCode] = useState<string | null>(null);
@@ -8,21 +8,34 @@ export const useUserLocation = () => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setLocationError("Error of location");
+      try {
+        console.log("Requesting location permissions...");
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        console.log("Permission status:", status);
+        
+        if (status !== "granted") {
+          setLocationError("Permission to access location was denied");
+          setIsLoadingLocation(false);
+          return;
+        }
+
+        console.log("Getting current position...");
+        let location = await Location.getCurrentPositionAsync({});
+        console.log("Location obtained:", location.coords);
+        
+        let reverseGeocode = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+        console.log("Reverse geocode result:", reverseGeocode[0]);
+
+        setIsoCountryCode(reverseGeocode[0]?.isoCountryCode || null);
         setIsLoadingLocation(false);
-        return;
+      } catch (error) {
+        console.error("Location error:", error);
+        setLocationError(`Error getting location: ${error}`);
+        setIsLoadingLocation(false);
       }
-
-      let location = await Location.getCurrentPositionAsync({});
-      let reverseGeocode = await Location.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
-      setIsoCountryCode(reverseGeocode[0]?.isoCountryCode || null);
-      setIsLoadingLocation(false);
     })();
   }, []);
 

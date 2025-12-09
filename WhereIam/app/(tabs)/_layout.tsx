@@ -22,21 +22,21 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="infoCountry"
         options={{
           title: "Info Country",
           tabBarIcon: ({ color }) => <InformationCircleIcon size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="News"
+        name="news"
         options={{
           title: "Local News",
           tabBarIcon: ({ color }) => <NewspaperIcon size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="Image"
+        name="image"
         options={{
           title: "Random Images",
           tabBarIcon: ({ color }) => <PhotoIcon size={28} color={color} />,
