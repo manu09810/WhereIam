@@ -1,10 +1,14 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
+import React from "react";
+import {
+  InformationCircleIcon,
+  NewspaperIcon,
+  PhotoIcon,
+} from "react-native-heroicons/solid";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { HapticTab } from "@/components/haptic-tab";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -12,22 +16,30 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Info Country",
+          tabBarIcon: ({ color }) => <InformationCircleIcon size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="News"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Local News",
+          tabBarIcon: ({ color }) => <NewspaperIcon size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="Image"
+        options={{
+          title: "Random Images",
+          tabBarIcon: ({ color }) => <PhotoIcon size={28} color={color} />,
         }}
       />
     </Tabs>

@@ -8,7 +8,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 import { ScrollView } from 'react-native';
 
-export default function HomeScreen() {
+export default function ImageScreen() {
   return (
     <ScrollView>
       
