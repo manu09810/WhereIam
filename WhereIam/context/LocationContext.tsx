@@ -1,10 +1,14 @@
 import React, { createContext, useContext } from "react";
 import { useUserLocation } from "@/hooks/use-location";
+import { useCountry } from "@/hooks/use-country";
 
 interface LocationContextType {
   isoCountryCode: string | null;
   isLoadingLocation: boolean;
   locationError: string;
+  countryData: any;
+  isLoadingCountry: boolean;
+  countryError: string;
 }
 
 const LocationContext = createContext<LocationContextType | undefined>(
@@ -13,9 +17,15 @@ const LocationContext = createContext<LocationContextType | undefined>(
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
   const location = useUserLocation();
+  const country = useCountry(location.isoCountryCode);
 
   return (
-    <LocationContext.Provider value={location}>
+    <LocationContext.Provider
+      value={{
+        ...location,
+        ...country,
+      }}
+    >
       {children}
     </LocationContext.Provider>
   );
