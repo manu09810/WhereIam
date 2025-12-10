@@ -1,12 +1,6 @@
-import {
-  Modal,
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  Linking,
-} from "react-native";
+import { Modal, View, TouchableOpacity, Text, Linking } from "react-native";
 import { XMarkIcon, GlobeAltIcon, MapIcon } from "react-native-heroicons/solid";
+import MapView, { Marker } from "react-native-maps";
 
 interface MapModalProps {
   visible: boolean;
@@ -23,10 +17,24 @@ export const MapModal = ({
   longitude,
   countryName,
 }: MapModalProps) => {
-  const latNum = parseFloat(String(latitude));
-  const lonNum = parseFloat(String(longitude));
+  // Validación robusta para evitar NaN y valores undefined/null
+  const latNum =
+    typeof latitude === "number" && !isNaN(latitude)
+      ? latitude
+      : latitude && !isNaN(Number(latitude))
+      ? Number(latitude)
+      : null;
+  const lonNum =
+    typeof longitude === "number" && !isNaN(longitude)
+      ? longitude
+      : longitude && !isNaN(Number(longitude))
+      ? Number(longitude)
+      : null;
 
-  const openWikipedia = (query) => {
+  // Si no hay coordenadas válidas, no renderizar el mapa
+  const showMap = latNum !== null && lonNum !== null;
+
+  const openWikipedia = (query: string) => {
     const wikipediaUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(
       query
     )}`;
@@ -35,7 +43,7 @@ export const MapModal = ({
     );
   };
 
-  const openGoogleMaps = (query) => {
+  const openGoogleMaps = (query: string) => {
     const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(
       query
     )}`;
@@ -54,25 +62,31 @@ export const MapModal = ({
           alignItems: "center",
         }}
       >
-        {latNum && lonNum ? (
-          <Image
-            source={{
-              uri: `https://tile.openstreetmap.de/tiles/osmde/4/${Math.floor(
-                ((lonNum + 180) / 360) * Math.pow(2, 4)
-              )}/${Math.floor(
-                ((1 -
-                  Math.log(
-                    Math.tan((latNum * Math.PI) / 180) +
-                      1 / Math.cos((latNum * Math.PI) / 180)
-                  ) /
-                    Math.PI) /
-                  2) *
-                  Math.pow(2, 4)
-              )}.png`,
+        {showMap ? (
+          <View
+            style={{
+              width: "90%",
+              height: "60%",
+              borderRadius: 16,
+              overflow: "hidden",
             }}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="cover"
-          />
+          >
+            <MapView
+              style={{ flex: 1 }}
+              initialRegion={{
+                latitude: latNum,
+                longitude: lonNum,
+                latitudeDelta: 10,
+                longitudeDelta: 10,
+              }}
+            >
+              <Marker
+                coordinate={{ latitude: latNum, longitude: lonNum }}
+                title={countryName}
+                description={`${latNum}, ${lonNum}`}
+              />
+            </MapView>
+          </View>
         ) : (
           <Text style={{ fontSize: 48, color: "#fff" }}>📍</Text>
         )}
