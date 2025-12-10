@@ -12,17 +12,10 @@ import { useState, useEffect } from "react";
 import { MapModal } from "@/components/MapCountry";
 
 export default function InfoCountryScreen() {
-  const {
-    countryData,
-    isLoadingCountry,
-    countryError,
-    city,
-    region,
-    timezone: locationTimezone,
-  } = useLocation();
+  const { countryData, isLoadingCountry, countryError } = useLocation();
   const [mapModalVisible, setMapModalVisible] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(null);
-  const [currentTime, setCurrentTime] = useState<string | null>(null);
+  const [flagImage, setFlagImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (countryData?.name?.common) {
@@ -31,38 +24,14 @@ export default function InfoCountryScreen() {
   }, [countryData]);
 
   useEffect(() => {
-    const timezoneForApi =
-      locationTimezone ||
-      countryData?.timezones?.find((tz) => tz.includes("/")) ||
-      countryData?.timezones?.[0];
-
-    if (
-      timezoneForApi &&
-      timezoneForApi !== "N/A" &&
-      timezoneForApi.includes("/")
-    ) {
-      fetchCurrentTime(timezoneForApi);
-    }
-  }, [locationTimezone, countryData]);
-
-  const fetchCurrentTime = async (tz: string) => {
-    try {
-      const response = await fetch(
-        `http://worldtimeapi.org/api/timezone/${tz}`
+    // Usa el código ISO 3166-1 alfa-2 (cca2) para la bandera
+    if (countryData?.cca2) {
+      // Puedes cambiar "flat" por "shiny" y "64" por otro tamaño si quieres
+      setFlagImage(
+        `https://flagcdn.com/w2560/${countryData.cca2.toLowerCase()}.png`
       );
-      const data = await response.json();
-      if (data.datetime) {
-        const time = new Date(data.datetime).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        });
-        setCurrentTime(time);
-      }
-    } catch (error) {
-      console.log("Error fetching time:", error);
     }
-  };
+  }, [countryData?.cca2]);
 
   const fetchCountryImage = async (countryName) => {
     try {
@@ -101,22 +70,21 @@ export default function InfoCountryScreen() {
   const openGoogleTranslate = (languageCode: string): void => {
     // Obtener el código de idioma ISO 639-1 de los datos del país (idioma origen)
     const sourceLangCode = countryData.languages
-      ? Object.keys(countryData.languages)[0].toUpperCase()
-      : "EN";
+      ? Object.keys(countryData.languages)[0]
+      : "en";
 
     // Siempre traducir a inglés si el país no habla inglés
     // Si el país habla inglés, traducir al idioma del dispositivo
-    let targetLangCode = "EN";
+    let targetLangCode = "en";
 
-    if (sourceLangCode === "EN") {
+    if (sourceLangCode === "en") {
       const deviceLanguage = Intl.DateTimeFormat().resolvedOptions().locale;
-      targetLangCode = deviceLanguage.split("-")[0].toUpperCase();
+      targetLangCode = deviceLanguage.split("-")[0];
     }
 
     // Usar el nombre del país como texto de ejemplo
     const sampleText = countryName || "hello";
-    const translateUrl = `https://translate.google.com/m?sl=${sourceLangCode}&tl=${targetLangCode}&q=${encodeURIComponent(
-      sampleText
+    const translateUrl = `https://translate.google.com/?sl=${sourceLangCode}&tl=${targetLangCode}
     )}`;
 
     Linking.openURL(translateUrl).catch((err: Error) =>
@@ -166,7 +134,6 @@ export default function InfoCountryScreen() {
   const population = countryData.population
     ? (countryData.population / 1000000).toFixed(1)
     : "N/A";
-  const flagImage = countryData.flags?.png;
   const capital = countryData.capital?.[0] || "N/A";
   const latitude = countryData.latlng?.[0].toFixed(2) || "N/A";
   const longitude = countryData.latlng?.[1].toFixed(2) || "N/A";
@@ -216,9 +183,6 @@ export default function InfoCountryScreen() {
       </Text>
     </TouchableOpacity>
   );
-
-  const countryTimezone = countryData.timezones?.[0] || "N/A";
-  const timezoneForDisplay = countryTimezone;
 
   return (
     <>
@@ -346,19 +310,14 @@ export default function InfoCountryScreen() {
           {/* Grid Data Cards */}
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard
-              label="City"
-              value={city || "N/A"}
-              onPress={() => city && openWikipedia(city)}
-            />
-            <DataCard
               label="Capital"
               value={capital}
               onPress={() => capital !== "N/A" && openWikipedia(capital)}
             />
+            <DataCard label="Currency" value={currencies} onPress={undefined} />
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard label="Currency" value={currencies} onPress={undefined} />
             <DataCard
               label="Languages"
               value={languages.length > 0 ? languages.join(", ") : "N/A"}
@@ -366,28 +325,20 @@ export default function InfoCountryScreen() {
                 languages.length > 0 && openGoogleTranslate(languages[0])
               }
             />
-          </View>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard
               label="Population"
               value={`${population}M`}
               onPress={undefined}
             />
+          </View>
+
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard
               label="Continent"
               value={continent}
               onPress={() => continent !== "N/A" && openWikipedia(continent)}
             />
-          </View>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard label="Timezone" value={timezone} onPress={undefined} />
-            <DataCard
-              label="Region"
-              value={region || "N/A"}
-              onPress={() => region && openWikipedia(region)}
-            />
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -402,55 +353,6 @@ export default function InfoCountryScreen() {
               onPress={undefined}
             />
           </View>
-
-          {/* Current Time Card - Full Width */}
-          {timezoneForDisplay !== "N/A" && currentTime && (
-            <View
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 12,
-                padding: 20,
-                marginHorizontal: 6,
-                marginVertical: 8,
-                borderWidth: 1,
-                borderColor: "#1a1a1a",
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: "#999",
-                  fontWeight: "600",
-                  marginBottom: 12,
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                }}
-              >
-                Current Local Time
-              </Text>
-              <Text
-                style={{
-                  fontSize: 48,
-                  color: "#1a1a1a",
-                  fontWeight: "700",
-                  letterSpacing: 2,
-                }}
-              >
-                {currentTime}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: "#666",
-                  fontWeight: "500",
-                  marginTop: 8,
-                }}
-              >
-                {timezoneForDisplay}
-              </Text>
-            </View>
-          )}
         </View>
 
         <View style={{ height: 20 }} />
