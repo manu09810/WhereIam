@@ -209,13 +209,19 @@ export default function InfoCountryScreen() {
     ? (countryData.population / 1000000).toFixed(1)
     : "N/A";
   const capital = countryData.capital?.[0] || "N/A";
-  const latitude = countryData.latlng?.[0].toFixed(2) || "N/A";
-  const longitude = countryData.latlng?.[1].toFixed(2) || "N/A";
+  // Asegúrate de NO redondear latitud/longitud para el mapa/modal:
+  const latitudeRaw = countryData.latlng?.[0];
+  const longitudeRaw = countryData.latlng?.[1];
+  // Para mostrar en pantalla, puedes redondear:
+  const latitude =
+    typeof latitudeRaw === "number" ? latitudeRaw.toFixed(2) : "N/A";
+  const longitude =
+    typeof longitudeRaw === "number" ? longitudeRaw.toFixed(2) : "N/A";
+  // Para el mapa/modal, usa el valor original sin redondear:
+  const latNum = typeof latitudeRaw === "number" ? latitudeRaw : null;
+  const lonNum = typeof longitudeRaw === "number" ? longitudeRaw : null;
   const continent = countryData.continents?.[0] || "N/A";
   const timezone = countryData.timezones?.[0] || "N/A";
-
-  const latNum = parseFloat(latitude);
-  const lonNum = parseFloat(longitude);
 
   const DataCard = ({ label, value, onPress }) => (
     <TouchableOpacity

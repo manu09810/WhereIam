@@ -23,7 +23,9 @@ export const useUserLocation = () => {
         }
 
         console.log("Getting current position...");
-        let location = await Location.getCurrentPositionAsync({});
+        let location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest
+        });
         console.log("Location obtained:", location.coords);
 
         let reverseGeocode = await Location.reverseGeocodeAsync({

@@ -52,6 +52,7 @@ export const MapModal = ({
     );
   };
 
+  // El mapa ocupará toda la pantalla del modal
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View
@@ -63,30 +64,21 @@ export const MapModal = ({
         }}
       >
         {showMap ? (
-          <View
-            style={{
-              width: "90%",
-              height: "60%",
-              borderRadius: 16,
-              overflow: "hidden",
+          <MapView
+            style={{ flex: 1, width: "100%", height: "100%" }} // Cambia aquí
+            initialRegion={{
+              latitude: latNum,
+              longitude: lonNum,
+              latitudeDelta: 10,
+              longitudeDelta: 10,
             }}
           >
-            <MapView
-              style={{ flex: 1 }}
-              initialRegion={{
-                latitude: latNum,
-                longitude: lonNum,
-                latitudeDelta: 10,
-                longitudeDelta: 10,
-              }}
-            >
-              <Marker
-                coordinate={{ latitude: latNum, longitude: lonNum }}
-                title={countryName}
-                description={`${latNum}, ${lonNum}`}
-              />
-            </MapView>
-          </View>
+            <Marker
+              coordinate={{ latitude: latNum, longitude: lonNum }}
+              title={countryName}
+              description={`${latNum}, ${lonNum}`}
+            />
+          </MapView>
         ) : (
           <Text style={{ fontSize: 48, color: "#fff" }}>📍</Text>
         )}
