@@ -4,15 +4,16 @@ import {
   Image,
   ActivityIndicator,
   ScrollView,
-  Modal,
   TouchableOpacity,
   Linking,
 } from "react-native";
 import { useLocation } from "@/context/LocationContext";
 import { useState, useEffect } from "react";
+import { MapModal } from "@/components/MapCountry";
 
 export default function InfoCountryScreen() {
-  const { countryData, isLoadingCountry, countryError } = useLocation();
+  const { countryData, isLoadingCountry, countryError, city, region } =
+    useLocation();
   const [mapModalVisible, setMapModalVisible] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(null);
 
@@ -44,6 +45,41 @@ export default function InfoCountryScreen() {
     )}`;
     Linking.openURL(wikipediaUrl).catch((err) =>
       console.log("Error opening Wikipedia:", err)
+    );
+  };
+
+  const openGoogleMaps = (query: string): void => {
+    const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(
+      query
+    )}`;
+    Linking.openURL(mapsUrl).catch((err: Error) =>
+      console.log("Error opening Google Maps:", err)
+    );
+  };
+
+  const openGoogleTranslate = (languageCode: string): void => {
+    // Obtener el código de idioma ISO 639-1 de los datos del país (idioma origen)
+    const sourceLangCode = countryData.languages
+      ? Object.keys(countryData.languages)[0].toUpperCase()
+      : "EN";
+
+    // Siempre traducir a inglés si el país no habla inglés
+    // Si el país habla inglés, traducir al idioma del dispositivo
+    let targetLangCode = "EN";
+
+    if (sourceLangCode === "EN") {
+      const deviceLanguage = Intl.DateTimeFormat().resolvedOptions().locale;
+      targetLangCode = deviceLanguage.split("-")[0].toUpperCase();
+    }
+
+    // Usar el nombre del país como texto de ejemplo
+    const sampleText = countryName || "hello";
+    const translateUrl = `https://translate.google.com/m?sl=${sourceLangCode}&tl=${targetLangCode}&q=${encodeURIComponent(
+      sampleText
+    )}`;
+
+    Linking.openURL(translateUrl).catch((err: Error) =>
+      console.log("Error opening Google Translate:", err)
     );
   };
 
@@ -102,6 +138,7 @@ export default function InfoCountryScreen() {
   const DataCard = ({ label, value, onPress }) => (
     <TouchableOpacity
       onPress={onPress}
+      activeOpacity={0.7}
       style={{
         flex: 1,
         backgroundColor: "#fff",
@@ -155,7 +192,7 @@ export default function InfoCountryScreen() {
               left: 0,
               right: 0,
               bottom: 0,
-              opacity: 0.58,
+              opacity: 0.08,
               zIndex: -1,
             }}
             blurRadius={3}
@@ -217,6 +254,7 @@ export default function InfoCountryScreen() {
             {/* Mini Map - Touchable */}
             <TouchableOpacity
               onPress={() => setMapModalVisible(true)}
+              activeOpacity={0.7}
               style={{
                 width: 100,
                 height: 100,
@@ -264,29 +302,61 @@ export default function InfoCountryScreen() {
           {/* Grid Data Cards */}
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard
+              label="City"
+              value={city || "N/A"}
+              onPress={() => city && openWikipedia(city)}
+            />
+            <DataCard
               label="Capital"
               value={capital}
               onPress={() => capital !== "N/A" && openWikipedia(capital)}
             />
-            <DataCard label="Currency" value={currencies} />
+          </View>
+
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <DataCard label="Currency" value={currencies} onPress={undefined} />
+            <DataCard
+              label="Languages"
+              value={languages.length > 0 ? languages.join(", ") : "N/A"}
+              onPress={() =>
+                languages.length > 0 && openGoogleTranslate(languages[0])
+              }
+            />
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard
-              label="Languages"
-              value={languages.length > 0 ? languages.join(", ") : "N/A"}
+              label="Population"
+              value={`${population}M`}
+              onPress={undefined}
             />
-            <DataCard label="Population" value={`${population}M`} />
+            <DataCard
+              label="Continent"
+              value={continent}
+              onPress={() => continent !== "N/A" && openWikipedia(continent)}
+            />
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard label="Continent" value={continent} />
-            <DataCard label="Timezone" value={timezone} />
+            <DataCard label="Timezone" value={timezone} onPress={undefined} />
+            <DataCard
+              label="Region"
+              value={region || "N/A"}
+              onPress={() => region && openWikipedia(region)}
+            />
           </View>
 
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard label="Latitude" value={`${latitude}°`} />
-            <DataCard label="Longitude" value={`${longitude}°`} />
+            <DataCard
+              label="Latitude"
+              value={`${latitude}°`}
+              onPress={undefined}
+            />
+            <DataCard
+              label="Longitude"
+              value={`${longitude}°`}
+              onPress={undefined}
+            />
           </View>
         </View>
 
@@ -294,55 +364,13 @@ export default function InfoCountryScreen() {
       </ScrollView>
 
       {/* Map Modal */}
-      <Modal visible={mapModalVisible} transparent={true} animationType="fade">
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#000",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {latNum && lonNum ? (
-            <Image
-              source={{
-                uri: `https://tile.openstreetmap.de/tiles/osmde/4/${Math.floor(
-                  ((lonNum + 180) / 360) * Math.pow(2, 4)
-                )}/${Math.floor(
-                  ((1 -
-                    Math.log(
-                      Math.tan((latNum * Math.PI) / 180) +
-                        1 / Math.cos((latNum * Math.PI) / 180)
-                    ) /
-                      Math.PI) /
-                    2) *
-                    Math.pow(2, 4)
-                )}.png`,
-              }}
-              style={{ width: "100%", height: "100%" }}
-              resizeMode="cover"
-            />
-          ) : (
-            <Text style={{ fontSize: 48, color: "#fff" }}>📍</Text>
-          )}
-
-          {/* Close Button */}
-          <TouchableOpacity
-            onPress={() => setMapModalVisible(false)}
-            style={{
-              position: "absolute",
-              top: 50,
-              right: 20,
-              backgroundColor: "#fff",
-              borderRadius: 50,
-              padding: 10,
-            }}
-          >
-            <Text style={{ fontSize: 24, fontWeight: "bold" }}>✕</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <MapModal
+        visible={mapModalVisible}
+        onClose={() => setMapModalVisible(false)}
+        latitude={latNum}
+        longitude={lonNum}
+        countryName={countryName}
+      />
     </>
   );
-
-}}
+}

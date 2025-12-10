@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 
 export const useUserLocation = () => {
   const [isoCountryCode, setIsoCountryCode] = useState<string | null>(null);
+  const [city, setCity] = useState<string | null>(null);
+  const [region, setRegion] = useState<string | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
   const [locationError, setLocationError] = useState("");
 
@@ -12,7 +14,7 @@ export const useUserLocation = () => {
         console.log("Requesting location permissions...");
         let { status } = await Location.requestForegroundPermissionsAsync();
         console.log("Permission status:", status);
-        
+
         if (status !== "granted") {
           setLocationError("Permission to access location was denied");
           setIsLoadingLocation(false);
@@ -22,7 +24,7 @@ export const useUserLocation = () => {
         console.log("Getting current position...");
         let location = await Location.getCurrentPositionAsync({});
         console.log("Location obtained:", location.coords);
-        
+
         let reverseGeocode = await Location.reverseGeocodeAsync({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -30,6 +32,8 @@ export const useUserLocation = () => {
         console.log("Reverse geocode result:", reverseGeocode[0]);
 
         setIsoCountryCode(reverseGeocode[0]?.isoCountryCode || null);
+        setCity(reverseGeocode[0]?.city || null);
+        setRegion(reverseGeocode[0]?.region || null);
         setIsLoadingLocation(false);
       } catch (error) {
         console.error("Location error:", error);
@@ -39,5 +43,5 @@ export const useUserLocation = () => {
     })();
   }, []);
 
-  return { isoCountryCode, isLoadingLocation, locationError };
+  return { isoCountryCode, city, region, isLoadingLocation, locationError };
 };

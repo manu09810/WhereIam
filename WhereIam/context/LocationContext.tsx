@@ -6,6 +6,8 @@ interface LocationContextType {
   isoCountryCode: string | null;
   isLoadingLocation: boolean;
   locationError: string;
+  city: string | null;
+  region: string | null;
   countryData: any;
   isLoadingCountry: boolean;
   countryError: string;
@@ -16,14 +18,20 @@ const LocationContext = createContext<LocationContextType | undefined>(
 );
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
-  const location = useUserLocation();
-  const country = useCountry(location.isoCountryCode);
+  const locationData = useUserLocation();
+  const country = useCountry(locationData.isoCountryCode);
 
   return (
     <LocationContext.Provider
       value={{
-        ...location,
-        ...country,
+        isoCountryCode: locationData.isoCountryCode,
+        isLoadingLocation: locationData.isLoadingLocation,
+        locationError: locationData.locationError,
+        city: (locationData as any).city || null,
+        region: (locationData as any).region || null,
+        countryData: country.countryData,
+        isLoadingCountry: country.isLoadingCountry,
+        countryError: country.countryError,
       }}
     >
       {children}
