@@ -10,12 +10,21 @@ import {
 import { useLocation } from "@/context/LocationContext";
 import { useState, useEffect } from "react";
 import { MapModal } from "@/components/MapCountry";
+import { WeatherModal } from "@/components/WeatherModal";
 
 export default function InfoCountryScreen() {
-  const { countryData, isLoadingCountry, countryError } = useLocation();
+  const {
+    countryData,
+    isLoadingCountry,
+    countryError,
+    timezone: locationTimezone,
+  } = useLocation();
   const [mapModalVisible, setMapModalVisible] = useState(false);
+  const [weatherModalVisible, setWeatherModalVisible] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [flagImage, setFlagImage] = useState<string | null>(null);
+  const [flagColors, setFlagColors] = useState<string[] | null>(null);
+  const [currentTime, setCurrentTime] = useState<string | null>(null);
 
   useEffect(() => {
     if (countryData?.name?.common) {
@@ -33,6 +42,24 @@ export default function InfoCountryScreen() {
     }
   }, [countryData?.cca2]);
 
+  useEffect(() => {
+    if (flagImage) {
+      detectFlagColors(flagImage);
+    }
+  }, [flagImage]);
+
+  // Fetch local time
+  useEffect(() => {
+    // Usar timezone de location si está disponible, si no el del país
+    const timezone =
+      locationTimezone ||
+      countryData?.timezones?.find((tz) => tz.includes("/")) ||
+      countryData?.timezones?.[0];
+    if (timezone && timezone !== "N/A" && timezone.includes("/")) {
+      fetchCurrentTime(timezone);
+    }
+  }, [countryData, locationTimezone]);
+
   const fetchCountryImage = async (countryName) => {
     try {
       const response = await fetch(
@@ -46,6 +73,53 @@ export default function InfoCountryScreen() {
       }
     } catch (error) {
       console.log("Error fetching background image:", error);
+    }
+  };
+
+  const detectFlagColors = async (imageUrl: string) => {
+    try {
+      const result = await ImageColors.getColors(imageUrl, {
+        fallback: "#ffffff",
+        cache: true,
+        key: imageUrl,
+      });
+      // El resultado puede variar según la plataforma
+      if (result.platform === "android") {
+        setFlagColors(
+          [result.dominant, result.average, result.vibrant].filter(Boolean)
+        );
+      } else if (result.platform === "ios") {
+        setFlagColors(
+          [
+            result.background,
+            result.primary,
+            result.secondary,
+            result.detail,
+          ].filter(Boolean)
+        );
+      }
+    } catch (e) {
+      setFlagColors(null);
+    }
+  };
+
+  const fetchCurrentTime = async (tz: string) => {
+    try {
+      const response = await fetch(
+        `http://worldtimeapi.org/api/timezone/${tz}`
+      );
+      const data = await response.json();
+      if (data.datetime) {
+        const time = new Date(data.datetime).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        setCurrentTime(time);
+      }
+    } catch (error) {
+      setCurrentTime(null);
+      console.log("Error fetching time:", error);
     }
   };
 
@@ -309,6 +383,48 @@ export default function InfoCountryScreen() {
 
           {/* Grid Data Cards */}
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#fff",
+                borderRadius: 16,
+                padding: 10,
+                marginHorizontal: 6,
+                marginVertical: 12,
+                borderWidth: 1,
+                borderColor: "#1a1a1a",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 100,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: "#999",
+                  fontWeight: "600",
+                  marginBottom: 10,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  textAlign: "center",
+                }}
+              >
+                Local Time
+              </Text>
+              <Text
+                style={{
+                  fontSize: 54,
+                  color: "#1a1a1a",
+                  fontWeight: "bold",
+                  letterSpacing: 2,
+                  textAlign: "center",
+                }}
+              >
+                {currentTime ? currentTime : "Loading..."}
+              </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard
               label="Capital"
               value={capital}
@@ -353,7 +469,34 @@ export default function InfoCountryScreen() {
               onPress={undefined}
             />
           </View>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <DataCard
+              label="Weather"
+              value="Tap to view"
+              onPress={() => setWeatherModalVisible(true)}
+            />
+          </View>
         </View>
+
+        {/* Colores de la bandera detectados */}
+        {flagColors && (
+          <View style={{ flexDirection: "row", marginVertical: 8 }}>
+            {flagColors.map((color, idx) => (
+              <View
+                key={idx}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  backgroundColor: color,
+                  marginRight: 8,
+                  borderWidth: 1,
+                  borderColor: "#ccc",
+                }}
+              />
+            ))}
+          </View>
+        )}
 
         <View style={{ height: 20 }} />
       </ScrollView>
@@ -365,6 +508,15 @@ export default function InfoCountryScreen() {
         latitude={latNum}
         longitude={lonNum}
         countryName={countryName}
+      />
+
+      {/* Weather Modal */}
+      <WeatherModal
+        visible={weatherModalVisible}
+        onClose={() => setWeatherModalVisible(false)}
+        latitude={latNum}
+        longitude={lonNum}
+        cityName={capital || countryName}
       />
     </>
   );
