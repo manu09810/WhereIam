@@ -12,16 +12,57 @@ import { useState, useEffect } from "react";
 import { MapModal } from "@/components/MapCountry";
 
 export default function InfoCountryScreen() {
-  const { countryData, isLoadingCountry, countryError, city, region } =
-    useLocation();
+  const {
+    countryData,
+    isLoadingCountry,
+    countryError,
+    city,
+    region,
+    timezone: locationTimezone,
+  } = useLocation();
   const [mapModalVisible, setMapModalVisible] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(null);
+  const [currentTime, setCurrentTime] = useState<string | null>(null);
 
   useEffect(() => {
     if (countryData?.name?.common) {
       fetchCountryImage(countryData.name.common);
     }
   }, [countryData]);
+
+  useEffect(() => {
+    const timezoneForApi =
+      locationTimezone ||
+      countryData?.timezones?.find((tz) => tz.includes("/")) ||
+      countryData?.timezones?.[0];
+
+    if (
+      timezoneForApi &&
+      timezoneForApi !== "N/A" &&
+      timezoneForApi.includes("/")
+    ) {
+      fetchCurrentTime(timezoneForApi);
+    }
+  }, [locationTimezone, countryData]);
+
+  const fetchCurrentTime = async (tz: string) => {
+    try {
+      const response = await fetch(
+        `http://worldtimeapi.org/api/timezone/${tz}`
+      );
+      const data = await response.json();
+      if (data.datetime) {
+        const time = new Date(data.datetime).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        setCurrentTime(time);
+      }
+    } catch (error) {
+      console.log("Error fetching time:", error);
+    }
+  };
 
   const fetchCountryImage = async (countryName) => {
     try {
@@ -175,6 +216,9 @@ export default function InfoCountryScreen() {
       </Text>
     </TouchableOpacity>
   );
+
+  const countryTimezone = countryData.timezones?.[0] || "N/A";
+  const timezoneForDisplay = countryTimezone;
 
   return (
     <>
@@ -358,6 +402,55 @@ export default function InfoCountryScreen() {
               onPress={undefined}
             />
           </View>
+
+          {/* Current Time Card - Full Width */}
+          {timezoneForDisplay !== "N/A" && currentTime && (
+            <View
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: 12,
+                padding: 20,
+                marginHorizontal: 6,
+                marginVertical: 8,
+                borderWidth: 1,
+                borderColor: "#1a1a1a",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 11,
+                  color: "#999",
+                  fontWeight: "600",
+                  marginBottom: 12,
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5,
+                }}
+              >
+                Current Local Time
+              </Text>
+              <Text
+                style={{
+                  fontSize: 48,
+                  color: "#1a1a1a",
+                  fontWeight: "700",
+                  letterSpacing: 2,
+                }}
+              >
+                {currentTime}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: "#666",
+                  fontWeight: "500",
+                  marginTop: 8,
+                }}
+              >
+                {timezoneForDisplay}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={{ height: 20 }} />

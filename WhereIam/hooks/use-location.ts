@@ -5,6 +5,7 @@ export const useUserLocation = () => {
   const [isoCountryCode, setIsoCountryCode] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
   const [region, setRegion] = useState<string | null>(null);
+  const [timezone, setTimezone] = useState<string | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
   const [locationError, setLocationError] = useState("");
 
@@ -34,6 +35,7 @@ export const useUserLocation = () => {
         setIsoCountryCode(reverseGeocode[0]?.isoCountryCode || null);
         setCity(reverseGeocode[0]?.city || null);
         setRegion(reverseGeocode[0]?.region || null);
+        setTimezone(reverseGeocode[0]?.timezone || null);
         setIsLoadingLocation(false);
       } catch (error) {
         console.error("Location error:", error);
@@ -43,5 +45,12 @@ export const useUserLocation = () => {
     })();
   }, []);
 
-  return { isoCountryCode, city, region, isLoadingLocation, locationError };
+  return {
+    isoCountryCode,
+    city,
+    region,
+    timezone,
+    isLoadingLocation,
+    locationError,
+  };
 };

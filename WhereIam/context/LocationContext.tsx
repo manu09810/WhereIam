@@ -8,6 +8,7 @@ interface LocationContextType {
   locationError: string;
   city: string | null;
   region: string | null;
+  timezone: string | null;
   countryData: any;
   isLoadingCountry: boolean;
   countryError: string;
@@ -27,8 +28,9 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         isoCountryCode: locationData.isoCountryCode,
         isLoadingLocation: locationData.isLoadingLocation,
         locationError: locationData.locationError,
-        city: (locationData as any).city || null,
-        region: (locationData as any).region || null,
+        city: locationData.city,
+        region: locationData.region,
+        timezone: locationData.timezone,
         countryData: country.countryData,
         isLoadingCountry: country.isLoadingCountry,
         countryError: country.countryError,
