@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { MapIcon } from "react-native-heroicons/outline";
 export default function InfoCountryScreen() {
   const {
     countryData,
@@ -31,6 +31,7 @@ export default function InfoCountryScreen() {
   const [flagImage, setFlagImage] = useState<string | null>(null);
   const [flagColors, setFlagColors] = useState<string[] | null>(null);
   const [currentTime, setCurrentTime] = useState<string | null>(null);
+  const [regionImage, setRegionImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (countryData?.name?.common) {
@@ -54,6 +55,28 @@ export default function InfoCountryScreen() {
     }
   }, [flagImage]);
 
+  useEffect(() => {
+    if (region) {
+      const fetchRegionImage = async () => {
+        try {
+          const response = await fetch(
+            `https://en.wikipedia.org/w/api.php?action=query&titles=${region}&prop=pageimages&format=json&pithumbsize=500&origin=*`
+          );
+          const data = await response.json();
+          const pages = data.query.pages;
+          const page = Object.values(pages)[0];
+          if (page?.thumbnail?.source) {
+            setRegionImage(page.thumbnail.source);
+          } else {
+            setRegionImage(null);
+          }
+        } catch (error) {
+          setRegionImage(null);
+        }
+      };
+      fetchRegionImage();
+    }
+  }, [region]);
   // Fetch local time
   useEffect(() => {
     // Usar timezone de location si está disponible, si no el del país
@@ -277,10 +300,7 @@ export default function InfoCountryScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
       <StatusBar hidden />
-      <ScrollView
-        style={{ flex: 1 }}
-        scrollEventThrottle={16}
-      >
+      <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
         {/* Background Image with Opacity */}
         {backgroundImage && (
           <Image
@@ -298,15 +318,14 @@ export default function InfoCountryScreen() {
           />
         )}
 
-        {/* Parallax Header with Flag */}
+        {/* Parallax Header con Bandera */}
         <View
           style={{
             height: 250,
             overflow: "hidden",
             backgroundColor: "#fff",
             borderTopEndRadius: 20,
-
-            marginBottom: 24,
+            marginBottom: 0, // Sin margen inferior
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.08,
@@ -325,6 +344,58 @@ export default function InfoCountryScreen() {
           )}
         </View>
 
+        {/* Nombre del país encima del mapa */}
+        <View style={{ paddingHorizontal: 12, marginTop: 18, marginBottom: 0 }}>
+          <Text
+            style={{
+              fontSize: 36,
+              fontWeight: "700",
+              color: "#1a1a1a",
+              marginBottom: 8,
+              letterSpacing: -0.5,
+              textAlign: "center",
+            }}
+          >
+            {countryName}
+          </Text>
+        </View>
+
+        {/* Mapa ocupa todo el rectángulo debajo de la bandera */}
+        <View
+          style={{
+            height: 180,
+            marginHorizontal: 12,
+           
+            borderRadius: 16,
+            overflow: "hidden",
+            backgroundColor: "#f0f0f0",
+            borderWidth: 1,
+            borderColor: "#1a1a1a",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Pressable
+            onPress={() => setMapModalVisible(true)}
+            style={{
+              width: "100%",
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {regionImage ? (
+              <Image
+                source={{ uri: regionImage }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
+            ) : (
+              <MapIcon color="#1a1a1a" size={64} />
+            )}
+          </Pressable>
+        </View>
+
         <View style={{ paddingHorizontal: 12 }}>
           {/* Country Name with Map */}
           <View
@@ -335,67 +406,7 @@ export default function InfoCountryScreen() {
               marginLeft: 12,
               marginRight: 12,
             }}
-          >
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  fontSize: 36,
-                  fontWeight: "700",
-                  color: "#1a1a1a",
-                  marginBottom: 4,
-                  letterSpacing: -0.5,
-                }}
-              >
-                {countryName}
-              </Text>
-            </View>
-
-            {/* Mini Map - Touchable */}
-            <Pressable
-              onPress={() => setMapModalVisible(true)}
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: 12,
-                overflow: "hidden",
-                marginLeft: 16,
-                backgroundColor: "#f0f0f0",
-                borderWidth: 1,
-                borderColor: "#1a1a1a",
-              }}
-            >
-              {latNum && lonNum ? (
-                <Image
-                  source={{
-                    uri: `https://tile.openstreetmap.de/tiles/osmde/4/${Math.floor(
-                      ((lonNum + 180) / 360) * Math.pow(2, 4)
-                    )}/${Math.floor(
-                      ((1 -
-                        Math.log(
-                          Math.tan((latNum * Math.PI) / 180) +
-                            1 / Math.cos((latNum * Math.PI) / 180)
-                        ) /
-                          Math.PI) /
-                        2) *
-                        Math.pow(2, 4)
-                    )}.png`,
-                  }}
-                  style={{ width: "100%", height: "100%" }}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ fontSize: 24 }}>📍</Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
+          ></View>
 
           {/* Grid Data Cards */}
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
