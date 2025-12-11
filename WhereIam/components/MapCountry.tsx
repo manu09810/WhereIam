@@ -1,12 +1,12 @@
-import { Modal, View, TouchableOpacity, Text, Linking } from "react-native";
-import { XMarkIcon, GlobeAltIcon, MapIcon } from "react-native-heroicons/solid";
+import { Linking, Modal, Pressable, Text, View } from "react-native";
+import { GlobeAltIcon, MapIcon, XMarkIcon } from "react-native-heroicons/solid";
 import MapView, { Marker } from "react-native-maps";
 
 interface MapModalProps {
   visible: boolean;
   onClose: () => void;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   countryName: string;
 }
 
@@ -19,17 +19,9 @@ export const MapModal = ({
 }: MapModalProps) => {
   // Validación robusta para evitar NaN y valores undefined/null
   const latNum =
-    typeof latitude === "number" && !isNaN(latitude)
-      ? latitude
-      : latitude && !isNaN(Number(latitude))
-      ? Number(latitude)
-      : null;
+    typeof latitude === "number" && !isNaN(latitude) ? latitude : null;
   const lonNum =
-    typeof longitude === "number" && !isNaN(longitude)
-      ? longitude
-      : longitude && !isNaN(Number(longitude))
-      ? Number(longitude)
-      : null;
+    typeof longitude === "number" && !isNaN(longitude) ? longitude : null;
 
   // Si no hay coordenadas válidas, no renderizar el mapa
   const showMap = latNum !== null && lonNum !== null;
@@ -65,12 +57,12 @@ export const MapModal = ({
       >
         {showMap ? (
           <MapView
-            style={{ flex: 1, width: "100%", height: "100%" }} // Cambia aquí
+            style={{ flex: 1, width: "100%", height: "100%" }}
             initialRegion={{
               latitude: latNum,
               longitude: lonNum,
-              latitudeDelta: 10,
-              longitudeDelta: 10,
+              latitudeDelta: 0.1, // Usa un delta pequeño para mayor precisión
+              longitudeDelta: 0.1,
             }}
           >
             <Marker
@@ -94,12 +86,11 @@ export const MapModal = ({
           }}
         >
           {/* Wikipedia Button */}
-          <TouchableOpacity
+          <Pressable
             onPress={() => {
               onClose();
               openWikipedia(countryName);
             }}
-            activeOpacity={0.7}
             style={{
               backgroundColor: "#fff",
               borderRadius: 50,
@@ -107,15 +98,14 @@ export const MapModal = ({
             }}
           >
             <GlobeAltIcon size={24} color="#1a1a1a" />
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Google Maps Button */}
-          <TouchableOpacity
+          <Pressable
             onPress={() => {
               onClose();
               openGoogleMaps(countryName);
             }}
-            activeOpacity={0.7}
             style={{
               backgroundColor: "#fff",
               borderRadius: 50,
@@ -123,12 +113,11 @@ export const MapModal = ({
             }}
           >
             <MapIcon size={24} color="#1a1a1a" />
-          </TouchableOpacity>
+          </Pressable>
 
           {/* Close Button */}
-          <TouchableOpacity
+          <Pressable
             onPress={onClose}
-            activeOpacity={0.7}
             style={{
               backgroundColor: "#fff",
               borderRadius: 50,
@@ -136,7 +125,7 @@ export const MapModal = ({
             }}
           >
             <XMarkIcon size={24} color="#1a1a1a" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </Modal>

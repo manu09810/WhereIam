@@ -1,6 +1,6 @@
-import React, { createContext, useContext } from "react";
-import { useUserLocation } from "@/hooks/use-location";
 import { useCountry } from "@/hooks/use-country";
+import { useUserLocation } from "@/hooks/use-location";
+import React, { createContext, useContext } from "react";
 
 interface LocationContextType {
   isoCountryCode: string | null;
@@ -9,6 +9,8 @@ interface LocationContextType {
   city: string | null;
   region: string | null;
   timezone: string | null;
+  latitude: number | null;
+  longitude: number | null;
   countryData: any;
   isLoadingCountry: boolean;
   countryError: string;
@@ -31,6 +33,8 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         city: locationData.city,
         region: locationData.region,
         timezone: locationData.timezone,
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
         countryData: country.countryData,
         isLoadingCountry: country.isLoadingCountry,
         countryError: country.countryError,

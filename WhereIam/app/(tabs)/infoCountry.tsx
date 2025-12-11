@@ -1,16 +1,16 @@
-import {
-  View,
-  Text,
-  Image,
-  ActivityIndicator,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-} from "react-native";
-import { useLocation } from "@/context/LocationContext";
-import { useState, useEffect } from "react";
 import { MapModal } from "@/components/MapCountry";
 import { WeatherModal } from "@/components/WeatherModal";
+import { useLocation } from "@/context/LocationContext";
+import { useEffect, useState } from "react";
+import {
+    ActivityIndicator,
+    Image,
+    Linking,
+    Pressable,
+    ScrollView,
+    Text,
+    View,
+} from "react-native";
 
 export default function InfoCountryScreen() {
   const {
@@ -18,6 +18,10 @@ export default function InfoCountryScreen() {
     isLoadingCountry,
     countryError,
     timezone: locationTimezone,
+    city,
+    region,
+    latitude: userLatitude,
+    longitude: userLongitude,
   } = useLocation();
   const [mapModalVisible, setMapModalVisible] = useState(false);
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
@@ -209,24 +213,26 @@ export default function InfoCountryScreen() {
     ? (countryData.population / 1000000).toFixed(1)
     : "N/A";
   const capital = countryData.capital?.[0] || "N/A";
-  // Asegúrate de NO redondear latitud/longitud para el mapa/modal:
-  const latitudeRaw = countryData.latlng?.[0];
-  const longitudeRaw = countryData.latlng?.[1];
-  // Para mostrar en pantalla, puedes redondear:
-  const latitude =
-    typeof latitudeRaw === "number" ? latitudeRaw.toFixed(2) : "N/A";
-  const longitude =
-    typeof longitudeRaw === "number" ? longitudeRaw.toFixed(2) : "N/A";
-  // Para el mapa/modal, usa el valor original sin redondear:
-  const latNum = typeof latitudeRaw === "number" ? latitudeRaw : null;
-  const lonNum = typeof longitudeRaw === "number" ? longitudeRaw : null;
+  
+  // Usar las coordenadas GPS del usuario si están disponibles, si no, usar las del país
+  // Las coordenadas del usuario son mucho más precisas que las del centro del país
+  const latlngArr = Array.isArray(countryData.latlng) ? countryData.latlng : [];
+  const countryLatitude = typeof latlngArr[0] === "number" ? latlngArr[0] : null;
+  const countryLongitude = typeof latlngArr[1] === "number" ? latlngArr[1] : null;
+  
+  // Priorizar coordenadas GPS del usuario sobre las del país
+  const latNum = userLatitude !== null ? userLatitude : countryLatitude;
+  const lonNum = userLongitude !== null ? userLongitude : countryLongitude;
+  
+  // Para mostrar en la UI
+  const latitude = latNum !== null ? latNum.toFixed(6) : "N/A";
+  const longitude = lonNum !== null ? lonNum.toFixed(6) : "N/A";
   const continent = countryData.continents?.[0] || "N/A";
   const timezone = countryData.timezones?.[0] || "N/A";
 
   const DataCard = ({ label, value, onPress }) => (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
-      activeOpacity={0.7}
       style={{
         flex: 1,
         backgroundColor: "#fff",
@@ -261,7 +267,7 @@ export default function InfoCountryScreen() {
       >
         {value}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
@@ -340,9 +346,8 @@ export default function InfoCountryScreen() {
             </View>
 
             {/* Mini Map - Touchable */}
-            <TouchableOpacity
+            <Pressable
               onPress={() => setMapModalVisible(true)}
-              activeOpacity={0.7}
               style={{
                 width: 100,
                 height: 100,
@@ -384,7 +389,7 @@ export default function InfoCountryScreen() {
                   <Text style={{ fontSize: 24 }}>📍</Text>
                 </View>
               )}
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Grid Data Cards */}
@@ -477,6 +482,20 @@ export default function InfoCountryScreen() {
           </View>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <DataCard
+              label="City"
+              value={city || "N/A"}
+              onPress={() => city && city !== "N/A" && openWikipedia(city)}
+            />
+            <DataCard
+              label="Region"
+              value={region || "N/A"}
+              onPress={() =>
+                region && region !== "N/A" && openWikipedia(region)
+              }
+            />
+          </View>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <DataCard
               label="Weather"
               value="Tap to view"
               onPress={() => setWeatherModalVisible(true)}
@@ -522,7 +541,7 @@ export default function InfoCountryScreen() {
         onClose={() => setWeatherModalVisible(false)}
         latitude={latNum}
         longitude={lonNum}
-        cityName={capital || countryName}
+        cityName={city || capital}
       />
     </>
   );

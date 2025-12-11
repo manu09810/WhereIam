@@ -1,19 +1,19 @@
+import { useEffect, useState } from "react";
 import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  ActivityIndicator,
-  ScrollView,
+    ActivityIndicator,
+    Modal,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { XMarkIcon } from "react-native-heroicons/solid";
-import { useEffect, useState } from "react";
 
 interface WeatherModalProps {
   visible: boolean;
   onClose: () => void;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   cityName: string;
 }
 
@@ -42,6 +42,11 @@ export const WeatherModal = ({
   }, [visible, latitude, longitude]);
 
   const fetchWeather = async () => {
+    if (latitude === null || longitude === null) {
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     try {
       const response = await fetch(
