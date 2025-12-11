@@ -12,8 +12,8 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { MapIcon } from "react-native-heroicons/outline";
+const UNSPLASH_ACCESS_KEY = "RwiSvq_81KR6uZGGbjxKiQn7zCF5-BokzPWajnLzsiA";
 export default function InfoCountryScreen() {
   const {
     countryData,
@@ -34,12 +34,6 @@ export default function InfoCountryScreen() {
   const [regionImage, setRegionImage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (countryData?.name?.common) {
-      fetchCountryImage(countryData.name.common);
-    }
-  }, [countryData]);
-
-  useEffect(() => {
     // Usa el código ISO 3166-1 alfa-2 (cca2) para la bandera
     if (countryData?.cca2) {
       // Puedes cambiar "flat" por "shiny" y "64" por otro tamaño si quieres
@@ -55,28 +49,6 @@ export default function InfoCountryScreen() {
     }
   }, [flagImage]);
 
-  useEffect(() => {
-    if (region) {
-      const fetchRegionImage = async () => {
-        try {
-          const response = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=query&titles=${region}&prop=pageimages&format=json&pithumbsize=500&origin=*`
-          );
-          const data = await response.json();
-          const pages = data.query.pages;
-          const page = Object.values(pages)[0];
-          if (page?.thumbnail?.source) {
-            setRegionImage(page.thumbnail.source);
-          } else {
-            setRegionImage(null);
-          }
-        } catch (error) {
-          setRegionImage(null);
-        }
-      };
-      fetchRegionImage();
-    }
-  }, [region]);
   // Fetch local time
   useEffect(() => {
     // Usar timezone de location si está disponible, si no el del país
@@ -88,22 +60,6 @@ export default function InfoCountryScreen() {
       fetchCurrentTime(timezone);
     }
   }, [countryData, locationTimezone]);
-
-  const fetchCountryImage = async (countryName) => {
-    try {
-      const response = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=query&titles=${countryName}&prop=pageimages&format=json&pithumbsize=500`
-      );
-      const data = await response.json();
-      const pages = data.query.pages;
-      const page = Object.values(pages)[0];
-      if (page?.thumbnail?.source) {
-        setBackgroundImage(page.thumbnail.source);
-      }
-    } catch (error) {
-      console.log("Error fetching background image:", error);
-    }
-  };
 
   const detectFlagColors = async (imageUrl: string) => {
     try {
@@ -194,6 +150,46 @@ export default function InfoCountryScreen() {
       console.log("Error opening Google Translate:", err)
     );
   };
+
+  // Helper function to fetch images from Unsplash
+  const fetchUnsplashImage = async (query: string) => {
+    try {
+      const response = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+          query
+        )}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`
+      );
+      const data = await response.json();
+      
+      // Log para debugging
+      console.log(`Unsplash response for "${query}":`, data);
+      
+      if (data.results && data.results.length > 0) {
+        return data.results[0].urls.regular;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching Unsplash image for "${query}":`, error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (countryData?.name?.common) {
+      fetchUnsplashImage(`${countryData.name.common} landscape`).then((img) =>
+        setBackgroundImage(img)
+      );
+    }
+  }, [countryData]);
+
+  useEffect(() => {
+    if (region) {
+      fetchUnsplashImage(`${region} landscape`).then((img) =>
+        setRegionImage(img)
+      );
+    }
+  }, [region]);
+
 
   if (isLoadingCountry) {
     return (
@@ -325,7 +321,7 @@ export default function InfoCountryScreen() {
             overflow: "hidden",
             backgroundColor: "#fff",
             borderTopEndRadius: 20,
-            marginBottom: 0, // Sin margen inferior
+            marginBottom: 0,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.08,
@@ -365,7 +361,6 @@ export default function InfoCountryScreen() {
           style={{
             height: 180,
             marginHorizontal: 12,
-           
             borderRadius: 16,
             overflow: "hidden",
             backgroundColor: "#f0f0f0",
