@@ -3,14 +3,16 @@ import { WeatherModal } from "@/components/WeatherModal";
 import { useLocation } from "@/context/LocationContext";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    Linking,
-    Pressable,
-    ScrollView,
-    Text,
-    View,
+  ActivityIndicator,
+  Image,
+  Linking,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  Text,
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function InfoCountryScreen() {
   const {
@@ -213,17 +215,19 @@ export default function InfoCountryScreen() {
     ? (countryData.population / 1000000).toFixed(1)
     : "N/A";
   const capital = countryData.capital?.[0] || "N/A";
-  
+
   // Usar las coordenadas GPS del usuario si están disponibles, si no, usar las del país
   // Las coordenadas del usuario son mucho más precisas que las del centro del país
   const latlngArr = Array.isArray(countryData.latlng) ? countryData.latlng : [];
-  const countryLatitude = typeof latlngArr[0] === "number" ? latlngArr[0] : null;
-  const countryLongitude = typeof latlngArr[1] === "number" ? latlngArr[1] : null;
-  
+  const countryLatitude =
+    typeof latlngArr[0] === "number" ? latlngArr[0] : null;
+  const countryLongitude =
+    typeof latlngArr[1] === "number" ? latlngArr[1] : null;
+
   // Priorizar coordenadas GPS del usuario sobre las del país
   const latNum = userLatitude !== null ? userLatitude : countryLatitude;
   const lonNum = userLongitude !== null ? userLongitude : countryLongitude;
-  
+
   // Para mostrar en la UI
   const latitude = latNum !== null ? latNum.toFixed(6) : "N/A";
   const longitude = lonNum !== null ? lonNum.toFixed(6) : "N/A";
@@ -271,9 +275,10 @@ export default function InfoCountryScreen() {
   );
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
+      <StatusBar hidden />
       <ScrollView
-        style={{ flex: 1, backgroundColor: "#fafafa" }}
+        style={{ flex: 1 }}
         scrollEventThrottle={16}
       >
         {/* Background Image with Opacity */}
@@ -286,7 +291,7 @@ export default function InfoCountryScreen() {
               left: 0,
               right: 0,
               bottom: 0,
-              opacity: 0.08,
+              opacity: 0.68,
               zIndex: -1,
             }}
             blurRadius={3}
@@ -296,11 +301,11 @@ export default function InfoCountryScreen() {
         {/* Parallax Header with Flag */}
         <View
           style={{
-            height: 280,
+            height: 250,
             overflow: "hidden",
             backgroundColor: "#fff",
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
+            borderTopEndRadius: 20,
+
             marginBottom: 24,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
@@ -543,6 +548,6 @@ export default function InfoCountryScreen() {
         longitude={lonNum}
         cityName={city || capital}
       />
-    </>
+    </View>
   );
 }
