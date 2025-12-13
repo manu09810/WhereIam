@@ -308,24 +308,6 @@ export default function InfoCountryScreen() {
           />
         )}
 
-        {/* Nombre del país */}
-        <View
-          style={{ paddingHorizontal: 12, marginTop: 18, marginBottom: 12 }}
-        >
-          <Text
-            style={{
-              fontSize: 36,
-              fontWeight: "700",
-              color: "#1a1a1a",
-              marginBottom: 8,
-              letterSpacing: -0.5,
-              textAlign: "center",
-            }}
-          >
-            {countryName}
-          </Text>
-        </View>
-
         {/* Mapa con imagen de región */}
         <View
           style={{
@@ -367,6 +349,24 @@ export default function InfoCountryScreen() {
               <MapIcon color="#1a1a1a" size={64} />
             )}
           </Pressable>
+        </View>
+        
+        {/* Nombre del país */}
+        <View
+          style={{ paddingHorizontal: 12, marginTop: 18, marginBottom: 12 }}
+        >
+          <Text
+            style={{
+              fontSize: 36,
+              fontWeight: "700",
+              color: "#1a1a1a",
+              marginBottom: 8,
+              letterSpacing: -0.5,
+              textAlign: "center",
+            }}
+          >
+            {countryName}
+          </Text>
         </View>
 
         {/* Bandera */}
