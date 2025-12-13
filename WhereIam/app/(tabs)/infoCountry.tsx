@@ -3,6 +3,7 @@ import { useLocation } from "@/context/LocationContext";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   Image,
   Linking,
   Pressable,
@@ -287,268 +288,265 @@ export default function InfoCountryScreen() {
     </Pressable>
   );
 
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fafafa" }}>
-      <StatusBar hidden />
-      <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
-        {/* Background Image with Opacity */}
-        {backgroundImage && (
-          <Image
-            source={{ uri: backgroundImage }}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              opacity: 0.88,
-              zIndex: -1,
-            }}
-            blurRadius={3}
-          />
-        )}
+  const { width, height } = Dimensions.get("window");
 
-        {/* Mapa con imagen de región */}
-        <View
+  return (
+    <View style={{ flex: 1 }}>
+      {/* Background Image fuera del SafeAreaView */}
+      {backgroundImage && (
+        <Image
+          source={{ uri: backgroundImage }}
           style={{
-            height: 180,
-            marginHorizontal: 12,
-            borderRadius: 16,
-            overflow: "hidden",
-            backgroundColor: "#f0f0f0",
-            borderWidth: 1,
-            borderColor: "#1a1a1a",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 16,
+            position: "absolute",
+            width,
+            height,
+            top: 0,
+            left: 0,
+            opacity: 0.88,
+            zIndex: -1,
           }}
-        >
-          <Pressable
-            onPress={() => {
-              if (latNum !== null && lonNum !== null) {
-                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`;
-                Linking.openURL(mapsUrl).catch((err) =>
-                  console.log("Error opening Google Maps:", err)
-                );
-              }
-            }}
+          blurRadius={3}
+        />
+      )}
+
+      <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
+        <StatusBar hidden />
+        <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
+          {/* Mapa con imagen de región */}
+          <View
             style={{
-              width: "100%",
-              height: "100%",
+              height: 180,
+              marginHorizontal: 12,
+              borderRadius: 16,
+              overflow: "hidden",
+              backgroundColor: "#f0f0f0",
+              borderWidth: 1,
+              borderColor: "#1a1a1a",
               alignItems: "center",
               justifyContent: "center",
-            }}
-          >
-            {regionImage ? (
-              <Image
-                source={{ uri: regionImage }}
-                style={{ width: "100%", height: "100%" }}
-                resizeMode="cover"
-              />
-            ) : (
-              <MapIcon color="#1a1a1a" size={64} />
-            )}
-          </Pressable>
-        </View>
-        
-        {/* Nombre del país */}
-        <View
-          style={{ paddingHorizontal: 12, marginTop: 18, marginBottom: 12 }}
-        >
-          <Text
-            style={{
-              fontSize: 36,
-              fontWeight: "700",
-              color: "#1a1a1a",
               marginBottom: 8,
-              letterSpacing: -0.5,
-              textAlign: "center",
+              marginTop: 16,
             }}
           >
-            {countryName}
-          </Text>
-        </View>
-
-        {/* Bandera */}
-        <View
-          style={{
-            height: 250,
-            overflow: "hidden",
-            backgroundColor: "#fff",
-            borderRadius: 16,
-            marginHorizontal: 12,
-
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
-          {flagImage && (
-            <Image
-              source={{ uri: flagImage }}
+            <Pressable
+              onPress={() => {
+                if (latNum !== null && lonNum !== null) {
+                  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`;
+                  Linking.openURL(mapsUrl).catch((err) =>
+                    console.log("Error opening Google Maps:", err)
+                  );
+                }
+              }}
               style={{
                 width: "100%",
                 height: "100%",
-              }}
-            />
-          )}
-        </View>
-
-        <View style={{ paddingHorizontal: 12 }}>
-          {/* Country Name with Map */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 24,
-              marginLeft: 12,
-              marginRight: 12,
-            }}
-          ></View>
-
-          {/* Grid Data Cards */}
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "#fff",
-                borderRadius: 16,
-                padding: 10,
-                marginHorizontal: 6,
-                marginVertical: 12,
-                borderWidth: 1,
-                borderColor: "#1a1a1a",
                 alignItems: "center",
                 justifyContent: "center",
-                minHeight: 100,
               }}
             >
-              <Text
+              {regionImage ? (
+                <Image
+                  source={{ uri: regionImage }}
+                  style={{ width: "100%", height: "100%" }}
+                  resizeMode="cover"
+                />
+              ) : (
+                <MapIcon color="#1a1a1a" size={64} />
+              )}
+            </Pressable>
+          </View>
+
+          {/* Nombre del país */}
+          <View
+            style={{ paddingHorizontal: 12, marginTop: 12, marginBottom: 12 }}
+          >
+            <Text
+              style={{
+                fontSize: 36,
+                fontWeight: "700",
+                color: "#1a1a1a",
+                marginBottom: 8,
+                letterSpacing: -0.5,
+                textAlign: "center",
+              }}
+            >
+              {countryName}
+            </Text>
+          </View>
+
+          {/* Bandera */}
+          <View
+            style={{
+              height: 200,
+              overflow: "hidden",
+              backgroundColor: "#fff",
+              borderRadius: 16,
+              marginHorizontal: 12,
+
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              elevation: 3,
+            }}
+          >
+            {flagImage && (
+              <Image
+                source={{ uri: flagImage }}
                 style={{
-                  fontSize: 18,
-                  color: "#999",
-                  fontWeight: "600",
-                  marginBottom: 10,
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                  textAlign: "center",
-                }}
-              >
-                Local Time
-              </Text>
-              <Text
-                style={{
-                  fontSize: 54,
-                  color: "#1a1a1a",
-                  fontWeight: "bold",
-                  letterSpacing: 2,
-                  textAlign: "center",
-                }}
-              >
-                {currentTime ? currentTime : "Loading..."}
-              </Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard
-              label="Capital"
-              value={capital}
-              onPress={() => capital !== "N/A" && openWikipedia(capital)}
-            />
-            <DataCard label="Currency" value={currencies} onPress={undefined} />
-          </View>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard
-              label="Languages"
-              value={languages.length > 0 ? languages.join(", ") : "N/A"}
-              onPress={() =>
-                languages.length > 0 && openGoogleTranslate(languages[0])
-              }
-            />
-            <DataCard
-              label="Population"
-              value={`${population}M`}
-              onPress={undefined}
-            />
-          </View>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard
-              label="Continent"
-              value={continent}
-              onPress={() => continent !== "N/A" && openWikipedia(continent)}
-            />
-            <DataCard label="Timezone" value={timezone} onPress={undefined} />
-          </View>
-
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard
-              label="Latitude"
-              value={`${latitude}°`}
-              onPress={undefined}
-            />
-            <DataCard
-              label="Longitude"
-              value={`${longitude}°`}
-              onPress={undefined}
-            />
-          </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard
-              label="City"
-              value={city || "N/A"}
-              onPress={() => city && city !== "N/A" && openWikipedia(city)}
-            />
-            <DataCard
-              label="Region"
-              value={region || "N/A"}
-              onPress={() =>
-                region && region !== "N/A" && openWikipedia(region)
-              }
-            />
-          </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            <DataCard
-              label="Weather"
-              value="Tap to view"
-              onPress={() => setWeatherModalVisible(true)}
-            />
-          </View>
-        </View>
-
-        {/* Colores de la bandera detectados */}
-        {flagColors && (
-          <View style={{ flexDirection: "row", marginVertical: 8 }}>
-            {flagColors.map((color, idx) => (
-              <View
-                key={idx}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  backgroundColor: color,
-                  marginRight: 8,
-                  borderWidth: 1,
-                  borderColor: "#ccc",
+                  width: "100%",
+                  height: "100%",
                 }}
               />
-            ))}
+            )}
           </View>
-        )}
 
-        <View style={{ height: 20 }} />
-      </ScrollView>
-      {/* Weather Modal */}
-      <WeatherModal
-        visible={weatherModalVisible}
-        onClose={() => setWeatherModalVisible(false)}
-        latitude={latNum}
-        longitude={lonNum}
-        cityName={city || capital}
-      />
-    </SafeAreaView>
+          <View style={{ paddingHorizontal: 12 }}>
+            {/* Country Name with Map */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 24,
+                marginLeft: 12,
+                marginRight: 12,
+              }}
+            ></View>
+
+            {/* Grid Data Cards */}
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: "#fff",
+                  borderRadius: 16,
+                  padding: 10,
+                  marginHorizontal: 6,
+                  marginVertical: 12,
+                  borderWidth: 1,
+                  borderColor: "#1a1a1a",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: 100,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: "#999",
+                    fontWeight: "600",
+                    marginBottom: 10,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    textAlign: "center",
+                  }}
+                >
+                  Local Time
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 54,
+                    color: "#1a1a1a",
+                    fontWeight: "bold",
+                    letterSpacing: 2,
+                    textAlign: "center",
+                  }}
+                >
+                  {currentTime ? currentTime : "Loading..."}
+                </Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <DataCard
+                label="Capital"
+                value={capital}
+                onPress={() => capital !== "N/A" && openWikipedia(capital)}
+              />
+              <DataCard
+                label="Currency"
+                value={currencies}
+                onPress={undefined}
+              />
+            </View>
+
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <DataCard
+                label="Languages"
+                value={languages.length > 0 ? languages.join(", ") : "N/A"}
+                onPress={() =>
+                  languages.length > 0 && openGoogleTranslate(languages[0])
+                }
+              />
+              <DataCard
+                label="Population"
+                value={`${population}M`}
+                onPress={undefined}
+              />
+            </View>
+
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <DataCard
+                label="Continent"
+                value={continent}
+                onPress={() => continent !== "N/A" && openWikipedia(continent)}
+              />
+              <DataCard label="Timezone" value={timezone} onPress={undefined} />
+            </View>
+
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <DataCard
+                label="City"
+                value={city || "N/A"}
+                onPress={() => city && city !== "N/A" && openWikipedia(city)}
+              />
+              <DataCard
+                label="Region"
+                value={region || "N/A"}
+                onPress={() =>
+                  region && region !== "N/A" && openWikipedia(region)
+                }
+              />
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <DataCard
+                label="Weather"
+                value="Tap to view"
+                onPress={() => setWeatherModalVisible(true)}
+              />
+            </View>
+          </View>
+
+          {/* Colores de la bandera detectados */}
+          {flagColors && (
+            <View style={{ flexDirection: "row", marginVertical: 8 }}>
+              {flagColors.map((color, idx) => (
+                <View
+                  key={idx}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: color,
+                    marginRight: 8,
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                  }}
+                />
+              ))}
+            </View>
+          )}
+
+          <View style={{ height: 20 }} />
+        </ScrollView>
+        {/* Weather Modal */}
+        <WeatherModal
+          visible={weatherModalVisible}
+          onClose={() => setWeatherModalVisible(false)}
+          latitude={latNum}
+          longitude={lonNum}
+          cityName={city || capital}
+        />
+      </SafeAreaView>
+    </View>
   );
 }
