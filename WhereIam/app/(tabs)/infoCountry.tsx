@@ -160,10 +160,10 @@ export default function InfoCountryScreen() {
         )}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`
       );
       const data = await response.json();
-      
+
       // Log para debugging
       console.log(`Unsplash response for "${query}":`, data);
-      
+
       if (data.results && data.results.length > 0) {
         return data.results[0].urls.regular;
       }
@@ -189,7 +189,6 @@ export default function InfoCountryScreen() {
       );
     }
   }, [region]);
-
 
   if (isLoadingCountry) {
     return (
@@ -307,41 +306,17 @@ export default function InfoCountryScreen() {
               left: 0,
               right: 0,
               bottom: 0,
-              opacity: 0.68,
+              opacity: 0.88,
               zIndex: -1,
             }}
             blurRadius={3}
           />
         )}
 
-        {/* Parallax Header con Bandera */}
+        {/* Nombre del país */}
         <View
-          style={{
-            height: 250,
-            overflow: "hidden",
-            backgroundColor: "#fff",
-            borderTopEndRadius: 20,
-            marginBottom: 0,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
+          style={{ paddingHorizontal: 12, marginTop: 18, marginBottom: 12 }}
         >
-          {flagImage && (
-            <Image
-              source={{ uri: flagImage }}
-              style={{
-                width: "100%",
-                height: "100%",
-              }}
-            />
-          )}
-        </View>
-
-        {/* Nombre del país encima del mapa */}
-        <View style={{ paddingHorizontal: 12, marginTop: 18, marginBottom: 0 }}>
           <Text
             style={{
               fontSize: 36,
@@ -356,7 +331,7 @@ export default function InfoCountryScreen() {
           </Text>
         </View>
 
-        {/* Mapa ocupa todo el rectángulo debajo de la bandera */}
+        {/* Mapa con imagen de región */}
         <View
           style={{
             height: 180,
@@ -368,6 +343,7 @@ export default function InfoCountryScreen() {
             borderColor: "#1a1a1a",
             alignItems: "center",
             justifyContent: "center",
+            marginBottom: 16,
           }}
         >
           <Pressable
@@ -389,6 +365,33 @@ export default function InfoCountryScreen() {
               <MapIcon color="#1a1a1a" size={64} />
             )}
           </Pressable>
+        </View>
+
+        {/* Bandera */}
+        <View
+          style={{
+            height: 250,
+            overflow: "hidden",
+            backgroundColor: "#fff",
+            borderRadius: 16,
+            marginHorizontal: 12,
+    
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
+        >
+          {flagImage && (
+            <Image
+              source={{ uri: flagImage }}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+            />
+          )}
         </View>
 
         <View style={{ paddingHorizontal: 12 }}>
