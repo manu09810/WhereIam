@@ -1,4 +1,3 @@
-import { MapModal } from "@/components/MapCountry";
 import { WeatherModal } from "@/components/WeatherModal";
 import { useLocation } from "@/context/LocationContext";
 import { useEffect, useState } from "react";
@@ -13,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { MapIcon } from "react-native-heroicons/outline";
+import { SafeAreaView } from "react-native-safe-area-context";
 const UNSPLASH_ACCESS_KEY = "RwiSvq_81KR6uZGGbjxKiQn7zCF5-BokzPWajnLzsiA";
 export default function InfoCountryScreen() {
   const {
@@ -25,7 +25,7 @@ export default function InfoCountryScreen() {
     latitude: userLatitude,
     longitude: userLongitude,
   } = useLocation();
-  const [mapModalVisible, setMapModalVisible] = useState(false);
+
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [flagImage, setFlagImage] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export default function InfoCountryScreen() {
       countryData?.timezones?.find((tz) => tz.includes("/")) ||
       countryData?.timezones?.[0];
     if (timezone && timezone !== "N/A" && timezone.includes("/")) {
-      fetchCurrentTime(timezone);
+      CurrentTime(timezone);
     }
   }, [countryData, locationTimezone]);
 
@@ -88,20 +88,15 @@ export default function InfoCountryScreen() {
     }
   };
 
-  const fetchCurrentTime = async (tz: string) => {
+  const CurrentTime = (tz: string) => {
     try {
-      const response = await fetch(
-        `http://worldtimeapi.org/api/timezone/${tz}`
-      );
-      const data = await response.json();
-      if (data.datetime) {
-        const time = new Date(data.datetime).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        });
-        setCurrentTime(time);
-      }
+      const time = new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: tz, // tz es el timezone del país/región
+      });
+      setCurrentTime(time);
     } catch (error) {
       setCurrentTime(null);
       console.log("Error fetching time:", error);
@@ -293,7 +288,7 @@ export default function InfoCountryScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fafafa" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fafafa" }}>
       <StatusBar hidden />
       <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
         {/* Background Image with Opacity */}
@@ -347,7 +342,14 @@ export default function InfoCountryScreen() {
           }}
         >
           <Pressable
-            onPress={() => setMapModalVisible(true)}
+            onPress={() => {
+              if (latNum !== null && lonNum !== null) {
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`;
+                Linking.openURL(mapsUrl).catch((err) =>
+                  console.log("Error opening Google Maps:", err)
+                );
+              }
+            }}
             style={{
               width: "100%",
               height: "100%",
@@ -375,7 +377,7 @@ export default function InfoCountryScreen() {
             backgroundColor: "#fff",
             borderRadius: 16,
             marginHorizontal: 12,
-    
+
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.08,
@@ -539,16 +541,6 @@ export default function InfoCountryScreen() {
 
         <View style={{ height: 20 }} />
       </ScrollView>
-
-      {/* Map Modal */}
-      <MapModal
-        visible={mapModalVisible}
-        onClose={() => setMapModalVisible(false)}
-        latitude={latNum}
-        longitude={lonNum}
-        countryName={countryName}
-      />
-
       {/* Weather Modal */}
       <WeatherModal
         visible={weatherModalVisible}
@@ -557,6 +549,6 @@ export default function InfoCountryScreen() {
         longitude={lonNum}
         cityName={city || capital}
       />
-    </View>
+    </SafeAreaView>
   );
 }

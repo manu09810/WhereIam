@@ -26,7 +26,7 @@ export const useUserLocation = () => {
 
         console.log("Getting current position...");
         let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Highest,
+          accuracy: Location.Accuracy.Lowest,
         });
         console.log("Location obtained:", location.coords);
 
