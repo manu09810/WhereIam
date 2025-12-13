@@ -1,4 +1,5 @@
 import { WeatherModal } from "@/components/WeatherModal";
+import { CurrencyModal } from "@/components/CurrencyModal"; // Agrega esta línea
 import { useLocation } from "@/context/LocationContext";
 import { useEffect, useState } from "react";
 import {
@@ -27,7 +28,9 @@ export default function InfoCountryScreen() {
     longitude: userLongitude,
   } = useLocation();
 
+  const countryName = countryData?.name?.common || "N/A";
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
+  const [currencyModalVisible, setCurrencyModalVisible] = useState(false); // Nuevo estado
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [flagImage, setFlagImage] = useState<string | null>(null);
   const [flagColors, setFlagColors] = useState<string[] | null>(null);
@@ -180,7 +183,7 @@ export default function InfoCountryScreen() {
 
   useEffect(() => {
     if (region) {
-      fetchUnsplashImage(`${region} landscape`).then((img) =>
+      fetchUnsplashImage(`${region} ${countryName} landscape`).then((img) =>
         setRegionImage(img)
       );
     }
@@ -218,7 +221,6 @@ export default function InfoCountryScreen() {
     );
   }
 
-  const countryName = countryData.name?.common || "N/A";
   const currencies = countryData.currencies
     ? Object.values(countryData.currencies)[0]?.name
     : "N/A";
@@ -287,6 +289,11 @@ export default function InfoCountryScreen() {
       </Text>
     </Pressable>
   );
+
+  // Obtén el código de moneda (ej: "EUR", "ARS", etc)
+  const currencyCode = countryData.currencies
+    ? Object.keys(countryData.currencies)[0]
+    : null;
 
   const { width, height } = Dimensions.get("window");
 
@@ -465,7 +472,7 @@ export default function InfoCountryScreen() {
               <DataCard
                 label="Currency"
                 value={currencies}
-                onPress={undefined}
+                onPress={() => setCurrencyModalVisible(true)} // <-- Abre el modal al tocar currency
               />
             </View>
 
@@ -545,6 +552,12 @@ export default function InfoCountryScreen() {
           latitude={latNum}
           longitude={lonNum}
           cityName={city || capital}
+        />
+        {/* Currency Modal */}
+        <CurrencyModal
+          visible={currencyModalVisible}
+          onClose={() => setCurrencyModalVisible(false)}
+          currency={currencyCode}
         />
       </SafeAreaView>
     </View>
