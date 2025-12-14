@@ -172,8 +172,8 @@ export default function InfoCountryScreen() {
       return null;
     }
   };
-
-  useEffect(() => {
+/* 
+   useEffect(() => {
     if (countryData?.name?.common) {
       fetchUnsplashImage(`${countryData.name.common} landscape`).then((img) =>
         setBackgroundImage(img)
@@ -188,7 +188,7 @@ export default function InfoCountryScreen() {
       );
     }
   }, [region]);
-
+ */
   if (isLoadingCountry) {
     return (
       <View
