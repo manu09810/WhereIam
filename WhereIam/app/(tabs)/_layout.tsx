@@ -24,8 +24,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="infoCountry"
         options={{
-          title: "Info Country",
-          tabBarIcon: ({ color }) => <InformationCircleIcon size={28} color={color} />,
+          title: "Country Info",
+          tabBarIcon: ({ color }) => (
+            <InformationCircleIcon size={28} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -38,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="image"
         options={{
-          title: "Random Images",
+          title: "Landscapes",
           tabBarIcon: ({ color }) => <PhotoIcon size={28} color={color} />,
         }}
       />
