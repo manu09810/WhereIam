@@ -1,8 +1,10 @@
-import { ISO639_2_TO_1 } from "@/constants/languages";
+// @ts-ignore
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+// @ts-ignore
+const { iso6392 } = require("iso-639-2");
 
 export default function News() {
   const router = useRouter();
@@ -15,7 +17,10 @@ export default function News() {
       ? Object.keys(countryData.languages)[0]
       : "en";
 
-  const langCode = ISO639_2_TO_1[rawLangCode] || "en";
+  const langCode =
+    iso6392.find(
+      (l: any) => l.iso6392B === rawLangCode || l.iso6392T === rawLangCode
+    )?.iso6391 || "en";
 
   const countryName = countryData?.name?.common;
   const regionName = region;
@@ -26,7 +31,7 @@ export default function News() {
       <Text style={styles.header}>News Search</Text>
       <View style={styles.switchRow}>
         <Text style={styles.switchLabel}>
-          {localNews ? "Local News" : "English News"}
+          {localNews ? "Local News" : "International News"}
         </Text>
         <Switch
           value={localNews}
@@ -41,7 +46,7 @@ export default function News() {
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: `"${countryName || ''}"`,
+              query: `"${countryName || ""}"`,
               label: "Country",
               lang: localNews ? langCode : "en",
             },
@@ -55,7 +60,7 @@ export default function News() {
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: `"${regionName || ''}" ${countryName}`,
+              query: `"${regionName || ""}" ${countryName}`,
               label: "Region",
               lang: localNews ? langCode : "en",
             },
@@ -69,7 +74,7 @@ export default function News() {
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: `"${cityName || ''}" ${regionName || ''} ${countryName}`,
+              query: `"${cityName || ""}" ${regionName || ""} ${countryName}`,
               label: "City",
               lang: localNews ? langCode : "en",
             },
