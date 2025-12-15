@@ -30,6 +30,20 @@ export default function NewsDetail() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Set region and language for gl and hl
+  // Example: lang = 'es' → gl = 'uy', hl = 'es'
+  // You can pass more params if needed from News.tsx
+  // For now, try to infer from lang (for Spanish, use 'uy' as example)
+  const regionMap: Record<string, string> = {
+    es: "uy", // You can expand this map for more languages/regions
+    en: "us",
+    fr: "fr",
+    pt: "br",
+    // add more as needed
+  };
+  const gl = lang && regionMap[lang] ? regionMap[lang] : "us";
+  const hl = lang || "en";
+
   useEffect(() => {
     if (!query) return;
 
@@ -39,9 +53,11 @@ export default function NewsDetail() {
       try {
         // Use lang param for language restriction
         const lrParam = lang ? `&lr=lang_${lang}` : "";
+        const glParam = gl ? `&gl=${gl}` : "";
+        const hlParam = hl ? `&hl=${hl}` : "";
         const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${CX}&q=${encodeURIComponent(
           query + " news"
-        )}${lrParam}`;
+        )}${lrParam}${glParam}${hlParam}`;
         const res = await fetch(url);
         const data = await res.json();
         if (data.items && data.items.length > 0) {
@@ -64,7 +80,7 @@ export default function NewsDetail() {
     };
 
     fetchNews();
-  }, [query]);
+  }, [query, lang, gl, hl]);
 
   return (
     <View style={styles.container}>

@@ -10,9 +10,13 @@ export default function News() {
 
   // Try to get the country language code, fallback to 'en'
   const langCode =
-    countryData?.languages && Object.values(countryData.languages)[0]
-      ? Object.values(countryData.languages)[0].toString().slice(0, 2)
+    countryData?.languages && Object.keys(countryData.languages)[0]
+      ? Object.keys(countryData.languages)[0]
       : "en";
+
+  const countryName = countryData?.name?.common;
+  const regionName = region;
+  const cityName = city;
 
   return (
     <View style={styles.container}>
@@ -29,12 +33,12 @@ export default function News() {
       </View>
       <NewsButton
         label="Country News"
-        value={countryData?.name?.common}
+        value={countryName}
         onPress={() =>
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: countryData?.name?.common,
+              query: `"${countryName}"`,
               label: "Country",
               lang: localNews ? langCode : "en",
             },
@@ -42,28 +46,28 @@ export default function News() {
         }
       />
       <NewsButton
-        label="City News"
-        value={city}
+        label="Region News"
+        value={regionName}
         onPress={() =>
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: city,
-              label: "City",
+              query: `"${regionName}" ${countryName}`,
+              label: "Region",
               lang: localNews ? langCode : "en",
             },
           })
         }
       />
       <NewsButton
-        label="Region News"
-        value={region}
+        label="City News"
+        value={cityName}
         onPress={() =>
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: region,
-              label: "Region",
+              query: `"${cityName}" ${regionName} ${countryName}`,
+              label: "City",
               lang: localNews ? langCode : "en",
             },
           })
