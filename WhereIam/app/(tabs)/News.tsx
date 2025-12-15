@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from "react-native";
-import { useRouter } from "expo-router";
+import { ISO639_2_TO_1 } from "@/constants/languages";
 import { useLocation } from "@/context/LocationContext";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 
 export default function News() {
   const router = useRouter();
@@ -9,10 +10,12 @@ export default function News() {
   const [localNews, setLocalNews] = useState(false);
 
   // Try to get the country language code, fallback to 'en'
-  const langCode =
+  const rawLangCode =
     countryData?.languages && Object.keys(countryData.languages)[0]
       ? Object.keys(countryData.languages)[0]
       : "en";
+
+  const langCode = ISO639_2_TO_1[rawLangCode] || "en";
 
   const countryName = countryData?.name?.common;
   const regionName = region;
@@ -38,7 +41,7 @@ export default function News() {
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: `"${countryName}"`,
+              query: `"${countryName || ''}"`,
               label: "Country",
               lang: localNews ? langCode : "en",
             },
@@ -52,7 +55,7 @@ export default function News() {
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: `"${regionName}" ${countryName}`,
+              query: `"${regionName || ''}" ${countryName}`,
               label: "Region",
               lang: localNews ? langCode : "en",
             },
@@ -66,7 +69,7 @@ export default function News() {
           router.push({
             pathname: "/NewsDetail",
             params: {
-              query: `"${cityName}" ${regionName} ${countryName}`,
+              query: `"${cityName || ''}" ${regionName || ''} ${countryName}`,
               label: "City",
               lang: localNews ? langCode : "en",
             },
@@ -83,7 +86,7 @@ function NewsButton({
   onPress,
 }: {
   label: string;
-  value?: string;
+  value?: string | null;
   onPress: () => void;
 }) {
   if (!value) return null;
