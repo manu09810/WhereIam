@@ -1,38 +1,131 @@
-import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
-
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
-import { ScrollView, Text } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Switch } from "react-native";
+import { useRouter } from "expo-router";
 import { useLocation } from "@/context/LocationContext";
 
 export default function News() {
-  let value = useLocation();
+  const router = useRouter();
+  const { countryData, city, region } = useLocation();
+  const [localNews, setLocalNews] = useState(false);
+
+  // Try to get the country language code, fallback to 'en'
+  const langCode =
+    countryData?.languages && Object.values(countryData.languages)[0]
+      ? Object.values(countryData.languages)[0].toString().slice(0, 2)
+      : "en";
+
   return (
-    <ScrollView>
-      <Text>{`${value}`}</Text>
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.header}>News Search</Text>
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>
+          {localNews ? "Local News" : "English News"}
+        </Text>
+        <Switch
+          value={localNews}
+          onValueChange={setLocalNews}
+          thumbColor={localNews ? "#007aff" : "#ccc"}
+        />
+      </View>
+      <NewsButton
+        label="Country News"
+        value={countryData?.name?.common}
+        onPress={() =>
+          router.push({
+            pathname: "/NewsDetail",
+            params: {
+              query: countryData?.name?.common,
+              label: "Country",
+              lang: localNews ? langCode : "en",
+            },
+          })
+        }
+      />
+      <NewsButton
+        label="City News"
+        value={city}
+        onPress={() =>
+          router.push({
+            pathname: "/NewsDetail",
+            params: {
+              query: city,
+              label: "City",
+              lang: localNews ? langCode : "en",
+            },
+          })
+        }
+      />
+      <NewsButton
+        label="Region News"
+        value={region}
+        onPress={() =>
+          router.push({
+            pathname: "/NewsDetail",
+            params: {
+              query: region,
+              label: "Region",
+              lang: localNews ? langCode : "en",
+            },
+          })
+        }
+      />
+    </View>
+  );
+}
+
+function NewsButton({
+  label,
+  value,
+  onPress,
+}: {
+  label: string;
+  value?: string;
+  onPress: () => void;
+}) {
+  if (!value) return null;
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={styles.buttonText}>
+        {label}: {value}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 32,
+    textAlign: "center",
+  },
+  switchRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    marginBottom: 24,
+    justifyContent: "center",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  switchLabel: {
+    fontSize: 16,
+    marginRight: 12,
+    fontWeight: "500",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  button: {
+    backgroundColor: "#007aff",
+    padding: 18,
+    borderRadius: 10,
+    marginBottom: 18,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 17,
+    textAlign: "center",
   },
 });
