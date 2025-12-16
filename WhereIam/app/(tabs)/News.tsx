@@ -1,14 +1,20 @@
-// @ts-ignore
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 // @ts-ignore
 const { iso6392 } = require("iso-639-2");
 
 export default function News() {
   const router = useRouter();
-  const { countryData, city, region } = useLocation();
+  const { countryData, city, region, backgroundImage } = useLocation();
   const [localNews, setLocalNews] = useState(false);
 
   // Try to get the country language code, fallback to 'en'
@@ -28,59 +34,68 @@ export default function News() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>News Search</Text>
-      <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>
-          {localNews ? "Local News" : "International News"}
-        </Text>
-        <Switch
-          value={localNews}
-          onValueChange={setLocalNews}
-          thumbColor={localNews ? "#007aff" : "#ccc"}
+      {backgroundImage && (
+        <Image
+          source={{ uri: backgroundImage }}
+          style={StyleSheet.absoluteFillObject}
+          blurRadius={3}
+        />
+      )}
+      <View style={styles.content}>
+        <Text style={styles.header}>News Search</Text>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>
+            {localNews ? "Local News" : "International News"}
+          </Text>
+          <Switch
+            value={localNews}
+            onValueChange={setLocalNews}
+            thumbColor={localNews ? "#007aff" : "#ccc"}
+          />
+        </View>
+        <NewsButton
+          label="Country News"
+          value={countryName}
+          onPress={() =>
+            router.push({
+              pathname: "/NewsDetail",
+              params: {
+                query: `"${countryName || ""}"`,
+                label: "Country",
+                lang: localNews ? langCode : "en",
+              },
+            })
+          }
+        />
+        <NewsButton
+          label="Region News"
+          value={regionName}
+          onPress={() =>
+            router.push({
+              pathname: "/NewsDetail",
+              params: {
+                query: `"${regionName || ""}" ${countryName}`,
+                label: "Region",
+                lang: localNews ? langCode : "en",
+              },
+            })
+          }
+        />
+        <NewsButton
+          label="City News"
+          value={cityName}
+          onPress={() =>
+            router.push({
+              pathname: "/NewsDetail",
+              params: {
+                query: `"${cityName || ""}" ${regionName || ""} ${countryName}`,
+                label: "City",
+                lang: localNews ? langCode : "en",
+              },
+            })
+          }
         />
       </View>
-      <NewsButton
-        label="Country News"
-        value={countryName}
-        onPress={() =>
-          router.push({
-            pathname: "/NewsDetail",
-            params: {
-              query: `"${countryName || ""}"`,
-              label: "Country",
-              lang: localNews ? langCode : "en",
-            },
-          })
-        }
-      />
-      <NewsButton
-        label="Region News"
-        value={regionName}
-        onPress={() =>
-          router.push({
-            pathname: "/NewsDetail",
-            params: {
-              query: `"${regionName || ""}" ${countryName}`,
-              label: "Region",
-              lang: localNews ? langCode : "en",
-            },
-          })
-        }
-      />
-      <NewsButton
-        label="City News"
-        value={cityName}
-        onPress={() =>
-          router.push({
-            pathname: "/NewsDetail",
-            params: {
-              query: `"${cityName || ""}" ${regionName || ""} ${countryName}`,
-              label: "City",
-              lang: localNews ? langCode : "en",
-            },
-          })
-        }
-      />
     </View>
   );
 }
@@ -107,9 +122,12 @@ function NewsButton({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  content: {
+    flex: 1,
     padding: 24,
     justifyContent: "center",
-    backgroundColor: "#fff",
   },
   header: {
     fontSize: 22,

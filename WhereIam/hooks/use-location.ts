@@ -14,47 +14,32 @@ export const useUserLocation = () => {
   useEffect(() => {
     (async () => {
       try {
-        console.log("Requesting location permissions...");
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        console.log("Permission status:", status);
-
+        const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setLocationError("Permission to access location was denied");
           setIsLoadingLocation(false);
           return;
         }
 
-        console.log("Getting current position...");
-        let location = await Location.getCurrentPositionAsync({
+        const loc = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Lowest,
         });
-        console.log("Location obtained:", location.coords);
 
-        // Guardar las coordenadas GPS
-        setLatitude(location.coords.latitude);
-        setLongitude(location.coords.longitude);
+        setLatitude(loc.coords.latitude);
+        setLongitude(loc.coords.longitude);
 
-        // Evita múltiples llamadas seguidas al reverseGeocode
-        // Solo ejecuta si no hay datos previos
-        if (!isoCountryCode && !city && !region && !timezone) {
-          // Espera 1 segundo antes de hacer reverseGeocode para evitar rate limit
-          await new Promise((res) => setTimeout(res, 1000));
+        const [rev] = await Location.reverseGeocodeAsync({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        });
 
-          let reverseGeocode = await Location.reverseGeocodeAsync({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          });
-          console.log("Reverse geocode result:", reverseGeocode[0]);
-
-          setIsoCountryCode(reverseGeocode[0]?.isoCountryCode || null);
-          setCity(reverseGeocode[0]?.city || null);
-          setRegion(reverseGeocode[0]?.region || null);
-          setTimezone(reverseGeocode[0]?.timezone || null);
-        }
-        setIsLoadingLocation(false);
-      } catch (error) {
-        console.error("Location error:", error);
-        setLocationError(`Error getting location: ${error}`);
+        setIsoCountryCode(rev?.isoCountryCode ?? null);
+        setCity(rev?.city ?? rev?.district ?? null);
+        setRegion(rev?.region ?? rev?.subregion ?? null);
+        setTimezone(rev?.timezone ?? null);
+      } catch (error: any) {
+        setLocationError(error?.message || "Error getting location");
+      } finally {
         setIsLoadingLocation(false);
       }
     })();

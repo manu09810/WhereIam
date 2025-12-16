@@ -3,21 +3,74 @@ import { WeatherModal } from "@/components/WeatherModal";
 import { useLocation } from "@/context/LocationContext";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Dimensions,
-    Image,
-    Linking,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    Text,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Linking,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  Text,
+  View,
 } from "react-native";
 import { MapIcon } from "react-native-heroicons/outline";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const { width, height } = Dimensions.get("window");
 
-const UNSPLASH_ACCESS_KEY = process.env.EXPO_PUBLIC_UNSPLASH_ACCESS_KEY;
+function DataCard({
+  label,
+  value,
+  onPress,
+}: {
+  label: string;
+  value: string | null | undefined;
+  onPress?: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        flex: 1,
+        backgroundColor: "#fff",
+        borderRadius: 16,
+        padding: 10,
+        marginHorizontal: 6,
+        marginVertical: 12,
+        borderWidth: 1,
+        borderColor: "#1a1a1a",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 100,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 18,
+          color: "#999",
+          fontWeight: "600",
+          marginBottom: 10,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+          textAlign: "center",
+        }}
+      >
+        {label}
+      </Text>
+      <Text
+        style={{
+          fontSize: 16,
+          color: "#1a1a1a",
+          fontWeight: "700",
+          textAlign: "center",
+        }}
+      >
+        {value ?? "N/A"}
+      </Text>
+    </Pressable>
+  );
+}
+
 export default function InfoCountryScreen() {
   const {
     countryData,
@@ -28,21 +81,20 @@ export default function InfoCountryScreen() {
     region,
     latitude: userLatitude,
     longitude: userLongitude,
+    backgroundImage,
+    regionImage,
   } = useLocation();
 
   const countryName = countryData?.name?.common || "N/A";
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
-  const [currencyModalVisible, setCurrencyModalVisible] = useState(false); // Nuevo estado
-  const [backgroundImage, setBackgroundImage] = useState(null);
+  const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
   const [flagImage, setFlagImage] = useState<string | null>(null);
   const [flagColors, setFlagColors] = useState<string[] | null>(null);
   const [currentTime, setCurrentTime] = useState<string | null>(null);
-  const [regionImage, setRegionImage] = useState<string | null>(null);
 
+  // Usa el código ISO 3166-1 alfa-2 (cca2) para la bandera
   useEffect(() => {
-    // Usa el código ISO 3166-1 alfa-2 (cca2) para la bandera
     if (countryData?.cca2) {
-      // Puedes cambiar "flat" por "shiny" y "64" por otro tamaño si quieres
       setFlagImage(
         `https://flagcdn.com/w2560/${countryData.cca2.toLowerCase()}.png`
       );
@@ -57,7 +109,6 @@ export default function InfoCountryScreen() {
 
   // Fetch local time
   useEffect(() => {
-    // Usar timezone de location si está disponible, si no el del país
     const timezone =
       locationTimezone ||
       countryData?.timezones?.find((tz) => tz.includes("/")) ||
@@ -129,7 +180,7 @@ export default function InfoCountryScreen() {
 
   const openGoogleTranslate = (languageCode: string): void => {
     // Obtener el código de idioma ISO 639-1 de los datos del país (idioma origen)
-    const sourceLangCode = countryData.languages
+    const sourceLangCode = countryData?.languages
       ? Object.keys(countryData.languages)[0]
       : "en";
 
@@ -144,164 +195,62 @@ export default function InfoCountryScreen() {
 
     // Usar el nombre del país como texto de ejemplo
     const sampleText = countryName || "hello";
-    const translateUrl = `https://translate.google.com/?sl=${sourceLangCode}&tl=${targetLangCode}
-    )}`;
+    const translateUrl = `https://translate.google.com/?sl=${sourceLangCode}&tl=${targetLangCode})}`;
 
     Linking.openURL(translateUrl).catch((err: Error) =>
       console.log("Error opening Google Translate:", err)
     );
   };
 
-  // Helper function to fetch images from Unsplash
-  const fetchUnsplashImage = async (query: string) => {
-    try {
-      const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
-          query
-        )}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`
-      );
-      const data = await response.json();
-
-      // Log para debugging
-      console.log(`Unsplash response for "${query}":`, data);
-
-      if (data.results && data.results.length > 0) {
-        return data.results[0].urls.regular;
-      }
-      return null;
-    } catch (error) {
-      console.error(`Error fetching Unsplash image for "${query}":`, error);
-      return null;
-    }
-  };
-  /* 
-   useEffect(() => {
-    if (countryData?.name?.common) {
-      fetchUnsplashImage(`${countryData.name.common} landscape`).then((img) =>
-        setBackgroundImage(img)
-      );
-    }
-  }, [countryData]);
-
-  useEffect(() => {
-    if (region) {
-      fetchUnsplashImage(`${region} ${countryName} landscape`).then((img) =>
-        setRegionImage(img)
-      );
-    }
-  }, [region]);
- */
-  if (isLoadingCountry) {
+  // --- guards después de hooks ---
+  if (isLoadingCountry || !countryData) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#fafafa",
-        }}
-      >
-        <ActivityIndicator size="large" color="#1a1a1a" />
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator />
       </View>
     );
   }
 
-  if (countryError || !countryData) {
+  if (countryError) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#fafafa",
-        }}
-      >
-        <Text style={{ color: "#666", fontSize: 16 }}>
-          Unable to load country data
-        </Text>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>{countryError}</Text>
       </View>
     );
   }
 
-  const currencies = countryData.currencies
+  const currencies = countryData?.currencies
     ? Object.values(countryData.currencies)[0]?.name
     : "N/A";
-  const languages = countryData.languages
+  const languages = countryData?.languages
     ? Object.values(countryData.languages).slice(0, 2)
     : [];
-  const population = countryData.population
+  const population = countryData?.population
     ? (countryData.population / 1000000).toFixed(1)
     : "N/A";
-  const capital = countryData.capital?.[0] || "N/A";
+  const capital = countryData?.capital?.[0] || "N/A";
 
-  // Usar las coordenadas GPS del usuario si están disponibles, si no, usar las del país
-  // Las coordenadas del usuario son mucho más precisas que las del centro del país
-  const latlngArr = Array.isArray(countryData.latlng) ? countryData.latlng : [];
+  const continent = countryData.continents?.[0] || "N/A";
+  const timezone = countryData.timezones?.[0] || "N/A";
+  const currencyCode = countryData.currencies
+    ? Object.keys(countryData.currencies)[0]
+    : null;
+
+  const latlngArr = Array.isArray(countryData?.latlng)
+    ? countryData.latlng
+    : [];
   const countryLatitude =
     typeof latlngArr[0] === "number" ? latlngArr[0] : null;
   const countryLongitude =
     typeof latlngArr[1] === "number" ? latlngArr[1] : null;
 
-  // Priorizar coordenadas GPS del usuario sobre las del país
   const latNum = userLatitude !== null ? userLatitude : countryLatitude;
   const lonNum = userLongitude !== null ? userLongitude : countryLongitude;
 
-  // Para mostrar en la UI
-  const latitude = latNum !== null ? latNum.toFixed(6) : "N/A";
-  const longitude = lonNum !== null ? lonNum.toFixed(6) : "N/A";
-  const continent = countryData.continents?.[0] || "N/A";
-  const timezone = countryData.timezones?.[0] || "N/A";
-
-  const DataCard = ({ label, value, onPress }) => (
-    <Pressable
-      onPress={onPress}
-      style={{
-        flex: 1,
-        backgroundColor: "#fff",
-        borderRadius: 12,
-        padding: 16,
-        marginHorizontal: 6,
-        marginVertical: 8,
-        justifyContent: "center",
-        borderWidth: 1,
-        borderColor: "#1a1a1a",
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 11,
-          color: "#999",
-          fontWeight: "600",
-          marginBottom: 8,
-          textTransform: "uppercase",
-          letterSpacing: 0.5,
-        }}
-      >
-        {label}
-      </Text>
-      <Text
-        style={{
-          fontSize: 16,
-          color: "#1a1a1a",
-          fontWeight: "700",
-        }}
-        numberOfLines={2}
-      >
-        {value}
-      </Text>
-    </Pressable>
-  );
-
-  // Obtén el código de moneda (ej: "EUR", "ARS", etc)
-  const currencyCode = countryData.currencies
-    ? Object.keys(countryData.currencies)[0]
-    : null;
-
-  const { width, height } = Dimensions.get("window");
+  const mapImage = regionImage || backgroundImage;
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Background Image fuera del SafeAreaView */}
       {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
@@ -353,9 +302,9 @@ export default function InfoCountryScreen() {
                 justifyContent: "center",
               }}
             >
-              {regionImage ? (
+              {mapImage ? (
                 <Image
-                  source={{ uri: regionImage }}
+                  source={{ uri: mapImage }}
                   style={{ width: "100%", height: "100%" }}
                   resizeMode="cover"
                 />
@@ -411,18 +360,7 @@ export default function InfoCountryScreen() {
           </View>
 
           <View style={{ paddingHorizontal: 12 }}>
-            {/* Country Name with Map */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 24,
-                marginLeft: 12,
-                marginRight: 12,
-              }}
-            ></View>
-
-            {/* Grid Data Cards */}
+            {/* Local Time */}
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <View
                 style={{
@@ -465,6 +403,7 @@ export default function InfoCountryScreen() {
                 </Text>
               </View>
             </View>
+
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <DataCard
                 label="Capital"

@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    ActivityIndicator,
-    Linking,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { useLocation } from "@/context/LocationContext";
 
 type NewsResult = {
   title: string;
@@ -29,6 +30,10 @@ export default function NewsDetail() {
     label?: string;
     lang?: string;
   }>();
+  const { backgroundImage, regionImage } = useLocation();
+  const bgToUse =
+    label === "Country" ? backgroundImage : regionImage || backgroundImage;
+
   const [results, setResults] = useState<NewsResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,9 +47,11 @@ export default function NewsDetail() {
       setError(null);
       try {
         const lrParam = lang ? `&lr=lang_${lang}` : "";
-        const url = `https://www.googleapis.com/customsearch/v1?key=${process.env.EXPO_PUBLIC_GOOGLE_API_KEY}&cx=${process.env.EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(
-          query + " news"
-        )}${lrParam}`;
+        const url = `https://www.googleapis.com/customsearch/v1?key=${
+          process.env.EXPO_PUBLIC_GOOGLE_API_KEY
+        }&cx=${
+          process.env.EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID
+        }&q=${encodeURIComponent(query + " news")}${lrParam}`;
         const res = await fetch(url);
         const data = await res.json();
         if (data.items && data.items.length > 0) {
@@ -71,6 +78,13 @@ export default function NewsDetail() {
 
   return (
     <View style={styles.container}>
+      {bgToUse && (
+        <Image
+          source={{ uri: bgToUse }}
+          style={StyleSheet.absoluteFillObject}
+          blurRadius={3}
+        />
+      )}
       <TouchableOpacity onPress={() => router.back()}>
         <Text style={styles.backButton}>← Back</Text>
       </TouchableOpacity>
