@@ -8,15 +8,6 @@
     "scheme": "whereiam",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "extra": {
-      "EXPO_PUBLIC_RESTCOUNTRIES_API": "https://restcountries.com/v3.1/alpha",
-      "EXPO_PUBLIC_OPENMETEO_API": "https://api.open-meteo.com/v1/forecast",
-      "EXPO_PUBLIC_EXCHANGERATE_API": "https://api.exchangerate.host/convert",
-      "EXPO_PUBLIC_EXCHANGERATE_API_KEY": "73deba80b9041807c660fcc359e6653c",
-      "EXPO_PUBLIC_UNSPLASH_ACCESS_KEY": "RwiSvq_81KR6uZGGbjxKiQn7zCF5-BokzPWajnLzsiA",
-      "EXPO_PUBLIC_GOOGLE_API_KEY": "AIzaSyDlpFwCSN9f5rqGN80dayH7inYyq5MmlaI",
-      "EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID": "c66d69282c23145de"
-    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {

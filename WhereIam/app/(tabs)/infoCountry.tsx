@@ -1,21 +1,23 @@
+import { CurrencyModal } from "@/components/CurrencyModal";
 import { WeatherModal } from "@/components/WeatherModal";
-import { CurrencyModal } from "@/components/CurrencyModal"; // Agrega esta línea
 import { useLocation } from "@/context/LocationContext";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Dimensions,
-  Image,
-  Linking,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  Text,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    Image,
+    Linking,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    Text,
+    View,
 } from "react-native";
 import { MapIcon } from "react-native-heroicons/outline";
 import { SafeAreaView } from "react-native-safe-area-context";
-const UNSPLASH_ACCESS_KEY = "RwiSvq_81KR6uZGGbjxKiQn7zCF5-BokzPWajnLzsiA";
+
+
+const UNSPLASH_ACCESS_KEY = process.env.EXPO_PUBLIC_UNSPLASH_ACCESS_KEY;
 export default function InfoCountryScreen() {
   const {
     countryData,
@@ -172,7 +174,7 @@ export default function InfoCountryScreen() {
       return null;
     }
   };
-/* 
+  /* 
    useEffect(() => {
     if (countryData?.name?.common) {
       fetchUnsplashImage(`${countryData.name.common} landscape`).then((img) =>

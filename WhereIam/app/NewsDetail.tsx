@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from "react";
-import Constants from "expo-constants";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-} from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 
-const { EXPO_PUBLIC_GOOGLE_API_KEY, EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID } =
-  Constants.expoConfig?.extra || {};
+import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+    ActivityIndicator,
+    Linking,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 type NewsResult = {
+  title: string;
+  snippet: string;
+  link: string;
+};
+
+type GoogleSearchItem = {
   title: string;
   snippet: string;
   link: string;
@@ -39,14 +42,14 @@ export default function NewsDetail() {
       setError(null);
       try {
         const lrParam = lang ? `&lr=lang_${lang}` : "";
-        const url = `https://www.googleapis.com/customsearch/v1?key=${EXPO_PUBLIC_GOOGLE_API_KEY}&cx=${EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(
+        const url = `https://www.googleapis.com/customsearch/v1?key=${process.env.EXPO_PUBLIC_GOOGLE_API_KEY}&cx=${process.env.EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(
           query + " news"
         )}${lrParam}`;
         const res = await fetch(url);
         const data = await res.json();
         if (data.items && data.items.length > 0) {
           setResults(
-            data.items.map((item: any) => ({
+            data.items.map((item: GoogleSearchItem) => ({
               title: item.title,
               snippet: item.snippet,
               link: item.link,
@@ -64,7 +67,7 @@ export default function NewsDetail() {
     };
 
     fetchNews();
-  }, [query]);
+  }, [query, lang]);
 
   return (
     <View style={styles.container}>
@@ -76,20 +79,25 @@ export default function NewsDetail() {
       </Text>
       {loading && <ActivityIndicator />}
       {error && <Text style={styles.error}>{error}</Text>}
-      <ScrollView>
-        {results.map((item, idx) => (
-          <TouchableOpacity
-            key={idx}
-            onPress={() => Linking.openURL(item.link)}
-          >
-            <View style={styles.resultContainer}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.snippet}>{item.snippet}</Text>
-              <Text style={styles.link}>{item.link}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      {!loading && !error && results.length === 0 && (
+        <Text style={styles.emptyState}>No results available</Text>
+      )}
+      {results.length > 0 && (
+        <ScrollView>
+          {results.map((item, idx) => (
+            <TouchableOpacity
+              key={idx}
+              onPress={() => Linking.openURL(item.link)}
+            >
+              <View style={styles.resultContainer}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.snippet}>{item.snippet}</Text>
+                <Text style={styles.link}>{item.link}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -115,6 +123,11 @@ const styles = StyleSheet.create({
     color: "red",
     marginBottom: 12,
     textAlign: "center",
+  },
+  emptyState: {
+    textAlign: "center",
+    color: "#999",
+    marginTop: 20,
   },
   resultContainer: {
     marginBottom: 18,
