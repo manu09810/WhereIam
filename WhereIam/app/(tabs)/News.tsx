@@ -17,7 +17,6 @@ export default function News() {
   const { countryData, city, region, backgroundImage } = useLocation();
   const [localNews, setLocalNews] = useState(false);
 
-  // Try to get the country language code, fallback to 'en'
   const rawLangCode =
     countryData?.languages && Object.keys(countryData.languages)[0]
       ? Object.keys(countryData.languages)[0]
@@ -31,6 +30,12 @@ export default function News() {
   const countryName = countryData?.name?.common;
   const regionName = region;
   const cityName = city;
+
+  // Check if City and Region are the same
+  const isCityRegionSame =
+    cityName &&
+    regionName &&
+    cityName.toLowerCase() === regionName.toLowerCase();
 
   return (
     <View style={styles.container}>
@@ -67,34 +72,55 @@ export default function News() {
             })
           }
         />
-        <NewsButton
-          label="Region News"
-          value={regionName}
-          onPress={() =>
-            router.push({
-              pathname: "/NewsDetail",
-              params: {
-                query: `"${regionName || ""}" ${countryName}`,
-                label: "Region",
-                lang: localNews ? langCode : "en",
-              },
-            })
-          }
-        />
-        <NewsButton
-          label="City News"
-          value={cityName}
-          onPress={() =>
-            router.push({
-              pathname: "/NewsDetail",
-              params: {
-                query: `"${cityName || ""}" ${regionName || ""} ${countryName}`,
-                label: "City",
-                lang: localNews ? langCode : "en",
-              },
-            })
-          }
-        />
+        {isCityRegionSame ? (
+          <NewsButton
+            label="Region / City News"
+            value={regionName}
+            onPress={() =>
+              router.push({
+                pathname: "/NewsDetail",
+                params: {
+                  query: `"${regionName || ""}" ${countryName}`,
+                  label: "Region / City",
+                  lang: localNews ? langCode : "en",
+                },
+              })
+            }
+          />
+        ) : (
+          <>
+            <NewsButton
+              label="Region News"
+              value={regionName}
+              onPress={() =>
+                router.push({
+                  pathname: "/NewsDetail",
+                  params: {
+                    query: `"${regionName || ""}" ${countryName}`,
+                    label: "Region",
+                    lang: localNews ? langCode : "en",
+                  },
+                })
+              }
+            />
+            <NewsButton
+              label="City News"
+              value={cityName}
+              onPress={() =>
+                router.push({
+                  pathname: "/NewsDetail",
+                  params: {
+                    query: `"${cityName || ""}" ${
+                      regionName || ""
+                    } ${countryName}`,
+                    label: "City",
+                    lang: localNews ? langCode : "en",
+                  },
+                })
+              }
+            />
+          </>
+        )}
       </View>
     </View>
   );
