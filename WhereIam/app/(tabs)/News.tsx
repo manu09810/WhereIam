@@ -73,20 +73,23 @@ export default function News() {
           }
         />
         {isCityRegionSame ? (
-          <NewsButton
-            label="Region / City News"
-            value={regionName}
+          <TouchableOpacity
+            style={[styles.button, styles.largeButton]}
             onPress={() =>
               router.push({
                 pathname: "/NewsDetail",
                 params: {
                   query: `"${regionName || ""}" ${countryName}`,
-                  label: "Region / City",
+                  label: "City / Region",
                   lang: localNews ? langCode : "en",
                 },
               })
             }
-          />
+          >
+            <Text style={styles.buttonText}>
+              City / Region News: {regionName}
+            </Text>
+          </TouchableOpacity>
         ) : (
           <>
             <NewsButton
@@ -177,6 +180,9 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 10,
     marginBottom: 18,
+  },
+  largeButton: {
+    padding: 28,
   },
   buttonText: {
     color: "#fff",

@@ -1,6 +1,7 @@
 import { CurrencyModal } from "@/components/CurrencyModal";
 import { WeatherModal } from "@/components/WeatherModal";
 import { useLocation } from "@/context/LocationContext";
+
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -249,6 +250,9 @@ export default function InfoCountryScreen() {
 
   const mapImage = regionImage || backgroundImage;
 
+  const isCityRegionSame =
+    city && region && city.toLowerCase() === region.toLowerCase();
+
   return (
     <View style={{ flex: 1 }}>
       {backgroundImage && (
@@ -359,51 +363,51 @@ export default function InfoCountryScreen() {
             )}
           </View>
 
-          <View style={{ paddingHorizontal: 12 }}>
-            {/* Local Time */}
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              <View
+          {/* Local Time */}
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#fff",
+                borderRadius: 16,
+                padding: 10,
+                marginHorizontal: 6,
+                marginVertical: 12,
+                borderWidth: 1,
+                borderColor: "#1a1a1a",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 100,
+              }}
+            >
+              <Text
                 style={{
-                  flex: 1,
-                  backgroundColor: "#fff",
-                  borderRadius: 16,
-                  padding: 10,
-                  marginHorizontal: 6,
-                  marginVertical: 12,
-                  borderWidth: 1,
-                  borderColor: "#1a1a1a",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minHeight: 100,
+                  fontSize: 18,
+                  color: "#999",
+                  fontWeight: "600",
+                  marginBottom: 10,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  textAlign: "center",
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    color: "#999",
-                    fontWeight: "600",
-                    marginBottom: 10,
-                    textTransform: "uppercase",
-                    letterSpacing: 1,
-                    textAlign: "center",
-                  }}
-                >
-                  Local Time
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 54,
-                    color: "#1a1a1a",
-                    fontWeight: "bold",
-                    letterSpacing: 2,
-                    textAlign: "center",
-                  }}
-                >
-                  {currentTime ? currentTime : "Loading..."}
-                </Text>
-              </View>
+                Local Time
+              </Text>
+              <Text
+                style={{
+                  fontSize: 54,
+                  color: "#1a1a1a",
+                  fontWeight: "bold",
+                  letterSpacing: 2,
+                  textAlign: "center",
+                }}
+              >
+                {currentTime ? currentTime : "Loading..."}
+              </Text>
             </View>
+          </View>
 
+          <View style={{ paddingHorizontal: 12 }}>
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <DataCard
                 label="Capital"
@@ -413,7 +417,7 @@ export default function InfoCountryScreen() {
               <DataCard
                 label="Currency"
                 value={currencies}
-                onPress={() => setCurrencyModalVisible(true)} // <-- Abre el modal al tocar currency
+                onPress={() => setCurrencyModalVisible(true)}
               />
             </View>
 
@@ -441,20 +445,29 @@ export default function InfoCountryScreen() {
               <DataCard label="Timezone" value={timezone} onPress={undefined} />
             </View>
 
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {isCityRegionSame ? (
               <DataCard
-                label="City"
-                value={city || "N/A"}
+                label="City / Region"
+                value={city}
                 onPress={() => city && city !== "N/A" && openWikipedia(city)}
               />
-              <DataCard
-                label="Region"
-                value={region || "N/A"}
-                onPress={() =>
-                  region && region !== "N/A" && openWikipedia(region)
-                }
-              />
-            </View>
+            ) : (
+              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                <DataCard
+                  label="City"
+                  value={city || "N/A"}
+                  onPress={() => city && city !== "N/A" && openWikipedia(city)}
+                />
+                <DataCard
+                  label="Region"
+                  value={region || "N/A"}
+                  onPress={() =>
+                    region && region !== "N/A" && openWikipedia(region)
+                  }
+                />
+              </View>
+            )}
+
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <DataCard
                 label="Weather"
@@ -486,7 +499,7 @@ export default function InfoCountryScreen() {
 
           <View style={{ height: 20 }} />
         </ScrollView>
-        {/* Weather Modal */}
+
         <WeatherModal
           visible={weatherModalVisible}
           onClose={() => setWeatherModalVisible(false)}
@@ -494,7 +507,6 @@ export default function InfoCountryScreen() {
           longitude={lonNum}
           cityName={city || capital}
         />
-        {/* Currency Modal */}
         <CurrencyModal
           visible={currencyModalVisible}
           onClose={() => setCurrencyModalVisible(false)}
