@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export const useCountry = (isoCountryCode: string | null) => {
-  const [countryData, setCountryData] = useState(null);
+  const [countryData, setCountryData] = useState<any | null>(null);
   const [isLoadingCountry, setIsLoadingCountry] = useState(true);
   const [countryError, setCountryError] = useState("");
 

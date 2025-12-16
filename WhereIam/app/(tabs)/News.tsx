@@ -1,38 +1,193 @@
-import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
-
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
-import { ScrollView, Text } from "react-native";
 import { useLocation } from "@/context/LocationContext";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  Image,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+// @ts-ignore
+const { iso6392 } = require("iso-639-2");
 
 export default function News() {
-  let value = useLocation();
+  const router = useRouter();
+  const { countryData, city, region, backgroundImage } = useLocation();
+  const [localNews, setLocalNews] = useState(false);
+
+  const rawLangCode =
+    countryData?.languages && Object.keys(countryData.languages)[0]
+      ? Object.keys(countryData.languages)[0]
+      : "en";
+
+  const langCode =
+    iso6392.find(
+      (l: any) => l.iso6392B === rawLangCode || l.iso6392T === rawLangCode
+    )?.iso6391 || "en";
+
+  const countryName = countryData?.name?.common;
+  const regionName = region;
+  const cityName = city;
+
+  // Check if City and Region are the same
+  const isCityRegionSame =
+    cityName &&
+    regionName &&
+    cityName.toLowerCase() === regionName.toLowerCase();
+
   return (
-    <ScrollView>
-      <Text>{`${value}`}</Text>
-    </ScrollView>
+    <View style={styles.container}>
+      {backgroundImage && (
+        <Image
+          source={{ uri: backgroundImage }}
+          style={StyleSheet.absoluteFillObject}
+          blurRadius={3}
+        />
+      )}
+      <View style={styles.content}>
+        <Text style={styles.header}>News Search</Text>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>
+            {localNews ? "Local News" : "International News"}
+          </Text>
+          <Switch
+            value={localNews}
+            onValueChange={setLocalNews}
+            thumbColor={localNews ? "#007aff" : "#ccc"}
+          />
+        </View>
+        <NewsButton
+          label="Country News"
+          value={countryName}
+          onPress={() =>
+            router.push({
+              pathname: "/NewsDetail",
+              params: {
+                query: `"${countryName || ""}"`,
+                label: "Country",
+                lang: localNews ? langCode : "en",
+              },
+            })
+          }
+        />
+        {isCityRegionSame ? (
+          <TouchableOpacity
+            style={[styles.button, styles.largeButton]}
+            onPress={() =>
+              router.push({
+                pathname: "/NewsDetail",
+                params: {
+                  query: `"${regionName || ""}" ${countryName}`,
+                  label: "City / Region",
+                  lang: localNews ? langCode : "en",
+                },
+              })
+            }
+          >
+            <Text style={styles.buttonText}>
+              City / Region News: {regionName}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <NewsButton
+              label="Region News"
+              value={regionName}
+              onPress={() =>
+                router.push({
+                  pathname: "/NewsDetail",
+                  params: {
+                    query: `"${regionName || ""}" ${countryName}`,
+                    label: "Region",
+                    lang: localNews ? langCode : "en",
+                  },
+                })
+              }
+            />
+            <NewsButton
+              label="City News"
+              value={cityName}
+              onPress={() =>
+                router.push({
+                  pathname: "/NewsDetail",
+                  params: {
+                    query: `"${cityName || ""}" ${
+                      regionName || ""
+                    } ${countryName}`,
+                    label: "City",
+                    lang: localNews ? langCode : "en",
+                  },
+                })
+              }
+            />
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+
+function NewsButton({
+  label,
+  value,
+  onPress,
+}: {
+  label: string;
+  value?: string | null;
+  onPress: () => void;
+}) {
+  if (!value) return null;
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={styles.buttonText}>
+        {label}: {value}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  content: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 32,
+    textAlign: "center",
+  },
+  switchRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    marginBottom: 24,
+    justifyContent: "center",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  switchLabel: {
+    fontSize: 16,
+    marginRight: 12,
+    fontWeight: "500",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  button: {
+    backgroundColor: "#007aff",
+    padding: 18,
+    borderRadius: 10,
+    marginBottom: 18,
+  },
+  largeButton: {
+    padding: 28,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 17,
+    textAlign: "center",
   },
 });

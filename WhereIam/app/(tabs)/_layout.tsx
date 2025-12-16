@@ -31,14 +31,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="news"
+        name="News"
         options={{
           title: "Local News",
           tabBarIcon: ({ color }) => <NewspaperIcon size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="image"
+        name="Image"
         options={{
           title: "Landscapes",
           tabBarIcon: ({ color }) => <PhotoIcon size={28} color={color} />,
