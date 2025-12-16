@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Constants from "expo-constants";
 import {
   View,
   Text,
@@ -10,8 +11,8 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-const GOOGLE_API_KEY = "AIzaSyDlpFwCSN9f5rqGN80dayH7inYyq5MmlaI";
-const CX = "c66d69282c23145de"; // Your Custom Search Engine ID
+const { EXPO_PUBLIC_GOOGLE_API_KEY, EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID } =
+  Constants.expoConfig?.extra || {};
 
 type NewsResult = {
   title: string;
@@ -37,9 +38,8 @@ export default function NewsDetail() {
       setLoading(true);
       setError(null);
       try {
-        // Use lang param for language restriction
         const lrParam = lang ? `&lr=lang_${lang}` : "";
-        const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${CX}&q=${encodeURIComponent(
+        const url = `https://www.googleapis.com/customsearch/v1?key=${EXPO_PUBLIC_GOOGLE_API_KEY}&cx=${EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(
           query + " news"
         )}${lrParam}`;
         const res = await fetch(url);

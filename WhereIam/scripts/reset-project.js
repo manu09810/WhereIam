@@ -6,6 +6,8 @@
  * You can remove the `reset-project` script from package.json and safely delete this file after running it.
  */
 
+import Constants from "expo-constants";
+
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
@@ -44,6 +46,15 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
+
+// Access environment variables
+const restCountriesApi = Constants.manifest.extra.EXPO_PUBLIC_RESTCOUNTRIES_API;
+const openMeteoApi = Constants.manifest.extra.EXPO_PUBLIC_OPENMETEO_API;
+const exchangeRateApi = Constants.manifest.extra.EXPO_PUBLIC_EXCHANGERATE_API;
+const exchangeRateApiKey = Constants.manifest.extra.EXPO_PUBLIC_EXCHANGERATE_API_KEY;
+const unsplashAccessKey = Constants.manifest.extra.EXPO_PUBLIC_UNSPLASH_ACCESS_KEY;
+const googleApiKey = Constants.manifest.extra.EXPO_PUBLIC_GOOGLE_API_KEY;
+const googleSearchEngineId = Constants.manifest.extra.EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID;
 
 const moveDirectories = async (userInput) => {
   try {
