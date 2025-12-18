@@ -2,6 +2,7 @@ import { CurrencyModal } from "@/components/CurrencyModal";
 import { WeatherModal } from "@/components/WeatherModal";
 import { useLocation } from "@/context/LocationContext";
 
+import ImageColors from "react-native-image-colors";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -23,23 +24,25 @@ function DataCard({
   label,
   value,
   onPress,
+  accentColor = "#007aff",
 }: {
   label: string;
   value: string | null | undefined;
   onPress?: () => void;
+  accentColor?: string;
 }) {
   return (
     <Pressable
       onPress={onPress}
       style={{
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: accentColor,
         borderRadius: 16,
         padding: 10,
         marginHorizontal: 6,
         marginVertical: 12,
         borderWidth: 1,
-        borderColor: "#1a1a1a",
+        borderColor: accentColor,
         alignItems: "center",
         justifyContent: "center",
         minHeight: 100,
@@ -48,7 +51,7 @@ function DataCard({
       <Text
         style={{
           fontSize: 18,
-          color: "#999",
+          color: "#ffffffcc",
           fontWeight: "600",
           marginBottom: 10,
           textTransform: "uppercase",
@@ -61,7 +64,7 @@ function DataCard({
       <Text
         style={{
           fontSize: 16,
-          color: "#1a1a1a",
+          color: "#fff",
           fontWeight: "700",
           textAlign: "center",
         }}
@@ -250,6 +253,8 @@ export default function InfoCountryScreen() {
 
   const mapImage = regionImage || backgroundImage;
 
+  const accentColor = flagColors?.[0] || "#007aff";
+  const accentColorHour = flagColors?.[1] || "#007aff";
   const isCityRegionSame =
     city && region && city.toLowerCase() === region.toLowerCase();
 
@@ -368,13 +373,13 @@ export default function InfoCountryScreen() {
             <View
               style={{
                 flex: 1,
-                backgroundColor: "#fff",
+                backgroundColor: accentColorHour,
                 borderRadius: 16,
                 padding: 10,
                 marginHorizontal: 6,
                 marginVertical: 12,
                 borderWidth: 1,
-                borderColor: "#1a1a1a",
+                borderColor: accentColorHour,
                 alignItems: "center",
                 justifyContent: "center",
                 minHeight: 100,
@@ -413,11 +418,13 @@ export default function InfoCountryScreen() {
                 label="Capital"
                 value={capital}
                 onPress={() => capital !== "N/A" && openWikipedia(capital)}
+                accentColor={accentColor}
               />
               <DataCard
                 label="Currency"
                 value={currencies}
                 onPress={() => setCurrencyModalVisible(true)}
+                accentColor={accentColor}
               />
             </View>
 
@@ -428,11 +435,13 @@ export default function InfoCountryScreen() {
                 onPress={() =>
                   languages.length > 0 && openGoogleTranslate(languages[0])
                 }
+                accentColor={accentColor}
               />
               <DataCard
                 label="Population"
                 value={`${population}M`}
                 onPress={undefined}
+                accentColor={accentColor}
               />
             </View>
 
@@ -441,8 +450,14 @@ export default function InfoCountryScreen() {
                 label="Continent"
                 value={continent}
                 onPress={() => continent !== "N/A" && openWikipedia(continent)}
+                accentColor={accentColor}
               />
-              <DataCard label="Timezone" value={timezone} onPress={undefined} />
+              <DataCard
+                label="Timezone"
+                value={timezone}
+                onPress={undefined}
+                accentColor={accentColor}
+              />
             </View>
 
             {isCityRegionSame ? (
@@ -450,6 +465,7 @@ export default function InfoCountryScreen() {
                 label="City / Region"
                 value={city}
                 onPress={() => city && city !== "N/A" && openWikipedia(city)}
+                accentColor={accentColor}
               />
             ) : (
               <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -457,6 +473,7 @@ export default function InfoCountryScreen() {
                   label="City"
                   value={city || "N/A"}
                   onPress={() => city && city !== "N/A" && openWikipedia(city)}
+                  accentColor={accentColor}
                 />
                 <DataCard
                   label="Region"
@@ -464,6 +481,7 @@ export default function InfoCountryScreen() {
                   onPress={() =>
                     region && region !== "N/A" && openWikipedia(region)
                   }
+                  accentColor={accentColor}
                 />
               </View>
             )}
@@ -473,6 +491,7 @@ export default function InfoCountryScreen() {
                 label="Weather"
                 value="Tap to view"
                 onPress={() => setWeatherModalVisible(true)}
+                accentColor={accentColor}
               />
             </View>
           </View>
