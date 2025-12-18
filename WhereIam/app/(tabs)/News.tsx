@@ -72,37 +72,15 @@ export default function News() {
         />
       )}
       <View style={styles.content}>
-        {/* Título como DataCard */}
-        <View
-          style={{
-            backgroundColor: primary,
-            borderRadius: 16,
-            padding: 20,
-            marginHorizontal: 12,
-            marginBottom: 24,
-            borderWidth: 1,
-            borderColor: primary,
-            alignItems: "center",
-            justifyContent: "center",
-            minHeight: 100,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 28,
-              fontWeight: "700",
-              color: buttonText,
-              letterSpacing: -0.5,
-              textAlign: "center",
-            }}
-          >
+        {/* Title (not a DataCard) */}
+        <View style={styles.titleWrapper}>
+          <Text style={[styles.titleMain, { color: primary }]}>
             News Search
           </Text>
+          <Text style={[styles.titleSub, { color: buttonText }]}>
+            Search local or international news
+          </Text>
+          <View style={[styles.titleAccent, { backgroundColor: primary }]} />
         </View>
 
         <View style={styles.switchRow}>
@@ -119,6 +97,7 @@ export default function News() {
             onValueChange={setLocalNews}
             thumbColor={thumbOn}
             trackColor={{ false: "#ccc", true: trackOn }}
+            style={{ flexShrink: 0 }}
           />
         </View>
         <NewsButton
@@ -238,11 +217,28 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: "center",
   },
-  header: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 32,
+  titleWrapper: {
+    alignItems: "center",
+    marginBottom: 18,
+    paddingHorizontal: 6,
+  },
+  titleMain: {
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: -0.5,
     textAlign: "center",
+  },
+  titleSub: {
+    fontSize: 13,
+    marginTop: 6,
+    opacity: 0.9,
+    textAlign: "center",
+  },
+  titleAccent: {
+    height: 6,
+    width: 96,
+    borderRadius: 3,
+    marginTop: 12,
   },
   switchRow: {
     flexDirection: "row",

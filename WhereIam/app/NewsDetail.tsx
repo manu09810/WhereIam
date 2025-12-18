@@ -25,15 +25,41 @@ type GoogleSearchItem = {
   link: string;
 };
 
+const getReadableTextColor = (hex: string) => {
+  if (!hex || hex.length < 7) return "#111";
+  const r = parseInt(hex.substr(1, 2), 16) / 255;
+  const g = parseInt(hex.substr(3, 2), 16) / 255;
+  const b = parseInt(hex.substr(5, 2), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.55 ? "#111111" : "#ffffff";
+};
+
+// Añadir helper para acortar links
+const shortenLink = (url: string, max = 60) => {
+  if (!url) return "";
+  if (url.length <= max) return url;
+  const headLen = Math.ceil(max * 0.6);
+  const tailLen = max - headLen;
+  return `${url.slice(0, headLen)}...${url.slice(-tailLen)}`;
+};
+
 export default function NewsDetail() {
   const { query, label, lang } = useLocalSearchParams<{
     query?: string;
     label?: string;
     lang?: string;
   }>();
-  const { backgroundImage, regionImage } = useLocation();
+  const { backgroundImage, regionImage, themeColors, averageColor } =
+    useLocation();
   const bgToUse =
     label === "Country" ? backgroundImage : regionImage || backgroundImage;
+
+  const primary = themeColors?.[0] || averageColor || "#007aff";
+  const titleColor = primary;
+  const pageBg = averageColor || "#fff";
+  const cardBg = themeColors?.[3] || "#f2f2f2";
+  const cardText = getReadableTextColor(cardBg);
+  const textOnPrimary = getReadableTextColor(primary);
 
   const [results, setResults] = useState<NewsResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +104,7 @@ export default function NewsDetail() {
   }, [query, lang]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: pageBg }]}>
       {bgToUse && (
         <Image
           source={{ uri: bgToUse }}
@@ -87,27 +113,67 @@ export default function NewsDetail() {
         />
       )}
       <TouchableOpacity onPress={() => router.back()}>
-        <Text style={styles.backButton}>← Back</Text>
+        <Text style={[styles.backButton, { color: primary }]}>← Back</Text>
       </TouchableOpacity>
-      <Text style={styles.header}>
-        {label} News{query ? `: ${query}` : ""}
-      </Text>
-      {loading && <ActivityIndicator />}
-      {error && <Text style={styles.error}>{error}</Text>}
+
+      {/* Título estético (no DataCard) */}
+      <View style={styles.titleWrapper}>
+        <Text
+          style={[
+            styles.header,
+            {
+              color: titleColor,
+              textShadowColor: `${primary}22`,
+              textShadowRadius: 6,
+              textShadowOffset: { width: 0, height: 2 },
+            },
+          ]}
+        >
+          {label} News
+        </Text>
+        {query ? (
+          <Text
+            style={[styles.subHeader, { color: getReadableTextColor(pageBg) }]}
+          >
+            {query}
+          </Text>
+        ) : null}
+        <View style={[styles.titleAccent, { backgroundColor: primary }]} />
+      </View>
+
+      {loading && <ActivityIndicator color={primary} />}
+      {error && <Text style={[styles.error, { color: primary }]}>{error}</Text>}
       {!loading && !error && results.length === 0 && (
-        <Text style={styles.emptyState}>No results available</Text>
+        <Text style={[styles.emptyState, { color: cardText }]}>
+          No results available
+        </Text>
       )}
       {results.length > 0 && (
-        <ScrollView>
+        <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
           {results.map((item, idx) => (
             <TouchableOpacity
               key={idx}
               onPress={() => Linking.openURL(item.link)}
             >
-              <View style={styles.resultContainer}>
-                <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.snippet}>{item.snippet}</Text>
-                <Text style={styles.link}>{item.link}</Text>
+              <View
+                style={[
+                  styles.resultContainer,
+                  { backgroundColor: cardBg, borderColor: `${primary}40` },
+                ]}
+              >
+                <Text style={[styles.title, { color: cardText }]}>
+                  {item.title}
+                </Text>
+                <Text style={[styles.snippet, { color: cardText }]}>
+                  {item.snippet}
+                </Text>
+                <Text
+                  style={[styles.link, { color: primary }]}
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                >
+                  {shortenLink(item.link, 60)}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -116,7 +182,6 @@ export default function NewsDetail() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -124,15 +189,33 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   backButton: {
-    color: "#007aff",
     fontSize: 16,
     marginBottom: 10,
+    paddingVertical: 4,
+  },
+  titleWrapper: {
+    alignItems: "center",
+    marginBottom: 18,
+    paddingHorizontal: 6,
   },
   header: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 18,
+    fontSize: 26,
+    fontWeight: "800",
     textAlign: "center",
+    letterSpacing: -0.5,
+  },
+  subHeader: {
+    fontSize: 13,
+    marginTop: 6,
+    opacity: 0.85,
+    textAlign: "center",
+  },
+  titleAccent: {
+    height: 6,
+    width: 96,
+    borderRadius: 3,
+    marginTop: 12,
+    opacity: 0.95,
   },
   error: {
     color: "red",
@@ -145,22 +228,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   resultContainer: {
+    marginHorizontal: 6,
     marginBottom: 18,
-    backgroundColor: "#f2f2f2",
     borderRadius: 8,
     padding: 12,
+    borderWidth: 1,
   },
   title: {
-    fontWeight: "bold",
+    fontWeight: "700",
     fontSize: 15,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   snippet: {
     fontSize: 14,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   link: {
-    color: "#007aff",
     fontSize: 12,
+    textDecorationLine: "underline",
   },
 });
