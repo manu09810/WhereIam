@@ -26,7 +26,7 @@ export default function TabLayout() {
   const [tabBorderColor, setTabBorderColor] = useState("#dddddd");
 
   useEffect(() => {
-    const bg = averageColor || themeColors?.[0] || "#f7f7f7";
+    const bg = (themeColors && themeColors[1]) || averageColor || "#f7f7f7";
     const icon = getReadableTextColor(bg);
 
     setTabBarBackground(bg);
