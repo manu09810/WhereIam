@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useLocation } from "@/context/LocationContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type NewsResult = {
   title: string;
@@ -77,7 +78,7 @@ export default function NewsDetail() {
   }, [query, lang]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {bgToUse && (
         <Image
           source={{ uri: bgToUse }}
@@ -112,7 +113,7 @@ export default function NewsDetail() {
           ))}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 

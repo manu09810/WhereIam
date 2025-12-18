@@ -9,13 +9,35 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 // @ts-ignore
 const { iso6392 } = require("iso-639-2");
 
+const getReadableTextColor = (hex: string) => {
+  if (!hex || hex.length < 7) return "#111";
+  const r = parseInt(hex.substr(1, 2), 16) / 255;
+  const g = parseInt(hex.substr(3, 2), 16) / 255;
+  const b = parseInt(hex.substr(5, 2), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.55 ? "#111111" : "#ffffff";
+};
+
 export default function News() {
   const router = useRouter();
-  const { countryData, city, region, backgroundImage } = useLocation();
+  const {
+    countryData,
+    city,
+    region,
+    backgroundImage,
+    themeColors,
+    averageColor,
+  } = useLocation();
   const [localNews, setLocalNews] = useState(false);
+
+  const primary = themeColors?.[0] || averageColor || "#007aff";
+  const buttonText = getReadableTextColor(primary);
+  const thumbOn = primary;
+  const trackOn = `${primary}66`;
 
   const rawLangCode =
     countryData?.languages && Object.keys(countryData.languages)[0]
@@ -38,7 +60,9 @@ export default function News() {
     cityName.toLowerCase() === regionName.toLowerCase();
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: averageColor || "#fff" }]}
+    >
       {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
@@ -47,15 +71,16 @@ export default function News() {
         />
       )}
       <View style={styles.content}>
-        <Text style={styles.header}>News Search</Text>
+        <Text style={[styles.header, { color: buttonText }]}>News Search</Text>
         <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>
+          <Text style={[styles.switchLabel, { color: buttonText }]}>
             {localNews ? "Local News" : "International News"}
           </Text>
           <Switch
             value={localNews}
             onValueChange={setLocalNews}
-            thumbColor={localNews ? "#007aff" : "#ccc"}
+            thumbColor={thumbOn}
+            trackColor={{ false: "#ccc", true: trackOn }}
           />
         </View>
         <NewsButton
@@ -71,10 +96,16 @@ export default function News() {
               },
             })
           }
+          accentColor={primary}
+          textColor={buttonText}
         />
         {isCityRegionSame ? (
           <TouchableOpacity
-            style={[styles.button, styles.largeButton]}
+            style={[
+              styles.button,
+              styles.largeButton,
+              { backgroundColor: primary },
+            ]}
             onPress={() =>
               router.push({
                 pathname: "/NewsDetail",
@@ -86,7 +117,7 @@ export default function News() {
               })
             }
           >
-            <Text style={styles.buttonText}>
+            <Text style={[styles.buttonText, { color: buttonText }]}>
               City / Region News: {regionName}
             </Text>
           </TouchableOpacity>
@@ -105,6 +136,8 @@ export default function News() {
                   },
                 })
               }
+              accentColor={primary}
+              textColor={buttonText}
             />
             <NewsButton
               label="City News"
@@ -121,11 +154,13 @@ export default function News() {
                   },
                 })
               }
+              accentColor={primary}
+              textColor={buttonText}
             />
           </>
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -133,15 +168,22 @@ function NewsButton({
   label,
   value,
   onPress,
+  accentColor = "#007aff",
+  textColor = "#fff",
 }: {
   label: string;
   value?: string | null;
   onPress: () => void;
+  accentColor?: string;
+  textColor?: string;
 }) {
   if (!value) return null;
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
-      <Text style={styles.buttonText}>
+    <TouchableOpacity
+      style={[styles.button, { backgroundColor: accentColor }]}
+      onPress={onPress}
+    >
+      <Text style={[styles.buttonText, { color: textColor }]}>
         {label}: {value}
       </Text>
     </TouchableOpacity>
@@ -186,8 +228,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "bold",
-    fontSize: 17,
+    fontWeight: "700",
     textAlign: "center",
+    fontSize: 17,
   },
 });
