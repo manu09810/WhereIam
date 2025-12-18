@@ -2,7 +2,6 @@ import { CurrencyModal } from "@/components/CurrencyModal";
 import { WeatherModal } from "@/components/WeatherModal";
 import { useLocation } from "@/context/LocationContext";
 
-import ImageColors from "react-native-image-colors";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -25,11 +24,13 @@ function DataCard({
   value,
   onPress,
   accentColor = "#007aff",
+  textColor,
 }: {
   label: string;
   value: string | null | undefined;
   onPress?: () => void;
   accentColor?: string;
+  textColor?: string;
 }) {
   return (
     <Pressable
@@ -64,7 +65,7 @@ function DataCard({
       <Text
         style={{
           fontSize: 16,
-          color: "#fff",
+          color: textColor || "#fff",
           fontWeight: "700",
           textAlign: "center",
         }}
@@ -74,7 +75,6 @@ function DataCard({
     </Pressable>
   );
 }
-
 export default function InfoCountryScreen() {
   const {
     countryData,
@@ -87,29 +87,14 @@ export default function InfoCountryScreen() {
     longitude: userLongitude,
     backgroundImage,
     regionImage,
+    flagImage,
+    flagColors,
   } = useLocation();
 
   const countryName = countryData?.name?.common || "N/A";
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
   const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
-  const [flagImage, setFlagImage] = useState<string | null>(null);
-  const [flagColors, setFlagColors] = useState<string[] | null>(null);
   const [currentTime, setCurrentTime] = useState<string | null>(null);
-
-  // Usa el código ISO 3166-1 alfa-2 (cca2) para la bandera
-  useEffect(() => {
-    if (countryData?.cca2) {
-      setFlagImage(
-        `https://flagcdn.com/w2560/${countryData.cca2.toLowerCase()}.png`
-      );
-    }
-  }, [countryData?.cca2]);
-
-  useEffect(() => {
-    if (flagImage) {
-      detectFlagColors(flagImage);
-    }
-  }, [flagImage]);
 
   // Fetch local time
   useEffect(() => {
@@ -121,33 +106,6 @@ export default function InfoCountryScreen() {
       CurrentTime(timezone);
     }
   }, [countryData, locationTimezone]);
-
-  const detectFlagColors = async (imageUrl: string) => {
-    try {
-      const result = await ImageColors.getColors(imageUrl, {
-        fallback: "#ffffff",
-        cache: true,
-        key: imageUrl,
-      });
-      // El resultado puede variar según la plataforma
-      if (result.platform === "android") {
-        setFlagColors(
-          [result.dominant, result.average, result.vibrant].filter(Boolean)
-        );
-      } else if (result.platform === "ios") {
-        setFlagColors(
-          [
-            result.background,
-            result.primary,
-            result.secondary,
-            result.detail,
-          ].filter(Boolean)
-        );
-      }
-    } catch (e) {
-      setFlagColors(null);
-    }
-  };
 
   const CurrentTime = (tz: string) => {
     try {
@@ -255,8 +213,13 @@ export default function InfoCountryScreen() {
 
   const accentColor = flagColors?.[0] || "#007aff";
   const accentColorHour = flagColors?.[1] || "#007aff";
+  const accentColorText = flagColors?.[3] || "#fff";
   const isCityRegionSame =
     city && region && city.toLowerCase() === region.toLowerCase();
+
+  // Export these for use in other components
+  (global as any).flagAccentColor = accentColor;
+  (global as any).flagAccentColorHour = accentColorHour;
 
   return (
     <View style={{ flex: 1 }}>
@@ -331,7 +294,7 @@ export default function InfoCountryScreen() {
               style={{
                 fontSize: 36,
                 fontWeight: "700",
-                color: "#1a1a1a",
+                color: accentColor,
                 marginBottom: 8,
                 letterSpacing: -0.5,
                 textAlign: "center",
@@ -388,7 +351,7 @@ export default function InfoCountryScreen() {
               <Text
                 style={{
                   fontSize: 18,
-                  color: "#999",
+                  color: accentColor,
                   fontWeight: "600",
                   marginBottom: 10,
                   textTransform: "uppercase",
@@ -401,7 +364,7 @@ export default function InfoCountryScreen() {
               <Text
                 style={{
                   fontSize: 54,
-                  color: "#1a1a1a",
+                  color: accentColor,
                   fontWeight: "bold",
                   letterSpacing: 2,
                   textAlign: "center",
@@ -419,12 +382,14 @@ export default function InfoCountryScreen() {
                 value={capital}
                 onPress={() => capital !== "N/A" && openWikipedia(capital)}
                 accentColor={accentColor}
+                textColor={accentColorText}
               />
               <DataCard
                 label="Currency"
                 value={currencies}
                 onPress={() => setCurrencyModalVisible(true)}
                 accentColor={accentColor}
+                textColor={accentColorText}
               />
             </View>
 
@@ -436,12 +401,14 @@ export default function InfoCountryScreen() {
                   languages.length > 0 && openGoogleTranslate(languages[0])
                 }
                 accentColor={accentColor}
+                textColor={flagColors?.[3] || "#fff"}
               />
               <DataCard
                 label="Population"
                 value={`${population}M`}
                 onPress={undefined}
                 accentColor={accentColor}
+                textColor={flagColors?.[3] || "#fff"}
               />
             </View>
 
@@ -451,12 +418,14 @@ export default function InfoCountryScreen() {
                 value={continent}
                 onPress={() => continent !== "N/A" && openWikipedia(continent)}
                 accentColor={accentColor}
+                textColor={flagColors?.[3] || "#fff"}
               />
               <DataCard
                 label="Timezone"
                 value={timezone}
                 onPress={undefined}
                 accentColor={accentColor}
+                textColor={flagColors?.[3] || "#fff"}
               />
             </View>
 
@@ -466,6 +435,7 @@ export default function InfoCountryScreen() {
                 value={city}
                 onPress={() => city && city !== "N/A" && openWikipedia(city)}
                 accentColor={accentColor}
+                textColor={flagColors?.[3] || "#fff"}
               />
             ) : (
               <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -474,6 +444,7 @@ export default function InfoCountryScreen() {
                   value={city || "N/A"}
                   onPress={() => city && city !== "N/A" && openWikipedia(city)}
                   accentColor={accentColor}
+                  textColor={flagColors?.[3] || "#fff"}
                 />
                 <DataCard
                   label="Region"
@@ -482,6 +453,7 @@ export default function InfoCountryScreen() {
                     region && region !== "N/A" && openWikipedia(region)
                   }
                   accentColor={accentColor}
+                  textColor={flagColors?.[3] || "#fff"}
                 />
               </View>
             )}
@@ -492,6 +464,7 @@ export default function InfoCountryScreen() {
                 value="Tap to view"
                 onPress={() => setWeatherModalVisible(true)}
                 accentColor={accentColor}
+                textColor={flagColors?.[3] || "#fff"}
               />
             </View>
           </View>

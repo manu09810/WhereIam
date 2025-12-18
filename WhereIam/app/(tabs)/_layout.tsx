@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   InformationCircleIcon,
   NewspaperIcon,
@@ -7,16 +7,33 @@ import {
 } from "react-native-heroicons/solid";
 
 import { HapticTab } from "@/components/haptic-tab";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useLocation } from "@/context/LocationContext";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { flagColors } = useLocation();
+  const [tabIconColor, setTabIconColor] = useState("#0a7ea4");
+  const [tabBarBackground, setTabBarBackground] = useState("#ffffff");
+
+  useEffect(() => {
+    if (flagColors && flagColors.length >= 2) {
+      setTabBarBackground(flagColors[0]);
+      setTabIconColor(flagColors[1]);
+    }
+  }, [flagColors]);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: tabIconColor,
+        tabBarInactiveTintColor: tabIconColor,
+        tabBarStyle: {
+          backgroundColor: tabBarBackground,
+          height: 70,
+          paddingBottom: 8,
+          paddingTop: 8,
+          borderTopWidth: 1,
+          borderTopColor: `${tabBarBackground}40`,
+        },
         headerShown: false,
         tabBarButton: HapticTab,
       }}
