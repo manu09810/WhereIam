@@ -19,18 +19,98 @@ interface LocationContextType {
   backgroundImage: string | null;
   regionImage: string | null;
   flagImage: string | null;
-  flagColors: string[] | null;
+  themeColors: string[] | null;
+  averageColor: string | null;
 }
 
 const LocationContext = createContext<LocationContextType | undefined>(
   undefined
 );
 
+// Utility functions
+function hexToRgb(hex: string): [number, number, number] {
+  const r = parseInt(hex.substr(1, 2), 16);
+  const g = parseInt(hex.substr(3, 2), 16);
+  const b = parseInt(hex.substr(5, 2), 16);
+  return [r, g, b];
+}
+
+function rgbToHex([r, g, b]: [number, number, number]): string {
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
+function averageColors(colors: string[]): string {
+  const total = colors.length;
+  const sum = colors.reduce(
+    (acc, hex) => {
+      const [r, g, b] = hexToRgb(hex);
+      return [acc[0] + r, acc[1] + g, acc[2] + b];
+    },
+    [0, 0, 0]
+  );
+
+  const avg = sum.map((val) => Math.round(val / total)) as [
+    number,
+    number,
+    number
+  ];
+  return rgbToHex(avg);
+}
+
 export function LocationProvider({ children }: { children: React.ReactNode }) {
   const locationData = useUserLocation();
   const country = useCountry(locationData.isoCountryCode);
   const [flagImage, setFlagImage] = useState<string | null>(null);
-  const [flagColors, setFlagColors] = useState<string[] | null>(null);
+  const [themeColors, setThemeColors] = useState<string[] | null>(null);
+  const [averageColor, setAverageColor] = useState<string | null>(null);
+
+  // Extract dominant color from an image
+  const getDominantColor = async (uri: string): Promise<string | null> => {
+    try {
+      const result = await getColors(uri, {
+        fallback: "#000000",
+        cache: true,
+        key: uri,
+      });
+
+      if (result.platform === "android") {
+        return result.dominant || result.average || "#000000";
+      } else if (result.platform === "ios") {
+        return result.background || result.primary || "#000000";
+      }
+      return "#000000";
+    } catch (e) {
+      console.error("Error getting dominant color:", e);
+      return null;
+    }
+  };
+
+  // Get multiple colors from an image
+  const getImageColors = async (uri: string): Promise<string[]> => {
+    try {
+      const result = await getColors(uri, {
+        fallback: "#ffffff",
+        cache: true,
+        key: uri,
+      });
+      if (result.platform === "android") {
+        return [result.dominant, result.average, result.vibrant].filter(
+          Boolean
+        ) as string[];
+      } else if (result.platform === "ios") {
+        return [
+          result.background,
+          result.primary,
+          result.secondary,
+          result.detail,
+        ].filter(Boolean) as string[];
+      }
+      return [];
+    } catch (e) {
+      console.error("Error getting image colors:", e);
+      return [];
+    }
+  };
 
   // Fetch flag image
   useEffect(() => {
@@ -41,39 +121,6 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     }
   }, [country.countryData?.cca2]);
 
-  // Detect flag colors
-  useEffect(() => {
-    if (flagImage) {
-      detectFlagColors(flagImage);
-    }
-  }, [flagImage]);
-
-  const detectFlagColors = async (imageUrl: string) => {
-    try {
-      const result = await getColors(imageUrl, {
-        fallback: "#ffffff",
-        cache: true,
-        key: imageUrl,
-      });
-      if (result.platform === "android") {
-        setFlagColors(
-          [result.dominant, result.average, result.vibrant].filter(Boolean)
-        );
-      } else if (result.platform === "ios") {
-        setFlagColors(
-          [
-            result.background,
-            result.primary,
-            result.secondary,
-            result.detail,
-          ].filter(Boolean)
-        );
-      }
-    } catch (e) {
-      setFlagColors(null);
-    }
-  };
-
   let normalizedRegion =
     locationData.region?.trim() ||
     locationData.city?.trim() ||
@@ -81,7 +128,6 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     country.countryData?.region?.trim() ||
     null;
 
-  // Prevent region from being the same as the country name to avoid duplicate searches/images
   if (
     normalizedRegion &&
     country.countryData?.name?.common &&
@@ -95,6 +141,48 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     country.countryData,
     normalizedRegion
   );
+
+  // Calculate theme colors and average from all images
+  useEffect(() => {
+    const calculateThemeColors = async () => {
+      const imagesToProcess = [flagImage, backgroundImage, regionImage].filter(
+        Boolean
+      ) as string[];
+
+      if (imagesToProcess.length === 0) {
+        setThemeColors(null);
+        setAverageColor(null);
+        return;
+      }
+
+      // Get all colors from all images
+      const allColorsArrays = await Promise.all(
+        imagesToProcess.map((uri) => getImageColors(uri))
+      );
+      const allColors = allColorsArrays.flat();
+
+      // Get dominant colors for averaging
+      const dominantColors = await Promise.all(
+        imagesToProcess.map((uri) => getDominantColor(uri))
+      );
+      const validDominantColors = dominantColors.filter(Boolean) as string[];
+
+      if (allColors.length > 0) {
+        setThemeColors(allColors);
+      } else {
+        setThemeColors(null);
+      }
+
+      if (validDominantColors.length > 0) {
+        const avg = averageColors(validDominantColors);
+        setAverageColor(avg);
+      } else {
+        setAverageColor(null);
+      }
+    };
+
+    calculateThemeColors();
+  }, [flagImage, backgroundImage, regionImage]);
 
   return (
     <LocationContext.Provider
@@ -113,7 +201,8 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         backgroundImage,
         regionImage,
         flagImage,
-        flagColors,
+        themeColors,
+        averageColor,
       }}
     >
       {children}

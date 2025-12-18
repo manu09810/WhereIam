@@ -9,17 +9,30 @@ import {
 import { HapticTab } from "@/components/haptic-tab";
 import { useLocation } from "@/context/LocationContext";
 
+// Helper de contraste
+const getReadableTextColor = (hex: string) => {
+  if (!hex || hex.length < 7) return "#111";
+  const r = parseInt(hex.substr(1, 2), 16) / 255;
+  const g = parseInt(hex.substr(3, 2), 16) / 255;
+  const b = parseInt(hex.substr(5, 2), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.55 ? "#111111" : "#ffffff";
+};
+
 export default function TabLayout() {
-  const { flagColors } = useLocation();
+  const { themeColors, averageColor } = useLocation();
   const [tabIconColor, setTabIconColor] = useState("#0a7ea4");
   const [tabBarBackground, setTabBarBackground] = useState("#ffffff");
+  const [tabBorderColor, setTabBorderColor] = useState("#dddddd");
 
   useEffect(() => {
-    if (flagColors && flagColors.length >= 2) {
-      setTabBarBackground(flagColors[0]);
-      setTabIconColor(flagColors[1]);
-    }
-  }, [flagColors]);
+    const bg = averageColor || themeColors?.[0] || "#f7f7f7";
+    const icon = getReadableTextColor(bg);
+
+    setTabBarBackground(bg);
+    setTabIconColor(icon);
+    setTabBorderColor("rgba(0,0,0,0.08)");
+  }, [themeColors, averageColor]);
 
   return (
     <Tabs
@@ -28,11 +41,11 @@ export default function TabLayout() {
         tabBarInactiveTintColor: tabIconColor,
         tabBarStyle: {
           backgroundColor: tabBarBackground,
-          height: 70,
+          height: 60,
           paddingBottom: 8,
-          paddingTop: 8,
+          paddingTop: 6,
           borderTopWidth: 1,
-          borderTopColor: `${tabBarBackground}40`,
+          borderTopColor: tabBorderColor,
         },
         headerShown: false,
         tabBarButton: HapticTab,
