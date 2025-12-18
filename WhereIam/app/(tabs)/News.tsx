@@ -35,9 +35,11 @@ export default function News() {
   const [localNews, setLocalNews] = useState(false);
 
   const primary = themeColors?.[0] || averageColor || "#007aff";
+  const secondary = themeColors?.[1] || "#f2f2f2";
+  const switchColor = themeColors?.[3] || "#34C759";
   const buttonText = getReadableTextColor(primary);
-  const thumbOn = primary;
-  const trackOn = `${primary}66`;
+  const thumbOn = switchColor;
+  const trackOn = `${switchColor}66`;
 
   const rawLangCode =
     countryData?.languages && Object.keys(countryData.languages)[0]
@@ -53,7 +55,6 @@ export default function News() {
   const regionName = region;
   const cityName = city;
 
-  // Check if City and Region are the same
   const isCityRegionSame =
     cityName &&
     regionName &&
@@ -71,11 +72,48 @@ export default function News() {
         />
       )}
       <View style={styles.content}>
-        <Text style={[styles.header, { color: buttonText }]}>News Search</Text>
-        <View style={styles.switchRow}>
-          <Text style={[styles.switchLabel, { color: buttonText }]}>
-            {localNews ? "Local News" : "International News"}
+        {/* Título como DataCard */}
+        <View
+          style={{
+            backgroundColor: primary,
+            borderRadius: 16,
+            padding: 20,
+            marginHorizontal: 12,
+            marginBottom: 24,
+            borderWidth: 1,
+            borderColor: primary,
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 100,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 28,
+              fontWeight: "700",
+              color: buttonText,
+              letterSpacing: -0.5,
+              textAlign: "center",
+            }}
+          >
+            News Search
           </Text>
+        </View>
+
+        <View style={styles.switchRow}>
+          <View style={{ height: 24, width: 180, justifyContent: "center" }}>
+            <Text
+              numberOfLines={1}
+              style={[styles.switchLabel, { color: buttonText }]}
+            >
+              {localNews ? "Local News" : "International News"}
+            </Text>
+          </View>
           <Switch
             value={localNews}
             onValueChange={setLocalNews}

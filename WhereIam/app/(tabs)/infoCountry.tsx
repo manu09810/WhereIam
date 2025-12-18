@@ -327,14 +327,30 @@ export default function InfoCountryScreen() {
 
           {/* Nombre del país */}
           <View
-            style={{ paddingHorizontal: 12, marginTop: 12, marginBottom: 12 }}
+            style={{
+              backgroundColor: accentColor,
+              borderRadius: 16,
+              padding: 16,
+              marginHorizontal: 12,
+              marginTop: 12,
+              marginBottom: 12,
+              borderWidth: 1,
+              borderColor: accentColor,
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: 120,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              elevation: 3,
+            }}
           >
             <Text
               style={{
-                fontSize: 36,
+                fontSize: 32,
                 fontWeight: "700",
-                color: accentColor,
-                marginBottom: 8,
+                color: getReadableTextColor(accentColor),
                 letterSpacing: -0.5,
                 textAlign: "center",
               }}
