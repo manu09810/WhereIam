@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   InformationCircleIcon,
   NewspaperIcon,
-  PhotoIcon,
+  QuestionMarkCircleIcon,
 } from "react-native-heroicons/solid";
 
 import { HapticTab } from "@/components/haptic-tab";
@@ -68,10 +68,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Image"
+        name="Facts"
         options={{
-          title: "Landscapes",
-          tabBarIcon: ({ color }) => <PhotoIcon size={28} color={color} />,
+          title: "Facts",
+          tabBarIcon: ({ color }) => (
+            <QuestionMarkCircleIcon size={28} color={color} />
+          ),
         }}
       />
     </Tabs>
