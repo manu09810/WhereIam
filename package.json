@@ -1,9 +1,10 @@
 {
   "dependencies": {
-    "react-native-image-colors": "^2.5.1",
     "expo": "~54.0.29",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-native": "0.81.5",
+    "react-native-image-colors": "^2.5.1",
+    "react-native-simple-worldmap": "^1.0.7"
   },
   "name": "WhereIam",
   "version": "1.0.0",

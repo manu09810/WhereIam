@@ -1,6 +1,7 @@
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { WorldMap } from "react-native-simple-worldmap";
 import {
   Image,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // @ts-ignore
@@ -31,6 +33,7 @@ export default function News() {
     backgroundImage,
     themeColors,
     averageColor,
+    isoCountryCode,
   } = useLocation();
   const [localNews, setLocalNews] = useState(false);
 
@@ -59,6 +62,117 @@ export default function News() {
     cityName &&
     regionName &&
     cityName.toLowerCase() === regionName.toLowerCase();
+
+  // --- Reemplazado: centrar mapa usando wrapper size y lat/lng correctamente ---
+  const continent = countryData?.continents?.[0] || regionName || "World";
+  const latlng = countryData?.latlng;
+
+  const WINDOW_W = Dimensions.get("window").width;
+  const WRAPPER_PADDING = 24 * 2; // coincide con paddingHorizontal de mapWrapper
+  const WRAPPER_W = Math.max(200, WINDOW_W - WRAPPER_PADDING);
+  const WRAPPER_H = 180; // debe coincidir con styles.mapWrapper.height
+
+  const getDefaultScale = (cont: string) => {
+    switch ((cont || "").toLowerCase()) {
+      case "africa":
+        return 1.6;
+      case "asia":
+        return 1.8;
+      case "europe":
+        return 2.2;
+      case "north america":
+      case "americas":
+        return 1.9;
+      case "south america":
+        return 2.0;
+      case "oceania":
+      case "australia":
+        return 3.2;
+      default:
+        return 1.0;
+    }
+  };
+
+  // zoom out a bit (un poquito más lejos)
+  const ZOOM_OUT = 0.7;
+  const scale = getDefaultScale(continent) * ZOOM_OUT;
+  // base map size (unscaled) — suficientes píxeles para permitir desplazamiento
+  const BASE_W = WRAPPER_W * 2;
+  const BASE_H = WRAPPER_H * 2;
+
+  const SCALED_W = BASE_W * scale;
+  const SCALED_H = BASE_H * scale;
+
+  // default center (no translate)
+  let translateX = (WRAPPER_W - SCALED_W) / 2;
+  let translateY = (WRAPPER_H - SCALED_H) / 2;
+
+  if (latlng && latlng.length === 2) {
+    const [lat, lng] = latlng; // lat, lon
+    // equirectangular projection mapping:
+    const x = ((lng + 180) / 360) * SCALED_W; // 0..SCALED_W
+    const y = ((90 - lat) / 180) * SCALED_H; // 0..SCALED_H (top = north)
+
+    // queremos que (x,y) quede en el centro del wrapper
+    translateX = WRAPPER_W / 2 - x;
+    translateY = WRAPPER_H / 2 - y;
+  }
+
+  const mapInnerStyle = {
+    width: SCALED_W,
+    height: SCALED_H,
+    transform: [{ translateX }, { translateY }],
+  };
+
+  // tamaño y estilo del marcador que pinta el país (usa el color principal, puedes reemplazar por color de bandera si lo obtienes)
+  const highlightSize = Math.max(WRAPPER_W * 0.18, 36); // ajustar para cubrir mejor el país
+  const highlightStyle = {
+    width: highlightSize,
+    height: highlightSize,
+    borderRadius: highlightSize / 2,
+    backgroundColor: `${primary}cc`, // semitransparente
+    position: "absolute" as const,
+    left: "50%",
+    top: "50%",
+    transform: [
+      { translateX: -highlightSize / 2 },
+      { translateY: -highlightSize / 2 },
+    ],
+    pointerEvents: "none" as const,
+  };
+
+  // log rápido para debug (ver metro/console)
+  console.log("map debug", {
+    latlng,
+    continent,
+    WRAPPER_W,
+    WRAPPER_H,
+    scale,
+    translateX,
+    translateY,
+  });
+
+  // country ISO for WorldMap + selected color (fall back to theme primary)
+  // prefer isoCountryCode from context (already normalized), fallback to countryData.cca2
+  const rawCode = (isoCountryCode || countryData?.cca2 || "") as
+    | string
+    | undefined;
+  // ensure we have a 2-letter ISO alpha-2 code, lowercase
+  const countryCode =
+    rawCode && rawCode.length >= 2 ? rawCode.slice(0, 2).toLowerCase() : null;
+  const countriesProp = countryCode ? [countryCode] : [];
+  const selectedColor =
+    (themeColors && themeColors[0]) || averageColor || primary || "#ff0000";
+
+  console.log("worldmap debug:", {
+    isoCountryCode,
+    countryDataCode: countryData?.cca2,
+    countryCode,
+    countriesProp,
+    selectedColor,
+    themeColors,
+  });
+  // --- end replaced ---
 
   return (
     <SafeAreaView
@@ -211,6 +325,44 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  mapWrapper: {
+    height: 180,
+    paddingHorizontal: 24,
+    marginTop: 8,
+  },
+  mapContainer: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    // iOS shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    // Android elevation
+    elevation: 4,
+  },
+  mapInnerWrapper: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  // (opcional) estilos por defecto para el highlight si quieres cambiar aquí
+  countryHighlight: {
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    pointerEvents: "none",
+  },
+  mapInner: {
+    // mapInnerStyle (width/height/transform) se aplica dinámicamente
+    alignSelf: "flex-start",
   },
   content: {
     flex: 1,
