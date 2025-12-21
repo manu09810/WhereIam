@@ -1,5 +1,6 @@
 import { CurrencyModal } from "@/components/CurrencyModal";
 import { WeatherModal } from "@/components/WeatherModal";
+import { TranslateModal } from "@/components/TranslateModal";
 import { useLocation } from "@/context/LocationContext";
 
 import { useEffect, useState } from "react";
@@ -132,6 +133,8 @@ export default function InfoCountryScreen() {
   const countryName = countryData?.name?.common || "N/A";
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
   const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
+  const [translateModalVisible, setTranslateModalVisible] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string | null>(null);
 
   // Fetch local time
@@ -178,29 +181,7 @@ export default function InfoCountryScreen() {
     );
   };
 
-  const openGoogleTranslate = (languageCode: string): void => {
-    // Obtener el código de idioma ISO 639-1 de los datos del país (idioma origen)
-    const sourceLangCode = countryData?.languages
-      ? Object.keys(countryData.languages)[0]
-      : "en";
 
-    // Siempre traducir a inglés si el país no habla inglés
-    // Si el país habla inglés, traducir al idioma del dispositivo
-    let targetLangCode = "en";
-
-    if (sourceLangCode === "en") {
-      const deviceLanguage = Intl.DateTimeFormat().resolvedOptions().locale;
-      targetLangCode = deviceLanguage.split("-")[0];
-    }
-
-    // Usar el nombre del país como texto de ejemplo
-    const sampleText = countryName || "hello";
-    const translateUrl = `https://translate.google.com/?sl=${sourceLangCode}&tl=${targetLangCode})}`;
-
-    Linking.openURL(translateUrl).catch((err: Error) =>
-      console.log("Error opening Google Translate:", err)
-    );
-  };
 
   // --- guards después de hooks ---
   if (isLoadingCountry || !countryData) {
@@ -452,9 +433,16 @@ export default function InfoCountryScreen() {
               <DataCard
                 label="Languages"
                 value={languages.length > 0 ? languages.join(", ") : "N/A"}
-                onPress={() =>
-                  languages.length > 0 && openGoogleTranslate(languages[0])
-                }
+                onPress={() => {
+                  if (languages.length > 0) {
+                    // Busca el código ISO del primer idioma
+                    const langCodes = countryData?.languages
+                      ? Object.keys(countryData.languages)
+                      : [];
+                    setSelectedLanguage(langCodes[0] || "es");
+                    setTranslateModalVisible(true);
+                  }
+                }}
                 accentColor={accentColor}
                 textColor={accentColorText}
               />
@@ -565,6 +553,13 @@ export default function InfoCountryScreen() {
           onClose={() => setCurrencyModalVisible(false)}
           currency={currencyCode}
         />
+        {selectedLanguage && (
+          <TranslateModal
+            visible={translateModalVisible}
+            onClose={() => setTranslateModalVisible(false)}
+            language={selectedLanguage}
+          />
+        )}
       </SafeAreaView>
     </View>
   );
