@@ -1,3 +1,4 @@
+import { useLocation } from "@/context/LocationContext";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -23,6 +24,7 @@ export const CurrencyModal = ({
   onClose,
   currency,
 }: CurrencyModalProps) => {
+  const { themeColors } = useLocation(); // Usa los colores del contexto
   const [amount, setAmount] = useState<string>("");
   const [converted, setConverted] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -78,7 +80,7 @@ export const CurrencyModal = ({
         >
           <View
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: themeColors?.[0] || "#fff", // Color del modal
               borderTopLeftRadius: 24,
               borderTopRightRadius: 24,
               padding: 24,
@@ -118,23 +120,27 @@ export const CurrencyModal = ({
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  backgroundColor: "#f0f0f0",
+                  backgroundColor: themeColors?.[1] || "#f0f0f0", // Color del switch
                   borderRadius: 20,
                   paddingVertical: 6,
                   paddingHorizontal: 16,
                 }}
               >
-                <Text style={{ fontWeight: "600", marginRight: 8 }}>
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    marginRight: 8,
+                    color: "#1a1a1a",
+                  }}
+                >
                   {toUSD ? `${currency} → USD` : `USD → ${currency}`}
                 </Text>
-                {/* Puedes usar un icono o un emoji */}
                 <ArrowsRightLeftIcon size={20} color="#1a1a1a" />
-                {/* O simplemente: <Text style={{fontSize: 18, marginLeft: 4}}>🔄</Text> */}
               </TouchableOpacity>
             </View>
 
             {/* Input */}
-            <Text style={{ fontSize: 16, color: "#666", marginBottom: 8 }}>
+            <Text style={{ fontSize: 16, color: "#1a1a1a", marginBottom: 8 }}>
               {toUSD
                 ? `Convert from ${currency} to USD`
                 : `Convert from USD to ${currency}`}
@@ -151,21 +157,27 @@ export const CurrencyModal = ({
                 padding: 12,
                 fontSize: 18,
                 marginBottom: 16,
+                backgroundColor: "#fff", // Fondo blanco
+                color: "#1a1a1a", // Texto negro
               }}
             />
 
             <TouchableOpacity
               onPress={handleConvert}
               style={{
-                backgroundColor: "#1a1a1a",
+                backgroundColor: "#fff", // Fondo blanco
                 borderRadius: 8,
                 padding: 14,
                 alignItems: "center",
                 marginBottom: 16,
+                borderWidth: 1,
+                borderColor: "#1a1a1a",
               }}
               disabled={loading}
             >
-              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+              <Text
+                style={{ color: "#1a1a1a", fontWeight: "700", fontSize: 16 }}
+              >
                 Convert
               </Text>
             </TouchableOpacity>
@@ -188,7 +200,9 @@ export const CurrencyModal = ({
             )}
 
             {error && (
-              <Text style={{ color: "red", marginTop: 8, textAlign: "center" }}>
+              <Text
+                style={{ color: "#1a1a1a", marginTop: 8, textAlign: "center" }}
+              >
                 {error}
               </Text>
             )}
