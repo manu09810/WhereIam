@@ -30,6 +30,7 @@ export const CurrencyModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toUSD, setToUSD] = useState(true); // Nuevo estado
+  const access_key = process.env.EXPO_PUBLIC_EXCHANGERATE_API_KEY;
 
   const handleConvert = async () => {
     if (!currency || !amount || isNaN(Number(amount))) {
@@ -43,7 +44,7 @@ export const CurrencyModal = ({
       const from = toUSD ? currency : "USD";
       const to = toUSD ? "USD" : currency;
       const response = await fetch(
-        `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}&access_key=73deba80b9041807c660fcc359e6653c`
+        `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}&access_key=${access_key}`
       );
       const data = await response.json();
       if (data.result !== undefined) {
@@ -157,15 +158,15 @@ export const CurrencyModal = ({
                 padding: 12,
                 fontSize: 18,
                 marginBottom: 16,
-                backgroundColor: "#fff", // Fondo blanco
-                color: "#1a1a1a", // Texto negro
+                backgroundColor: "#fff", 
+                color: "#1a1a1a",
               }}
             />
 
             <TouchableOpacity
               onPress={handleConvert}
               style={{
-                backgroundColor: "#fff", // Fondo blanco
+                backgroundColor: "#fff", 
                 borderRadius: 8,
                 padding: 14,
                 alignItems: "center",
