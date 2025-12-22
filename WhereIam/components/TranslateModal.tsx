@@ -1,13 +1,13 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
-  ActivityIndicator,
   Modal,
-  Text,
-  TouchableOpacity,
-  View,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { XMarkIcon } from "react-native-heroicons/solid";
 import { ArrowsRightLeftIcon } from "react-native-heroicons/outline";
@@ -18,19 +18,20 @@ interface TranslateModalProps {
   visible: boolean;
   onClose: () => void;
   language: string; // Puede ser ISO 639-1 o 639-2
+  textLanguage:string
 }
 
 export const TranslateModal = ({
   visible,
   onClose,
   language,
+  textLanguage,
 }: TranslateModalProps) => {
   const [translated, setTranslated] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [phrase, setPhrase] = useState("");
   const [toEnglish, setToEnglish] = useState(false);
-  const [match, setMatch] = useState<number | null>(null);
 
   // Convierte a ISO 639-1 si es necesario
   const isoLang = useMemo(() => {
@@ -41,6 +42,32 @@ export const TranslateModal = ({
     );
     return found?.iso6391 || language;
   }, [language]);
+
+  const GOOGLE_TRANSLATE_API_KEY =
+    process.env.EXPO_PUBLIC_GOOGLE_TRANSLATION_KEY;
+
+  async function translateText(
+    text: string,
+    targetLang: string,
+    sourceLang?: string
+  ) {
+    const url = `https://translation.googleapis.com/language/translate/v2?key=${GOOGLE_TRANSLATE_API_KEY}`;
+    const body: any = {
+      q: text,
+      target: targetLang,
+    };
+    if (sourceLang) body.source = sourceLang;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+ 
+    return data.data.translations[0].translatedText;
+  }
 
   const handleTranslate = async () => {
     if (!isoLang) {
@@ -54,46 +81,12 @@ export const TranslateModal = ({
     setLoading(true);
     setError(null);
     setTranslated(null);
-    setMatch(null);
+
     try {
-      // Añade un espacio al final si no lo hay
-      let phraseToSend = phrase.endsWith(" ") ? phrase : phrase + " ";
-      const from = toEnglish ? isoLang : "en";
-      const to = toEnglish ? "en" : isoLang;
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-        phraseToSend
-      )}&langpair=${from}|${to}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      let bestTranslation = null;
-      let bestMatch = null;
-
-      if (
-        data.matches &&
-        Array.isArray(data.matches) &&
-        data.matches.length > 0
-      ) {
-        // Usa siempre el primer match
-        const best = data.matches[0];
-        let translation = best.translation;
-        if (translation.includes("%")) {
-          translation = decodeURIComponent(translation);
-        }
-        bestTranslation = translation;
-        bestMatch = best.match;
-      } else if (data.responseData && data.responseData.translatedText) {
-        let translation = data.responseData.translatedText;
-        if (translation.includes("%")) {
-          translation = decodeURIComponent(translation);
-        }
-        bestTranslation = translation;
-        bestMatch = null;
-      } else {
-        setError("Translation failed.");
-      }
-
-      setTranslated(bestTranslation);
-      setMatch(bestMatch);
+      const target = toEnglish ? "en" : isoLang;
+      const source = toEnglish ? isoLang : "en";
+      const translatedText = await translateText(phrase, target, source);
+      setTranslated(translatedText);
     } catch (e) {
       setError("Error fetching translation.");
     } finally {
@@ -163,7 +156,9 @@ export const TranslateModal = ({
                 }}
               >
                 <Text style={{ fontWeight: "600", marginRight: 8 }}>
-                  {toEnglish ? `${isoLang} → EN` : `EN → ${isoLang}`}
+                  {toEnglish
+                    ? `${isoLang.toUpperCase()} → EN`
+                    : `EN → ${isoLang.toUpperCase()}`}
                 </Text>
                 <ArrowsRightLeftIcon size={20} color="#1a1a1a" />
               </TouchableOpacity>
@@ -172,13 +167,13 @@ export const TranslateModal = ({
             {/* Input */}
             <Text style={{ fontSize: 16, color: "#666", marginBottom: 8 }}>
               {toEnglish
-                ? `Translate from ${isoLang} to English`
-                : `Translate from English to ${isoLang}`}
+                ? `Translate from ${textLanguage} to English`
+                : `Translate from English to ${textLanguage}`}
             </Text>
             <TextInput
               placeholder={
                 toEnglish
-                  ? `Enter phrase in ${isoLang}`
+                  ? `Enter phrase in $}`
                   : "Enter phrase in English"
               }
               value={phrase}
@@ -222,11 +217,6 @@ export const TranslateModal = ({
                 <Text style={{ fontSize: 18, color: "#1a1a1a" }}>
                   {translated}
                 </Text>
-                {match !== null && (
-                  <Text style={{ fontSize: 14, color: "#888" }}>
-                    Match: {(match * 100).toFixed(0)}%
-                  </Text>
-                )}
               </View>
             )}
 

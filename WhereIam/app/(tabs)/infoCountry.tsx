@@ -181,8 +181,6 @@ export default function InfoCountryScreen() {
     );
   };
 
-
-
   // --- guards después de hooks ---
   if (isLoadingCountry || !countryData) {
     return (
@@ -512,8 +510,7 @@ export default function InfoCountryScreen() {
             </View>
           </View>
 
-          {/* Colores del tema detectados */}
-          {themeColors && (
+          {/*  {themeColors && (
             <View
               style={{
                 flexDirection: "row",
@@ -533,10 +530,10 @@ export default function InfoCountryScreen() {
                     borderWidth: 1,
                     borderColor: "#ccc",
                   }}
-                />
+                />ß
               ))}
             </View>
-          )}
+          )}  */}
 
           <View style={{ height: 20 }} />
         </ScrollView>
@@ -558,6 +555,7 @@ export default function InfoCountryScreen() {
             visible={translateModalVisible}
             onClose={() => setTranslateModalVisible(false)}
             language={selectedLanguage}
+            textLanguage={languages.length > 0 ? languages.join(", ") : "N/A"}
           />
         )}
       </SafeAreaView>
