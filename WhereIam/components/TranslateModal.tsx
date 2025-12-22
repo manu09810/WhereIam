@@ -18,7 +18,7 @@ interface TranslateModalProps {
   visible: boolean;
   onClose: () => void;
   language: string; // Puede ser ISO 639-1 o 639-2
-  textLanguage:string
+  textLanguage: string;
 }
 
 export const TranslateModal = ({
@@ -65,7 +65,7 @@ export const TranslateModal = ({
     });
 
     const data = await response.json();
- 
+
     return data.data.translations[0].translatedText;
   }
 
@@ -173,7 +173,7 @@ export const TranslateModal = ({
             <TextInput
               placeholder={
                 toEnglish
-                  ? `Enter phrase in $}`
+                  ? `Enter phrase in ${textLanguage}`
                   : "Enter phrase in English"
               }
               value={phrase}
