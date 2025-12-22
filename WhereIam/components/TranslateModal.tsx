@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { XMarkIcon } from "react-native-heroicons/solid";
 import { ArrowsRightLeftIcon } from "react-native-heroicons/outline";
+import { useLocation } from "@/context/LocationContext";
 // @ts-ignore
 const { iso6392 } = require("iso-639-2");
 
@@ -27,6 +28,8 @@ export const TranslateModal = ({
   language,
   textLanguage,
 }: TranslateModalProps) => {
+  const { themeColors } = useLocation(); // <-- Obtiene los colores del contexto
+
   const [translated, setTranslated] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +112,7 @@ export const TranslateModal = ({
         >
           <View
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: themeColors?.[0] || "#fff", // <-- Color del modal
               borderTopLeftRadius: 24,
               borderTopRightRadius: 24,
               padding: 24,
@@ -149,7 +152,7 @@ export const TranslateModal = ({
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  backgroundColor: "#f0f0f0",
+                  backgroundColor: themeColors?.[1] || "#f0f0f0", // <-- Color del switch
                   borderRadius: 20,
                   paddingVertical: 6,
                   paddingHorizontal: 16,
@@ -165,7 +168,8 @@ export const TranslateModal = ({
             </View>
 
             {/* Input */}
-            <Text style={{ fontSize: 16, color: "#666", marginBottom: 8 }}>
+            <Text style={{ fontSize: 16, color: "#1a1a1a", marginBottom: 8 }}>
+              {" "}
               {toEnglish
                 ? `Translate from ${textLanguage} to English`
                 : `Translate from English to ${textLanguage}`}
@@ -185,6 +189,8 @@ export const TranslateModal = ({
                 padding: 12,
                 fontSize: 18,
                 marginBottom: 16,
+                backgroundColor: "#fff",
+                color: "#1a1a1a",
               }}
             />
 
@@ -199,8 +205,10 @@ export const TranslateModal = ({
               }}
               disabled={loading}
             >
-              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
-                Translate
+              <Text
+                style={{ color: "#ffff", fontWeight: "700", fontSize: 16 }}
+              >
+                {"Translate"}
               </Text>
             </TouchableOpacity>
 
@@ -215,13 +223,17 @@ export const TranslateModal = ({
             {translated !== null && !loading && (
               <View style={{ alignItems: "center", marginBottom: 8 }}>
                 <Text style={{ fontSize: 18, color: "#1a1a1a" }}>
+                  {" "}
                   {translated}
                 </Text>
               </View>
             )}
 
             {error && (
-              <Text style={{ color: "red", marginTop: 8, textAlign: "center" }}>
+              <Text
+                style={{ color: "#1a1a1a", marginTop: 8, textAlign: "center" }}
+              >
+                {" "}
                 {error}
               </Text>
             )}

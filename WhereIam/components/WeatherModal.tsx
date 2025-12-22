@@ -1,11 +1,12 @@
+import { useLocation } from "@/context/LocationContext";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Modal,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { XMarkIcon } from "react-native-heroicons/solid";
 
@@ -32,6 +33,7 @@ export const WeatherModal = ({
   longitude,
   cityName,
 }: WeatherModalProps) => {
+  const { themeColors } = useLocation(); // Usa los colores del contexto
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +48,7 @@ export const WeatherModal = ({
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     try {
       const response = await fetch(
@@ -103,7 +105,7 @@ export const WeatherModal = ({
       >
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: themeColors?.[0] || "#fff", // Color del modal
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
             padding: 24,
@@ -125,7 +127,7 @@ export const WeatherModal = ({
               >
                 Weather
               </Text>
-              <Text style={{ fontSize: 14, color: "#666", marginTop: 4 }}>
+              <Text style={{ fontSize: 14, color: "#1a1a1a", marginTop: 4 }}>
                 {cityName}
               </Text>
             </View>
@@ -170,7 +172,7 @@ export const WeatherModal = ({
                 >
                   {Math.round(weather.temperature)}°
                 </Text>
-                <Text style={{ fontSize: 18, color: "#666", marginTop: 8 }}>
+                <Text style={{ fontSize: 18, color: "#1a1a1a", marginTop: 8 }}>
                   {getWeatherDescription(weather.weatherCode)}
                 </Text>
               </View>
@@ -189,7 +191,7 @@ export const WeatherModal = ({
                   <Text
                     style={{
                       fontSize: 12,
-                      color: "#999",
+                      color: "#1a1a1a",
                       fontWeight: "600",
                       marginBottom: 8,
                     }}
@@ -219,7 +221,7 @@ export const WeatherModal = ({
                   <Text
                     style={{
                       fontSize: 12,
-                      color: "#999",
+                      color: "#1a1a1a",
                       fontWeight: "600",
                       marginBottom: 8,
                     }}
@@ -249,7 +251,7 @@ export const WeatherModal = ({
                   <Text
                     style={{
                       fontSize: 12,
-                      color: "#999",
+                      color: "#1a1a1a",
                       fontWeight: "600",
                       marginBottom: 8,
                     }}
@@ -270,7 +272,9 @@ export const WeatherModal = ({
             </ScrollView>
           ) : (
             <View style={{ paddingVertical: 60, alignItems: "center" }}>
-              <Text style={{ color: "#666" }}>Unable to load weather data</Text>
+              <Text style={{ color: "#1a1a1a" }}>
+                Unable to load weather data
+              </Text>
             </View>
           )}
         </View>

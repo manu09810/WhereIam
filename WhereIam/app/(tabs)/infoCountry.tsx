@@ -530,7 +530,7 @@ export default function InfoCountryScreen() {
                     borderWidth: 1,
                     borderColor: "#ccc",
                   }}
-                />ß
+                />
               ))}
             </View>
           )}  */}
