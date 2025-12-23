@@ -37,7 +37,7 @@ export default function News() {
   const [localNews, setLocalNews] = useState(false);
 
   const primary = themeColors?.[0] || averageColor || "#007aff";
-  const secondary = themeColors?.[1] || "#f2f2f2";
+  const secondary = themeColors?.[4] || "#f2f2f2";
   const switchColor = themeColors?.[3] || "#34C759";
   const buttonText = getReadableTextColor(primary);
   const thumbOn = switchColor;
@@ -83,17 +83,16 @@ export default function News() {
   // --- end replaced ---
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: "#ffffff" }]}>
-      {/* Quita o comenta el Image */}
-      {/* {backgroundImage && (
+    <SafeAreaView style={[styles.container]}>
+      {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
           style={StyleSheet.absoluteFillObject}
           blurRadius={3}
         />
-      )} */}
+      )}
       <View style={styles.content}>
-        <View style={styles.titleWrapper}>
+        <View style={[styles.titleWrapper, { borderColor: secondary }]}>
           <Text style={[styles.titleMain, { color: primary }]}>
             News Search
           </Text>
@@ -118,84 +117,85 @@ export default function News() {
               style={{ flexShrink: 0 }}
             />
           </View>
+          <View style={{ width: "100%" }}>
+            <NewsButton
+              label="Country News"
+              value={countryName}
+              onPress={() =>
+                router.push({
+                  pathname: "/NewsDetail",
+                  params: {
+                    query: `"${countryName || ""}"`,
+                    label: "Country",
+                    lang: localNews ? langCode : "en",
+                  },
+                })
+              }
+              accentColor={primary}
+              textColor={buttonText}
+            />
+            {isCityRegionSame ? (
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  styles.largeButton,
+                  { backgroundColor: primary },
+                ]}
+                onPress={() =>
+                  router.push({
+                    pathname: "/NewsDetail",
+                    params: {
+                      query: `"${regionName || ""}" ${countryName}`,
+                      label: "City / Region",
+                      lang: localNews ? langCode : "en",
+                    },
+                  })
+                }
+              >
+                <Text style={[styles.buttonText, { color: buttonText }]}>
+                  City / Region News: {regionName}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <NewsButton
+                  label="Region News"
+                  value={regionName}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/NewsDetail",
+                      params: {
+                        query: `"${regionName || ""}" ${countryName}`,
+                        label: "Region",
+                        lang: localNews ? langCode : "en",
+                      },
+                    })
+                  }
+                  accentColor={primary}
+                  textColor={buttonText}
+                />
+                <NewsButton
+                  label="City News"
+                  value={cityName}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/NewsDetail",
+                      params: {
+                        query: `"${cityName || ""}" ${
+                          regionName || ""
+                        } ${countryName}`,
+                        label: "City",
+                        lang: localNews ? langCode : "en",
+                      },
+                    })
+                  }
+                  accentColor={primary}
+                  textColor={buttonText}
+                />
+              </>
+            )}
+          </View>
         </View>
-
-        <NewsButton
-          label="Country News"
-          value={countryName}
-          onPress={() =>
-            router.push({
-              pathname: "/NewsDetail",
-              params: {
-                query: `"${countryName || ""}"`,
-                label: "Country",
-                lang: localNews ? langCode : "en",
-              },
-            })
-          }
-          accentColor={secondary}
-          textColor={buttonText}
-        />
-        {isCityRegionSame ? (
-          <TouchableOpacity
-            style={[
-              styles.button,
-              styles.largeButton,
-              { backgroundColor: primary },
-            ]}
-            onPress={() =>
-              router.push({
-                pathname: "/NewsDetail",
-                params: {
-                  query: `"${regionName || ""}" ${countryName}`,
-                  label: "City / Region",
-                  lang: localNews ? langCode : "en",
-                },
-              })
-            }
-          >
-            <Text style={[styles.buttonText, { color: buttonText }]}>
-              City / Region News: {regionName}
-            </Text>
-          </TouchableOpacity>
-        ) : (
-          <>
-            <NewsButton
-              label="Region News"
-              value={regionName}
-              onPress={() =>
-                router.push({
-                  pathname: "/NewsDetail",
-                  params: {
-                    query: `"${regionName || ""}" ${countryName}`,
-                    label: "Region",
-                    lang: localNews ? langCode : "en",
-                  },
-                })
-              }
-              accentColor={secondary}
-              textColor={buttonText}
-            />
-            <NewsButton
-              label="City News"
-              value={cityName}
-              onPress={() =>
-                router.push({
-                  pathname: "/NewsDetail",
-                  params: {
-                    query: `"${cityName || ""}" ${
-                      regionName || ""
-                    } ${countryName}`,
-                    label: "City",
-                    lang: localNews ? langCode : "en",
-                  },
-                })
-              }
-              accentColor={secondary}
-              textColor={buttonText}
-            />
-          </>
-        )}
       </View>
     </SafeAreaView>
   );
@@ -276,9 +276,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleWrapper: {
-    backgroundColor: "rgba(0,0,0,0.7)",
-    borderColor: "white",
-    borderWidth: 1,
+    backgroundColor: "rgba(0,0,0,0.8)",
+
+    borderWidth: 8,
     alignItems: "center",
     marginBottom: 18,
     paddingHorizontal: 6,
