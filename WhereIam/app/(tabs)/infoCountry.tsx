@@ -2,6 +2,7 @@ import { CurrencyModal } from "@/components/CurrencyModal";
 import { WeatherModal } from "@/components/WeatherModal";
 import { TranslateModal } from "@/components/TranslateModal";
 import { useLocation } from "@/context/LocationContext";
+import DataCard from "@/components/Datacard";
 
 import { useEffect, useState } from "react";
 import {
@@ -19,99 +20,6 @@ import { MapIcon } from "react-native-heroicons/outline";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
-
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#ffffff";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
-
-const contrastRatio = (fg: string, bg: string) => {
-  const toL = (hex: string) => {
-    const r = parseInt(hex.substr(1, 2), 16) / 255;
-    const g = parseInt(hex.substr(3, 2), 16) / 255;
-    const b = parseInt(hex.substr(5, 2), 16) / 255;
-    const c = [r, g, b].map((v) =>
-      v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
-    );
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-  };
-  const L1 = toL(fg) + 0.05;
-  const L2 = toL(bg) + 0.05;
-  return L1 > L2 ? L1 / L2 : L2 / L1;
-};
-
-const pickAccessibleTextColor = (bg: string, preferred?: string) => {
-  const fallback = getReadableTextColor(bg);
-  if (preferred && contrastRatio(preferred, bg) >= 3) return preferred;
-  return fallback;
-};
-
-function DataCard({
-  label,
-  value,
-  onPress,
-  accentColor = "#007aff",
-  textColor,
-}: {
-  label: string;
-  value: string | null | undefined;
-  onPress?: () => void;
-  accentColor?: string;
-  textColor?: string;
-}) {
-  const readable = getReadableTextColor(accentColor);
-  const valueColor = pickAccessibleTextColor(
-    accentColor,
-    textColor || readable
-  );
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        flex: 1,
-        backgroundColor: accentColor,
-        borderRadius: 16,
-        padding: 10,
-        marginHorizontal: 6,
-        marginVertical: 12,
-        borderWidth: 1,
-        borderColor: accentColor,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 100,
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 18,
-          color: readable,
-          fontWeight: "600",
-          marginBottom: 10,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          textAlign: "center",
-        }}
-      >
-        {label}
-      </Text>
-      <Text
-        style={{
-          fontSize: 16,
-          color: valueColor,
-          fontWeight: "700",
-          textAlign: "center",
-        }}
-      >
-        {value ?? "N/A"}
-      </Text>
-    </Pressable>
-  );
-}
 
 export default function InfoCountryScreen() {
   const {
@@ -230,8 +138,8 @@ export default function InfoCountryScreen() {
 
   const accentColor = themeColors?.[0] || "#007aff";
   const accentColorHour = themeColors?.[1] || "#007aff";
-  const accentColorText = themeColors?.[3] || getReadableTextColor(accentColor);
-  const accentColorTimeText = getReadableTextColor(accentColorHour);
+  const accentColorText = themeColors?.[3] || "#ffffff";
+  const accentColorTimeText = "#ffffff";
   const isCityRegionSame =
     city && region && city.toLowerCase() === region.toLowerCase();
 
@@ -329,7 +237,7 @@ export default function InfoCountryScreen() {
               style={{
                 fontSize: 32,
                 fontWeight: "700",
-                color: getReadableTextColor(accentColor),
+                color: "#ffffff",
                 letterSpacing: -0.5,
                 textAlign: "center",
               }}
@@ -509,32 +417,6 @@ export default function InfoCountryScreen() {
               />
             </View>
           </View>
-
-          {/*  {themeColors && (
-            <View
-              style={{
-                flexDirection: "row",
-                marginVertical: 8,
-                paddingHorizontal: 12,
-              }}
-            >
-              {themeColors.map((color, idx) => (
-                <View
-                  key={idx}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: color,
-                    marginRight: 8,
-                    borderWidth: 1,
-                    borderColor: "#ccc",
-                  }}
-                />
-              ))}
-            </View>
-          )}  */}
-
           <View style={{ height: 20 }} />
         </ScrollView>
 

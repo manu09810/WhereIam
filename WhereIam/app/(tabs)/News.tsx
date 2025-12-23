@@ -1,7 +1,6 @@
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { WorldMap } from "react-native-simple-worldmap";
 import {
   Image,
   StyleSheet,
@@ -63,8 +62,7 @@ export default function News() {
     regionName &&
     cityName.toLowerCase() === regionName.toLowerCase();
 
-    // country ISO for WorldMap + selected color (fall back to theme primary)
-  // prefer isoCountryCode from context (already normalized), fallback to countryData.cca2
+  
   const rawCode = (isoCountryCode || countryData?.cca2 || "") as
     | string
     | undefined;
@@ -97,7 +95,6 @@ export default function News() {
         />
       )}
       <View style={styles.content}>
-        {/* Title (not a DataCard) */}
         <View style={styles.titleWrapper}>
           <Text style={[styles.titleMain, { color: primary }]}>
             News Search
@@ -281,18 +278,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleWrapper: {
+    backgroundColor: "rgba(0,0,0,0.3)",
+    borderColor: "white",
+    borderWidth: 1,
     alignItems: "center",
     marginBottom: 18,
     paddingHorizontal: 6,
+    borderRadius: 10,
   },
   titleMain: {
+    opacity: 1,
     fontSize: 28,
     fontWeight: "800",
     letterSpacing: -0.5,
     textAlign: "center",
   },
   titleSub: {
-    fontSize: 13,
+    fontSize: 20,
     marginTop: 6,
     opacity: 0.9,
     textAlign: "center",
