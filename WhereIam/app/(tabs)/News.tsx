@@ -1,7 +1,6 @@
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { WorldMap } from "react-native-simple-worldmap";
 import {
   Image,
   StyleSheet,
@@ -63,8 +62,6 @@ export default function News() {
     regionName &&
     cityName.toLowerCase() === regionName.toLowerCase();
 
-    // country ISO for WorldMap + selected color (fall back to theme primary)
-  // prefer isoCountryCode from context (already normalized), fallback to countryData.cca2
   const rawCode = (isoCountryCode || countryData?.cca2 || "") as
     | string
     | undefined;
@@ -86,18 +83,16 @@ export default function News() {
   // --- end replaced ---
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: averageColor || "#fff" }]}
-    >
-      {backgroundImage && (
+    <SafeAreaView style={[styles.container, { backgroundColor: "#ffffff" }]}>
+      {/* Quita o comenta el Image */}
+      {/* {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
           style={StyleSheet.absoluteFillObject}
           blurRadius={3}
         />
-      )}
+      )} */}
       <View style={styles.content}>
-        {/* Title (not a DataCard) */}
         <View style={styles.titleWrapper}>
           <Text style={[styles.titleMain, { color: primary }]}>
             News Search
@@ -105,26 +100,26 @@ export default function News() {
           <Text style={[styles.titleSub, { color: buttonText }]}>
             Search local or international news
           </Text>
-          <View style={[styles.titleAccent, { backgroundColor: primary }]} />
+
+          <View style={styles.switchRow}>
+            <View style={{ height: 24, width: 180, justifyContent: "center" }}>
+              <Text
+                numberOfLines={1}
+                style={[styles.switchLabel, { color: buttonText }]}
+              >
+                {localNews ? "Local News" : "International News"}
+              </Text>
+            </View>
+            <Switch
+              value={localNews}
+              onValueChange={setLocalNews}
+              thumbColor={thumbOn}
+              trackColor={{ false: "#ccc", true: trackOn }}
+              style={{ flexShrink: 0 }}
+            />
+          </View>
         </View>
 
-        <View style={styles.switchRow}>
-          <View style={{ height: 24, width: 180, justifyContent: "center" }}>
-            <Text
-              numberOfLines={1}
-              style={[styles.switchLabel, { color: buttonText }]}
-            >
-              {localNews ? "Local News" : "International News"}
-            </Text>
-          </View>
-          <Switch
-            value={localNews}
-            onValueChange={setLocalNews}
-            thumbColor={thumbOn}
-            trackColor={{ false: "#ccc", true: trackOn }}
-            style={{ flexShrink: 0 }}
-          />
-        </View>
         <NewsButton
           label="Country News"
           value={countryName}
@@ -138,7 +133,7 @@ export default function News() {
               },
             })
           }
-          accentColor={primary}
+          accentColor={secondary}
           textColor={buttonText}
         />
         {isCityRegionSame ? (
@@ -178,7 +173,7 @@ export default function News() {
                   },
                 })
               }
-              accentColor={primary}
+              accentColor={secondary}
               textColor={buttonText}
             />
             <NewsButton
@@ -196,7 +191,7 @@ export default function News() {
                   },
                 })
               }
-              accentColor={primary}
+              accentColor={secondary}
               textColor={buttonText}
             />
           </>
@@ -281,21 +276,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleWrapper: {
+    backgroundColor: "rgba(0,0,0,0.7)",
+    borderColor: "white",
+    borderWidth: 1,
     alignItems: "center",
     marginBottom: 18,
     paddingHorizontal: 6,
+    borderRadius: 10,
   },
   titleMain: {
+    marginTop: 16,
+    opacity: 1,
     fontSize: 28,
     fontWeight: "800",
     letterSpacing: -0.5,
     textAlign: "center",
   },
   titleSub: {
-    fontSize: 13,
+    fontSize: 20,
     marginTop: 6,
     opacity: 0.9,
     textAlign: "center",
+    marginBottom: 15,
   },
   titleAccent: {
     height: 6,

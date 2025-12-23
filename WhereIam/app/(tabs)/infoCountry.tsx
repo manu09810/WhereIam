@@ -510,7 +510,7 @@ export default function InfoCountryScreen() {
             </View>
           </View>
 
-          {/*  {themeColors && (
+           {themeColors && (
             <View
               style={{
                 flexDirection: "row",
@@ -533,7 +533,7 @@ export default function InfoCountryScreen() {
                 />
               ))}
             </View>
-          )}  */}
+          )} 
 
           <View style={{ height: 20 }} />
         </ScrollView>

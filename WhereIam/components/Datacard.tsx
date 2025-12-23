@@ -1,0 +1,97 @@
+import React from "react";
+import { Pressable, Text } from "react-native";
+
+const getReadableTextColor = (hex: string) => {
+  if (!hex || hex.length < 7) return "#ffffff";
+  const r = parseInt(hex.substr(1, 2), 16) / 255;
+  const g = parseInt(hex.substr(3, 2), 16) / 255;
+  const b = parseInt(hex.substr(5, 2), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.55 ? "#111111" : "#ffffff";
+};
+
+const contrastRatio = (fg: string, bg: string) => {
+  const toL = (hex: string) => {
+    const r = parseInt(hex.substr(1, 2), 16) / 255;
+    const g = parseInt(hex.substr(3, 2), 16) / 255;
+    const b = parseInt(hex.substr(5, 2), 16) / 255;
+    const c = [r, g, b].map((v) =>
+      v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+    );
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  };
+  const L1 = toL(fg) + 0.05;
+  const L2 = toL(bg) + 0.05;
+  return L1 > L2 ? L1 / L2 : L2 / L1;
+};
+
+const pickAccessibleTextColor = (bg: string, preferred?: string) => {
+  const fallback = getReadableTextColor(bg);
+  if (preferred && contrastRatio(preferred, bg) >= 3) return preferred;
+  return fallback;
+};
+
+interface DataCardProps {
+  label: string;
+  value: string | null | undefined;
+  onPress?: () => void;
+  accentColor?: string;
+  textColor?: string;
+}
+
+export default function DataCard({
+  label,
+  value,
+  onPress,
+  accentColor = "#007aff",
+  textColor,
+}: DataCardProps) {
+  const readable = getReadableTextColor(accentColor);
+  const valueColor = pickAccessibleTextColor(
+    accentColor,
+    textColor || readable
+  );
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        flex: 1,
+        backgroundColor: accentColor,
+        borderRadius: 16,
+        padding: 10,
+        marginHorizontal: 6,
+        marginVertical: 12,
+        borderWidth: 1,
+        borderColor: accentColor,
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 100,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 18,
+          color: readable,
+          fontWeight: "600",
+          marginBottom: 10,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+          textAlign: "center",
+        }}
+      >
+        {label}
+      </Text>
+      <Text
+        style={{
+          fontSize: 16,
+          color: valueColor,
+          fontWeight: "700",
+          textAlign: "center",
+        }}
+      >
+        {value ?? "N/A"}
+      </Text>
+    </Pressable>
+  );
+}
