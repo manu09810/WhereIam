@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleWrapper: {
-    backgroundColor: "rgba(0,0,0,0.7i)",
+    backgroundColor: "rgba(0,0,0,0.7)",
     borderColor: "white",
     borderWidth: 1,
     alignItems: "center",
