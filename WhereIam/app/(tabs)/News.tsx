@@ -83,16 +83,15 @@ export default function News() {
   // --- end replaced ---
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: averageColor || "#fff" }]}
-    >
-      {backgroundImage && (
+    <SafeAreaView style={[styles.container, { backgroundColor: "#ffffff" }]}>
+      {/* Quita o comenta el Image */}
+      {/* {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
           style={StyleSheet.absoluteFillObject}
           blurRadius={3}
         />
-      )}
+      )} */}
       <View style={styles.content}>
         <View style={styles.titleWrapper}>
           <Text style={[styles.titleMain, { color: primary }]}>
@@ -277,7 +276,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleWrapper: {
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0,0,0,0.7i)",
     borderColor: "white",
     borderWidth: 1,
     alignItems: "center",
