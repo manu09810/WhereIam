@@ -62,7 +62,6 @@ export default function News() {
     regionName &&
     cityName.toLowerCase() === regionName.toLowerCase();
 
-  
   const rawCode = (isoCountryCode || countryData?.cca2 || "") as
     | string
     | undefined;
@@ -102,26 +101,26 @@ export default function News() {
           <Text style={[styles.titleSub, { color: buttonText }]}>
             Search local or international news
           </Text>
-          <View style={[styles.titleAccent, { backgroundColor: primary }]} />
+
+          <View style={styles.switchRow}>
+            <View style={{ height: 24, width: 180, justifyContent: "center" }}>
+              <Text
+                numberOfLines={1}
+                style={[styles.switchLabel, { color: buttonText }]}
+              >
+                {localNews ? "Local News" : "International News"}
+              </Text>
+            </View>
+            <Switch
+              value={localNews}
+              onValueChange={setLocalNews}
+              thumbColor={thumbOn}
+              trackColor={{ false: "#ccc", true: trackOn }}
+              style={{ flexShrink: 0 }}
+            />
+          </View>
         </View>
 
-        <View style={styles.switchRow}>
-          <View style={{ height: 24, width: 180, justifyContent: "center" }}>
-            <Text
-              numberOfLines={1}
-              style={[styles.switchLabel, { color: buttonText }]}
-            >
-              {localNews ? "Local News" : "International News"}
-            </Text>
-          </View>
-          <Switch
-            value={localNews}
-            onValueChange={setLocalNews}
-            thumbColor={thumbOn}
-            trackColor={{ false: "#ccc", true: trackOn }}
-            style={{ flexShrink: 0 }}
-          />
-        </View>
         <NewsButton
           label="Country News"
           value={countryName}
@@ -135,7 +134,7 @@ export default function News() {
               },
             })
           }
-          accentColor={primary}
+          accentColor={secondary}
           textColor={buttonText}
         />
         {isCityRegionSame ? (
@@ -175,7 +174,7 @@ export default function News() {
                   },
                 })
               }
-              accentColor={primary}
+              accentColor={secondary}
               textColor={buttonText}
             />
             <NewsButton
@@ -193,7 +192,7 @@ export default function News() {
                   },
                 })
               }
-              accentColor={primary}
+              accentColor={secondary}
               textColor={buttonText}
             />
           </>
@@ -278,7 +277,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleWrapper: {
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     borderColor: "white",
     borderWidth: 1,
     alignItems: "center",
@@ -287,6 +286,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   titleMain: {
+    marginTop: 16,
     opacity: 1,
     fontSize: 28,
     fontWeight: "800",
@@ -298,6 +298,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
     opacity: 0.9,
     textAlign: "center",
+    marginBottom: 15,
   },
   titleAccent: {
     height: 6,
