@@ -11,7 +11,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "We need your location for country finder."
+        "NSLocationWhenInUseUsageDescription": "We need your location for country finder.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "com.anonymous.WhereIam"
     },
@@ -28,7 +29,9 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION"
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "package": "com.anonymous.WhereIam"
     },
@@ -56,11 +59,18 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1bc60ea7-3037-4ba1-8d97-900c0dee27d3"
+      }
     }
   }
 }

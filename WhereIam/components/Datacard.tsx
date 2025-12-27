@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Pressable, Text } from "react-native";
+import { useAudioPlayer } from "expo-audio";
+
+const source = require("../assets/sounds/pop-up-something-160353.mp3");
 
 const getReadableTextColor = (hex: string) => {
   if (!hex || hex.length < 7) return "#ffffff";
@@ -35,6 +38,7 @@ interface DataCardProps {
   label: string;
   value: string | null | undefined;
   onPress?: () => void;
+  onPressIn?: () => void;
   accentColor?: string;
   textColor?: string;
 }
@@ -43,6 +47,7 @@ export default function DataCard({
   label,
   value,
   onPress,
+  onPressIn,
   accentColor = "#007aff",
   textColor,
 }: DataCardProps) {
@@ -52,8 +57,20 @@ export default function DataCard({
     textColor || readable
   );
 
+  const player = useAudioPlayer(source);
+
+  const handlePressIn = () => {
+    if (!player) return;
+    try {
+      player.seekTo(0);
+      player.play();
+    } catch {}  
+    onPressIn?.();
+  };
+
   return (
     <Pressable
+      onPressIn={handlePressIn}
       onPress={onPress}
       style={{
         flex: 1,
