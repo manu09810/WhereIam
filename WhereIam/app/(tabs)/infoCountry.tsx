@@ -263,17 +263,13 @@ export default function InfoCountryScreen() {
               elevation: 3,
             }}
           >
-            <Text
-              style={{
-                fontSize: 32,
-                fontWeight: "700",
-                color: getReadableTextColor(accentColor),
-                letterSpacing: -0.5,
-                textAlign: "center",
-              }}
-            >
-              {countryName}
-            </Text>
+            <DataCard
+              label="Country Name"
+              value={countryName}
+              onPress={() => openWikipedia(countryName)}
+              accentColor={accentColor}
+              textColor={accentColorText}
+            />
           </View>
 
           {/* Bandera */}
