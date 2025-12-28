@@ -2,6 +2,7 @@ import DataCard from "@/components/Datacard";
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { AudioPlayer  } from "expo-audio";
 import {
   Image,
   StyleSheet,

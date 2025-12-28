@@ -68,8 +68,10 @@ export default function DataCard({
   const handlePressIn = () => {
     if (!player) return;
     try {
-      player.seekTo(0);
-      player.play();
+      setTimeout(() => {
+        player.seekTo(0);
+        player.play();
+      }, 300);
     } catch {}
     onPressIn?.();
   };
