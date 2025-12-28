@@ -15,7 +15,7 @@ export function HapticTab(props: BottomTabBarButtonProps) {
         }
         props.onPressIn?.(ev);
         setTimeout(() => {
-          player.seekTo(1000);
+          player.seekTo(0);
           player.play();
         }, 500);
       }}

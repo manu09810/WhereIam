@@ -2,7 +2,7 @@ import DataCard from "@/components/Datacard";
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { AudioPlayer  } from "expo-audio";
+import { useAudioPlayer } from "expo-audio";
 import {
   Image,
   StyleSheet,
@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 // @ts-ignore
 const { iso6392 } = require("iso-639-2");
+const source = require("../../assets/sounds/confirm-tap-394001.mp3");
 
 const getReadableTextColor = (hex: string) => {
   if (!hex || hex.length < 7) return "#111";
@@ -26,6 +27,7 @@ const getReadableTextColor = (hex: string) => {
 };
 
 export default function News() {
+  const player = useAudioPlayer(source);
   const router = useRouter();
   const {
     countryData,
@@ -112,16 +114,22 @@ export default function News() {
             </View>
             <Switch
               value={localNews}
-              onValueChange={setLocalNews}
+              onValueChange={() => {
+                setLocalNews(!localNews);
+                setTimeout(() => {
+                  player.seekTo(0);
+                  player.play();
+                }, 200);
+              }}
               thumbColor={thumbOn}
               trackColor={{ false: "#ccc", true: trackOn }}
               style={{ flexShrink: 0 }}
             />
           </View>
-          <View style={{ width: "100%" }}>
+
+          <View style={{ width: "100%", paddingHorizontal: 6, height: 250}}>
             <DataCard
               value={`Country news: ${countryName}`}
-              // value="Tap to view"
               onPress={() =>
                 router.push({
                   pathname: "/NewsDetail",
@@ -204,40 +212,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  mapWrapper: {
-    height: 180,
-    paddingHorizontal: 24,
-    marginTop: 8,
-  },
-  mapContainer: {
-    flex: 1,
-    borderRadius: 12,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-  },
-  mapInnerWrapper: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   countryHighlight: {
     position: "absolute",
     left: "50%",
     top: "50%",
     pointerEvents: "none",
   },
-  mapInner: {
-    // mapInnerStyle (width/height/transform) se aplica dinámicamente
-    alignSelf: "flex-start",
-  },
+
   content: {
     flex: 1,
     padding: 24,
