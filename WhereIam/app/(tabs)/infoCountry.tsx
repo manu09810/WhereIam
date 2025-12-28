@@ -243,34 +243,16 @@ export default function InfoCountryScreen() {
           </View>
 
           {/* Nombre del país */}
-          <View
-            style={{
-              backgroundColor: accentColor,
-              borderRadius: 16,
-              padding: 16,
-              marginHorizontal: 12,
-              marginTop: 12,
-              marginBottom: 12,
-              borderWidth: 1,
-              borderColor: accentColor,
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: 120,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <DataCard
-              label="Country Name"
-              value={countryName}
-              onPress={() => openWikipedia(countryName)}
-              accentColor={accentColor}
-              textColor={accentColorText}
-            />
-          </View>
+
+          <DataCard
+            label="Country"
+            value={countryName}
+            onPress={() => openWikipedia(countryName)}
+            accentColor={accentColor}
+            textColor={accentColorText}
+            fontSize={32}
+            height = {150}
+          />
 
           {/* Bandera */}
           <View

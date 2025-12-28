@@ -41,6 +41,8 @@ interface DataCardProps {
   onPressIn?: () => void;
   accentColor?: string;
   textColor?: string;
+  fontSize?: number;
+  height?: number;
 }
 
 export default function DataCard({
@@ -50,6 +52,8 @@ export default function DataCard({
   onPressIn,
   accentColor = "#007aff",
   textColor,
+  fontSize,
+  height,
 }: DataCardProps) {
   const readable = getReadableTextColor(accentColor);
   const valueColor = pickAccessibleTextColor(
@@ -64,7 +68,7 @@ export default function DataCard({
     try {
       player.seekTo(0);
       player.play();
-    } catch {}  
+    } catch {}
     onPressIn?.();
   };
 
@@ -83,12 +87,13 @@ export default function DataCard({
         borderColor: accentColor,
         alignItems: "center",
         justifyContent: "center",
-        minHeight: 100,
+        minHeight: height ?? 100,
+      
       }}
     >
       <Text
         style={{
-          fontSize: 18,
+          fontSize: fontSize ?? 18,
           color: readable,
           fontWeight: "600",
           marginBottom: 10,
@@ -101,7 +106,7 @@ export default function DataCard({
       </Text>
       <Text
         style={{
-          fontSize: 16,
+          fontSize: (fontSize ?? 22) - 6,
           color: valueColor,
           fontWeight: "700",
           textAlign: "center",
