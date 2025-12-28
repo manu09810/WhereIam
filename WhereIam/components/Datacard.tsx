@@ -35,14 +35,15 @@ const pickAccessibleTextColor = (bg: string, preferred?: string) => {
 };
 
 interface DataCardProps {
-  label: string;
-  value: string | null | undefined;
+  label?: string;
+  value?: string | null | undefined;
   onPress?: () => void;
   onPressIn?: () => void;
   accentColor?: string;
   textColor?: string;
   fontSize?: number;
   height?: number;
+  block?: boolean; // nuevo
 }
 
 export default function DataCard({
@@ -54,6 +55,7 @@ export default function DataCard({
   textColor,
   fontSize,
   height,
+  block = false, // nuevo
 }: DataCardProps) {
   const readable = getReadableTextColor(accentColor);
   const valueColor = pickAccessibleTextColor(
@@ -77,7 +79,8 @@ export default function DataCard({
       onPressIn={handlePressIn}
       onPress={onPress}
       style={{
-        flex: 1,
+        flex: block ? 0 : 1, // cambiado
+        width: block ? "100%" : undefined, // cambiado
         backgroundColor: accentColor,
         borderRadius: 16,
         padding: 10,
@@ -88,32 +91,35 @@ export default function DataCard({
         alignItems: "center",
         justifyContent: "center",
         minHeight: height ?? 100,
-      
       }}
     >
-      <Text
-        style={{
-          fontSize: fontSize ?? 18,
-          color: readable,
-          fontWeight: "600",
-          marginBottom: 10,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          textAlign: "center",
-        }}
-      >
-        {label}
-      </Text>
-      <Text
-        style={{
-          fontSize: (fontSize ?? 22) - 6,
-          color: valueColor,
-          fontWeight: "700",
-          textAlign: "center",
-        }}
-      >
-        {value ?? "N/A"}
-      </Text>
+      {label && (
+        <Text
+          style={{
+            fontSize: fontSize ?? 18,
+            color: readable,
+            fontWeight: "600",
+            marginBottom: 10,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            textAlign: "center",
+          }}
+        >
+          {label}
+        </Text>
+      )}
+      {value && (
+        <Text
+          style={{
+            fontSize: (fontSize ?? 22) - 6,
+            color: valueColor,
+            fontWeight: "700",
+            textAlign: "center",
+          }}
+        >
+          {value}
+        </Text>
+      )}
     </Pressable>
   );
 }

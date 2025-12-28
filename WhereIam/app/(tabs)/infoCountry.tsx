@@ -251,7 +251,7 @@ export default function InfoCountryScreen() {
             accentColor={accentColor}
             textColor={accentColorText}
             fontSize={32}
-            height = {150}
+            height={150}
           />
 
           {/* Bandera */}
@@ -426,7 +426,7 @@ export default function InfoCountryScreen() {
             </View>
           </View>
 
-          {themeColors && (
+          {/*  {themeColors && (
             <View
               style={{
                 flexDirection: "row",
@@ -448,8 +448,7 @@ export default function InfoCountryScreen() {
                   }}
                 />
               ))}
-            </View>
-          )}
+            </View> */}
 
           <View style={{ height: 20 }} />
         </ScrollView>

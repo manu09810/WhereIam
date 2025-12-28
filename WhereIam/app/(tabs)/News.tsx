@@ -1,3 +1,4 @@
+import DataCard from "@/components/Datacard";
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -80,7 +81,6 @@ export default function News() {
     selectedColor,
     themeColors,
   });
-  // --- end replaced ---
 
   return (
     <SafeAreaView style={[styles.container]}>
@@ -118,9 +118,9 @@ export default function News() {
             />
           </View>
           <View style={{ width: "100%" }}>
-            <NewsButton
-              label="Country News"
-              value={countryName}
+            <DataCard
+              value={`Country news: ${countryName}`}
+              // value="Tap to view"
               onPress={() =>
                 router.push({
                   pathname: "/NewsDetail",
@@ -133,14 +133,12 @@ export default function News() {
               }
               accentColor={primary}
               textColor={buttonText}
+              height={50}
             />
+
             {isCityRegionSame ? (
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  styles.largeButton,
-                  { backgroundColor: primary },
-                ]}
+              <DataCard
+                value={`City / Region News: ${regionName}`}
                 onPress={() =>
                   router.push({
                     pathname: "/NewsDetail",
@@ -151,16 +149,14 @@ export default function News() {
                     },
                   })
                 }
-              >
-                <Text style={[styles.buttonText, { color: buttonText }]}>
-                  City / Region News: {regionName}
-                </Text>
-              </TouchableOpacity>
+                accentColor={primary}
+                textColor={buttonText}
+                height={50}
+              />
             ) : (
               <>
-                <NewsButton
-                  label="Region News"
-                  value={regionName}
+                <DataCard
+                  value={`Region News: ${regionName}`}
                   onPress={() =>
                     router.push({
                       pathname: "/NewsDetail",
@@ -173,10 +169,10 @@ export default function News() {
                   }
                   accentColor={primary}
                   textColor={buttonText}
+                  height={50}
                 />
-                <NewsButton
-                  label="City News"
-                  value={cityName}
+                <DataCard
+                  value={`City News: ${cityName}`}
                   onPress={() =>
                     router.push({
                       pathname: "/NewsDetail",
@@ -191,6 +187,7 @@ export default function News() {
                   }
                   accentColor={primary}
                   textColor={buttonText}
+                  height={50}
                 />
               </>
             )}
@@ -198,32 +195,6 @@ export default function News() {
         </View>
       </View>
     </SafeAreaView>
-  );
-}
-
-function NewsButton({
-  label,
-  value,
-  onPress,
-  accentColor = "#007aff",
-  textColor = "#fff",
-}: {
-  label: string;
-  value?: string | null;
-  onPress: () => void;
-  accentColor?: string;
-  textColor?: string;
-}) {
-  if (!value) return null;
-  return (
-    <TouchableOpacity
-      style={[styles.button, { backgroundColor: accentColor }]}
-      onPress={onPress}
-    >
-      <Text style={[styles.buttonText, { color: textColor }]}>
-        {label}: {value}
-      </Text>
-    </TouchableOpacity>
   );
 }
 
@@ -243,13 +214,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    // iOS shadow
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.12,
     shadowRadius: 6,
-    // Android elevation
-    elevation: 4,
   },
   mapInnerWrapper: {
     flex: 1,
@@ -259,7 +227,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  // (opcional) estilos por defecto para el highlight si quieres cambiar aquí
   countryHighlight: {
     position: "absolute",
     left: "50%",
