@@ -1,6 +1,8 @@
+import DataCard from "@/components/Datacard";
 import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useAudioPlayer } from "expo-audio";
 import {
   Image,
   StyleSheet,
@@ -13,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 // @ts-ignore
 const { iso6392 } = require("iso-639-2");
+const source = require("../../assets/sounds/confirm-tap-394001.mp3");
 
 const getReadableTextColor = (hex: string) => {
   if (!hex || hex.length < 7) return "#111";
@@ -24,6 +27,7 @@ const getReadableTextColor = (hex: string) => {
 };
 
 export default function News() {
+  const player = useAudioPlayer(source);
   const router = useRouter();
   const {
     countryData,
@@ -80,7 +84,6 @@ export default function News() {
     selectedColor,
     themeColors,
   });
-  // --- end replaced ---
 
   return (
     <SafeAreaView style={[styles.container]}>
@@ -111,16 +114,22 @@ export default function News() {
             </View>
             <Switch
               value={localNews}
-              onValueChange={setLocalNews}
+              onValueChange={() => {
+                setLocalNews(!localNews);
+                setTimeout(() => {
+                  player.seekTo(0);
+                  player.play();
+                }, 200);
+              }}
               thumbColor={thumbOn}
               trackColor={{ false: "#ccc", true: trackOn }}
               style={{ flexShrink: 0 }}
             />
           </View>
-          <View style={{ width: "100%" }}>
-            <NewsButton
-              label="Country News"
-              value={countryName}
+
+          <View style={{ width: "100%", paddingHorizontal: 6, height: 250}}>
+            <DataCard
+              value={`Country news: ${countryName}`}
               onPress={() =>
                 router.push({
                   pathname: "/NewsDetail",
@@ -133,14 +142,12 @@ export default function News() {
               }
               accentColor={primary}
               textColor={buttonText}
+              height={50}
             />
+
             {isCityRegionSame ? (
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  styles.largeButton,
-                  { backgroundColor: primary },
-                ]}
+              <DataCard
+                value={`City / Region News: ${regionName}`}
                 onPress={() =>
                   router.push({
                     pathname: "/NewsDetail",
@@ -151,16 +158,14 @@ export default function News() {
                     },
                   })
                 }
-              >
-                <Text style={[styles.buttonText, { color: buttonText }]}>
-                  City / Region News: {regionName}
-                </Text>
-              </TouchableOpacity>
+                accentColor={primary}
+                textColor={buttonText}
+                height={50}
+              />
             ) : (
               <>
-                <NewsButton
-                  label="Region News"
-                  value={regionName}
+                <DataCard
+                  value={`Region News: ${regionName}`}
                   onPress={() =>
                     router.push({
                       pathname: "/NewsDetail",
@@ -173,10 +178,10 @@ export default function News() {
                   }
                   accentColor={primary}
                   textColor={buttonText}
+                  height={50}
                 />
-                <NewsButton
-                  label="City News"
-                  value={cityName}
+                <DataCard
+                  value={`City News: ${cityName}`}
                   onPress={() =>
                     router.push({
                       pathname: "/NewsDetail",
@@ -191,6 +196,7 @@ export default function News() {
                   }
                   accentColor={primary}
                   textColor={buttonText}
+                  height={50}
                 />
               </>
             )}
@@ -201,75 +207,19 @@ export default function News() {
   );
 }
 
-function NewsButton({
-  label,
-  value,
-  onPress,
-  accentColor = "#007aff",
-  textColor = "#fff",
-}: {
-  label: string;
-  value?: string | null;
-  onPress: () => void;
-  accentColor?: string;
-  textColor?: string;
-}) {
-  if (!value) return null;
-  return (
-    <TouchableOpacity
-      style={[styles.button, { backgroundColor: accentColor }]}
-      onPress={onPress}
-    >
-      <Text style={[styles.buttonText, { color: textColor }]}>
-        {label}: {value}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
-  mapWrapper: {
-    height: 180,
-    paddingHorizontal: 24,
-    marginTop: 8,
-  },
-  mapContainer: {
-    flex: 1,
-    borderRadius: 12,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-    // iOS shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    // Android elevation
-    elevation: 4,
-  },
-  mapInnerWrapper: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  // (opcional) estilos por defecto para el highlight si quieres cambiar aquí
+
   countryHighlight: {
     position: "absolute",
     left: "50%",
     top: "50%",
     pointerEvents: "none",
   },
-  mapInner: {
-    // mapInnerStyle (width/height/transform) se aplica dinámicamente
-    alignSelf: "flex-start",
-  },
+
   content: {
     flex: 1,
     padding: 24,

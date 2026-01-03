@@ -2,6 +2,7 @@ import { CurrencyModal } from "@/components/CurrencyModal";
 import { WeatherModal } from "@/components/WeatherModal";
 import { TranslateModal } from "@/components/TranslateModal";
 import { useLocation } from "@/context/LocationContext";
+import DataCard from "@/components/Datacard";
 
 import { useEffect, useState } from "react";
 import {
@@ -49,69 +50,6 @@ const pickAccessibleTextColor = (bg: string, preferred?: string) => {
   if (preferred && contrastRatio(preferred, bg) >= 3) return preferred;
   return fallback;
 };
-
-function DataCard({
-  label,
-  value,
-  onPress,
-  accentColor = "#007aff",
-  textColor,
-}: {
-  label: string;
-  value: string | null | undefined;
-  onPress?: () => void;
-  accentColor?: string;
-  textColor?: string;
-}) {
-  const readable = getReadableTextColor(accentColor);
-  const valueColor = pickAccessibleTextColor(
-    accentColor,
-    textColor || readable
-  );
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        flex: 1,
-        backgroundColor: accentColor,
-        borderRadius: 16,
-        padding: 10,
-        marginHorizontal: 6,
-        marginVertical: 12,
-        borderWidth: 1,
-        borderColor: accentColor,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 100,
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 18,
-          color: readable,
-          fontWeight: "600",
-          marginBottom: 10,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          textAlign: "center",
-        }}
-      >
-        {label}
-      </Text>
-      <Text
-        style={{
-          fontSize: 16,
-          color: valueColor,
-          fontWeight: "700",
-          textAlign: "center",
-        }}
-      >
-        {value ?? "N/A"}
-      </Text>
-    </Pressable>
-  );
-}
 
 export default function InfoCountryScreen() {
   const {
@@ -305,38 +243,16 @@ export default function InfoCountryScreen() {
           </View>
 
           {/* Nombre del país */}
-          <View
-            style={{
-              backgroundColor: accentColor,
-              borderRadius: 16,
-              padding: 16,
-              marginHorizontal: 12,
-              marginTop: 12,
-              marginBottom: 12,
-              borderWidth: 1,
-              borderColor: accentColor,
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: 120,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 32,
-                fontWeight: "700",
-                color: getReadableTextColor(accentColor),
-                letterSpacing: -0.5,
-                textAlign: "center",
-              }}
-            >
-              {countryName}
-            </Text>
-          </View>
+
+          <DataCard
+            label="Country"
+            value={countryName}
+            onPress={() => openWikipedia(countryName)}
+            accentColor={accentColor}
+            textColor={accentColorText}
+            fontSize={32}
+            height={150}
+          />
 
           {/* Bandera */}
           <View
@@ -510,7 +426,7 @@ export default function InfoCountryScreen() {
             </View>
           </View>
 
-           {themeColors && (
+          {/*  {themeColors && (
             <View
               style={{
                 flexDirection: "row",
@@ -532,8 +448,7 @@ export default function InfoCountryScreen() {
                   }}
                 />
               ))}
-            </View>
-          )} 
+            </View> */}
 
           <View style={{ height: 20 }} />
         </ScrollView>
