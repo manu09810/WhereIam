@@ -47,8 +47,8 @@ export default function FactsDetail() {
         setError(null);
         const res = await ai.models.generateContent({
           model: "gemini-2.5-flash",
-          contents: `Give 5 hyper interesting facts about ${countryName}. THINK HARD Each fact should be ~100 characters.
-only facts separated by -`,
+          contents: `Give 5 hyper interesting and easy to average user about ${countryName}. THINK HARD about Each fact should be ~100 characters.
+and facts should separated by #$`,
         });
         if (mounted) setResponse(res);
       } catch (e: any) {
@@ -62,10 +62,7 @@ only facts separated by -`,
     };
   }, [countryName]);
 
-  const array = (response?.text ?? "")
-    .split("-")
-    .map((s: string) => s.trim())
-    .filter(Boolean);
+  const array = (response?.text ?? "").split("#$");
 
   return (
     <>
