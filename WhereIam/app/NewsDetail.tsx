@@ -116,7 +116,6 @@ export default function NewsDetail() {
         <Text style={[styles.backButton, { color: primary }]}>← Back</Text>
       </TouchableOpacity>
 
-      {/* Título estético (no DataCard) */}
       <View style={styles.titleWrapper}>
         <Text
           style={[

@@ -1,12 +1,68 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
-function textView() {
+function TextView({ texts }: { texts?: string[] }) {
+  const items = (texts &&
+    texts.length &&
+    texts.filter(Boolean).map((t) => t.trim())) || [
+    "Example Text 1",
+    "Example Text 2",
+    "Example Text 3",
+    "Example Text 4",
+    "Example Text 5",
+  ];
+
   return (
-    <View>
-      <Text>Example Text</Text>
+    <View style={styles.container}>
+      {items.map((t, i) => (
+        <View key={i} style={styles.row}>
+          <View style={styles.bullet}>
+            <Text style={styles.bulletText}>{i + 1}</Text>
+          </View>
+          <Text style={styles.text}>{t}</Text>
+        </View>
+      ))}
     </View>
   );
 }
 
-export default textView;
+const styles = StyleSheet.create({
+  container: {
+    padding: 12,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 12,
+  },
+  bullet: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#007aff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  bulletText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  text: {
+    flex: 1,
+    color: "#222",
+    fontSize: 16,
+    lineHeight: 20,
+    marginBottom: 6, 
+  },
+});
+
+export default TextView;

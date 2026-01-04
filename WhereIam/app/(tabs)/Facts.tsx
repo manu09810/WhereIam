@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import TextView from "@/components/textView";
+import DataCard from "@/components/Datacard";
 import {
   Platform,
   StyleSheet,
@@ -9,51 +10,23 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { GoogleGenAI } from "@google/genai";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useLocation } from "@/context/LocationContext";
-
-// inicializa el cliente top-level (usa tu variable de entorno Expo)
-const ai = new GoogleGenAI({
-  apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_GEMINI_KEY,
-});
+import { getReadableTextColor } from "@/constants/functions";
 
 export default function Facts() {
   const value = useLocation();
-  const { backgroundImage, averageColor } = value;
-  const { countryData } = value; // moved inside component
+  const router = useRouter();
+  const { backgroundImage, averageColor, themeColors } = value;
+  const { countryData } = value;
   const countryName = countryData?.name?.common;
-  const [response, setResponse] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+  const primary = themeColors?.[0] || averageColor || "#007aff";
+  const secondary = themeColors?.[4] || "#f2f2f2";
 
-  useEffect(() => {
-    if (!countryData?.name) {
-      // espera a que countryData esté disponible
-      return;
-    }
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: `Give 5 facts curiosity of ${countryName}, each one must be of about 50 caracters`,
-        });
-        if (mounted) setResponse(res); // guardar el objeto entero
-      } catch (e: any) {
-        if (mounted) setErr(e?.message ?? String(e));
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [countryData?.name]); // re-ejecuta cuando cambie countryData
-  console.log(response);
+  const buttonText = getReadableTextColor(primary);
 
   return (
     <SafeAreaView
@@ -66,14 +39,28 @@ export default function Facts() {
           blurRadius={3}
         />
       )}
-      
 
-      {loading && <Text>Loading...</Text>}
-      {err && <Text>Error: {err}</Text>}
-      {response && <Text>{response.text}</Text>}
-      <TextView />
+      <DataCard
+        value={`Country Facts: ${countryName || "—"}`}
+        onPress={() =>
+          router.push({
+            pathname: "/FactsDetail",
+            params: {
+              query: countryName || "",
+              label: "Country",
+            },
+          })
+        }
+        accentColor={primary}
+        textColor={buttonText}
+        height={50}
+      />
 
-      <ScrollView contentContainerStyle={styles.content}></ScrollView>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={{ color: "#333" }}>
+          Pulsa la tarjeta para ver los datos curiosos generados por AI.
+        </Text>
+      </ScrollView>
     </SafeAreaView>
   );
 }
