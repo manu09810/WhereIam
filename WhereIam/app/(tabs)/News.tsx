@@ -45,7 +45,7 @@ export default function News() {
   const switchColor = themeColors?.[3] || "#34C759";
   const buttonText = getReadableTextColor(primary);
   const thumbOn = switchColor;
-  const trackOn = `${switchColor}66`;
+  const trackOn = `${switchColor}`;
 
   const rawLangCode =
     countryData?.languages && Object.keys(countryData.languages)[0]
