@@ -21,7 +21,7 @@ export default function Facts() {
   const value = useLocation();
   const router = useRouter();
   const { backgroundImage, averageColor, themeColors } = value;
-  const { countryData } = value;
+  const { countryData, city, region } = value;
   const countryName = countryData?.name?.common;
   const primary = themeColors?.[0] || averageColor || "#007aff";
   const secondary = themeColors?.[4] || "#f2f2f2";
@@ -47,7 +47,7 @@ export default function Facts() {
             pathname: "/FactsDetail",
             params: {
               query: countryName || "",
-              label: "Country",
+              label: "Data",
             },
           })
         }
@@ -56,11 +56,36 @@ export default function Facts() {
         height={50}
       />
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={{ color: "#333" }}>
-          Pulsa la tarjeta para ver los datos curiosos generados por AI.
-        </Text>
-      </ScrollView>
+      <DataCard
+        value={`Region Facts: ${region || "—"}`}
+        onPress={() =>
+          router.push({
+            pathname: "/FactsDetail",
+            params: {
+              query: region || "" + countryName || "",
+              label: "Data",
+            },
+          })
+        }
+        accentColor={primary}
+        textColor={buttonText}
+        height={50}
+      />
+      <DataCard
+        value={`City Facts: ${city || "—"}`}
+        onPress={() =>
+          router.push({
+            pathname: "/FactsDetail",
+            params: {
+              query: city || "" + countryName || "",
+              label: "Data",
+            },
+          })
+        }
+        accentColor={primary}
+        textColor={buttonText}
+        height={50}
+      />
     </SafeAreaView>
   );
 }

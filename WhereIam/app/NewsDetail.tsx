@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useLocation } from "@/context/LocationContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getReadableTextColor, shortenLink } from "@/constants/functions";
 
 type NewsResult = {
   title: string;
@@ -25,23 +26,8 @@ type GoogleSearchItem = {
   link: string;
 };
 
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#111";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
-
 // Añadir helper para acortar links
-const shortenLink = (url: string, max = 60) => {
-  if (!url) return "";
-  if (url.length <= max) return url;
-  const headLen = Math.ceil(max * 0.6);
-  const tailLen = max - headLen;
-  return `${url.slice(0, headLen)}...${url.slice(-tailLen)}`;
-};
+
 
 export default function NewsDetail() {
   const { query, label, lang } = useLocalSearchParams<{

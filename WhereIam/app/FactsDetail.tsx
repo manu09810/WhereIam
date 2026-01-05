@@ -25,7 +25,7 @@ export default function FactsDetail() {
     countryData,
   } = useLocation();
   const bgToUse =
-    label === "Country" ? backgroundImage : regionImage || backgroundImage;
+    label === "Data" ? backgroundImage : regionImage || backgroundImage;
 
   const primary = themeColors?.[0] || averageColor || "#007aff";
   const pageBg = averageColor || "#fff";
@@ -36,10 +36,10 @@ export default function FactsDetail() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const countryName = (query as string) || countryData?.name?.common;
+  const queryName = (query as string) || countryData?.name?.common;
 
   useEffect(() => {
-    if (!countryName) return;
+    if (!queryName) return;
     let mounted = true;
     (async () => {
       try {
@@ -47,7 +47,7 @@ export default function FactsDetail() {
         setError(null);
         const res = await ai.models.generateContent({
           model: "gemini-2.5-flash",
-          contents: `Give 5 hyper interesting and easy to average user about ${countryName}. THINK HARD about Each fact should be ~100 characters.
+          contents: `Give 5 hyper interesting and easy to average user about ${queryName}. THINK HARD about Each fact should be ~100 characters.
 and facts should separated by #$`,
         });
         if (mounted) setResponse(res);
@@ -60,7 +60,7 @@ and facts should separated by #$`,
     return () => {
       mounted = false;
     };
-  }, [countryName]);
+  }, [queryName]);
 
   const array = (response?.text ?? "").split("#$");
 
