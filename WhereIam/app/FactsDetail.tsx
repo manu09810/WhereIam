@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Image } from "react-native";
+import { View, Text, ActivityIndicator, Image, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useLocation } from "@/context/LocationContext";
 import { getReadableTextColor } from "@/constants/functions";
@@ -28,8 +28,10 @@ export default function FactsDetail() {
     label === "Data" ? backgroundImage : regionImage || backgroundImage;
 
   const primary = themeColors?.[0] || averageColor || "#007aff";
+  const secundary = themeColors?.[1] || averageColor || "#007aff";
   const pageBg = averageColor || "#fff";
   const cardBg = themeColors?.[3] || "#f2f2f2";
+  const buttonColor = getReadableTextColor(primary);
 
   const [response, setResponse] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,23 +67,22 @@ and facts should separated by #$`,
   const array = (response?.text ?? "").split("#$");
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       {bgToUse && (
         <Image
           source={{ uri: bgToUse }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            opacity: 0.88,
-            zIndex: -1,
-          }}
+          style={StyleSheet.absoluteFillObject}
           blurRadius={3}
         />
       )}
-      <SafeAreaView style={{ flex: 1, backgroundColor: pageBg }}>
+      <SafeAreaView
+        style={[{ flex: 1, backgroundColor: pageBg }, styles.safeArea]}
+      >
+        <View style={[styles.titleWrapper, { borderColor: secundary }]}>
+          <Text style={[styles.titleMain, { color: secundary }]}>
+            Facts from {query || label}
+          </Text>
+        </View>
         {loading && (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -101,7 +102,49 @@ and facts should separated by #$`,
             <TextView texts={array} />
           </View>
         )}
+
+        <View style={styles.bottomContainer}>
+          <Text
+            style={[styles.backButton, { color: buttonColor }]}
+            onPress={() => router.back()}
+          >
+            ← Back
+          </Text>
+        </View>
       </SafeAreaView>
-    </>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    overflow: "hidden",
+  },
+  titleWrapper: {
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderWidth: 8,
+    alignItems: "center",
+    marginBottom: 18,
+    paddingHorizontal: 6,
+    borderRadius: 30,
+    marginTop: 50,
+    paddingVertical: 12,
+  },
+  titleMain: {
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    textAlign: "center",
+  },
+  bottomContainer: {
+    padding: 16,
+    alignItems: "center",
+    marginTop: "auto",
+  },
+  backButton: {
+    fontSize: 16,
+    fontWeight: "600",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+});

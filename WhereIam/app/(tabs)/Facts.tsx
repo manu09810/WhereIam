@@ -39,7 +39,7 @@ export default function Facts() {
         <View style={[styles.titleWrapper, { borderColor: secondary }]}>
           <Text style={[styles.titleMain, { color: primary }]}>Facts</Text>
           <Text style={[styles.titleSub, { color: buttonText }]}>
-           Facts about each site 
+            Facts about each site
           </Text>
 
           <View style={{ width: "100%", paddingHorizontal: 6, marginTop: 16 }}>
@@ -66,7 +66,7 @@ export default function Facts() {
                 router.push({
                   pathname: "/FactsDetail",
                   params: {
-                    query: regionName || countryName || "",
+                    query: regionName + ", " + countryName,
                     label: "Data",
                   },
                 })
@@ -83,7 +83,7 @@ export default function Facts() {
                 router.push({
                   pathname: "/FactsDetail",
                   params: {
-                    query: cityName || countryName || "",
+                    query: cityName + ", " + countryName,
                     label: "Data",
                   },
                 })
