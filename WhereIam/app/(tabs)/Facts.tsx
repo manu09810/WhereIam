@@ -50,7 +50,7 @@ export default function Facts() {
                   pathname: "/FactsDetail",
                   params: {
                     query: countryName || "",
-                    label: "Data",
+                    label: "country",
                   },
                 })
               }
@@ -67,7 +67,7 @@ export default function Facts() {
                   pathname: "/FactsDetail",
                   params: {
                     query: regionName + ", " + countryName,
-                    label: "Data",
+                    label: "region",
                   },
                 })
               }
@@ -84,7 +84,7 @@ export default function Facts() {
                   pathname: "/FactsDetail",
                   params: {
                     query: cityName + ", " + countryName,
-                    label: "Data",
+                    label: "city",
                   },
                 })
               }

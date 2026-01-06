@@ -6,6 +6,7 @@ import { getReadableTextColor } from "@/constants/functions";
 import { GoogleGenAI } from "@google/genai";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextView from "@/components/textView";
+import { Background } from "@react-navigation/elements";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_GEMINI_KEY,
@@ -24,8 +25,9 @@ export default function FactsDetail() {
     averageColor,
     countryData,
   } = useLocation();
+
   const bgToUse =
-    label === "Data" ? backgroundImage : regionImage || backgroundImage;
+    label === "country" ? backgroundImage : regionImage || backgroundImage;
 
   const primary = themeColors?.[0] || averageColor || "#007aff";
   const secundary = themeColors?.[1] || averageColor || "#007aff";
@@ -68,17 +70,24 @@ and facts should separated by #$`,
 
   return (
     <View style={{ flex: 1 }}>
-      {bgToUse && (
-        <Image
-          source={{ uri: bgToUse }}
-          style={StyleSheet.absoluteFillObject}
-          blurRadius={3}
-        />
-      )}
+        {bgToUse && (
+          <Image
+            source={{ uri: bgToUse }}
+            style={StyleSheet.absoluteFillObject}
+            blurRadius={3}
+          />
+        )}
+
       <SafeAreaView
-        style={[{ flex: 1, backgroundColor: pageBg }, styles.safeArea]}
+        style={[{ flex: 1, backgroundColor: "transparent" }, styles.safeArea]}
       >
-        <View style={[styles.titleWrapper, { borderColor: secundary }]}>
+        <Text
+          style={[styles.backButton, { color: buttonColor }]}
+          onPress={() => router.back()}
+        >
+          ← Back
+        </Text>
+        <View style={[styles.titleWrapper, { borderColor: primary }]}>
           <Text style={[styles.titleMain, { color: secundary }]}>
             Facts from {query || label}
           </Text>
@@ -99,35 +108,26 @@ and facts should separated by #$`,
 
         {!loading && response?.text && (
           <View style={{ padding: 16 }}>
-            <TextView texts={array} />
+            <TextView texts={array} bulletColor={primary} />
           </View>
         )}
 
-        <View style={styles.bottomContainer}>
-          <Text
-            style={[styles.backButton, { color: buttonColor }]}
-            onPress={() => router.back()}
-          >
-            ← Back
-          </Text>
-        </View>
+        <View style={styles.bottomContainer}></View>
       </SafeAreaView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    overflow: "hidden",
-  },
+
   titleWrapper: {
     backgroundColor: "rgba(0,0,0,0.6)",
     borderWidth: 8,
     alignItems: "center",
     marginBottom: 18,
     paddingHorizontal: 6,
-    borderRadius: 30,
-    marginTop: 50,
+    borderRadius: 10,
+    marginTop: 80,
     paddingVertical: 12,
   },
   titleMain: {

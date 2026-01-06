@@ -1,7 +1,18 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-function TextView({ texts }: { texts?: string[] }) {
+function TextView({ 
+  texts, 
+  bulletColor = "#007aff",
+  textColor = "#222",
+  fontSize = 16
+
+}: { 
+  texts?: string[];
+  bulletColor?: string;
+  textColor?: string;
+  fontSize?: number;
+}) {
   const items = (texts &&
     texts.length &&
     texts.filter(Boolean).map((t) => t.trim())) || [
@@ -16,10 +27,10 @@ function TextView({ texts }: { texts?: string[] }) {
     <View style={styles.container}>
       {items.map((t, i) => (
         <View key={i} style={styles.row}>
-          <View style={styles.bullet}>
+          <View style={[styles.bullet, { backgroundColor: bulletColor }]}>
             <Text style={styles.bulletText}>{i + 1}</Text>
           </View>
-          <Text style={styles.text}>{t}</Text>
+          <Text style={[styles.text, { color: textColor, fontSize }]}>{t}</Text>
         </View>
       ))}
     </View>
