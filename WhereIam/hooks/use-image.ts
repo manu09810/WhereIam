@@ -39,7 +39,7 @@ export const useImage = (countryData: any, region?: string | null) => {
         (img) => setRegionImage(img)
       );
     } else {
-      setRegionImage(null); // reset to avoid fallback showing the country image
+      setRegionImage(null); 
     }
   }, [region, countryData]);
 
