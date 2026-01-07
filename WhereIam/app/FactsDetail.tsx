@@ -70,25 +70,23 @@ and facts should separated by #$`,
 
   return (
     <View style={{ flex: 1 }}>
-        {bgToUse && (
-          <Image
-            source={{ uri: bgToUse }}
-            style={StyleSheet.absoluteFillObject}
-            blurRadius={3}
-          />
-        )}
+      {bgToUse && (
+        <Image
+          source={{ uri: bgToUse }}
+          style={StyleSheet.absoluteFillObject}
+          blurRadius={3}
+        />
+      )}
 
-      <SafeAreaView
-        style={[{ flex: 1, backgroundColor: "transparent" }, styles.safeArea]}
-      >
+      <SafeAreaView style={[{ flex: 1, backgroundColor: "transparent" }]}>
         <Text
           style={[styles.backButton, { color: buttonColor }]}
           onPress={() => router.back()}
         >
           ← Back
         </Text>
-        <View style={[styles.titleWrapper, { borderColor: primary }]}>
-          <Text style={[styles.titleMain, { color: secundary }]}>
+        <View style={[styles.titleWrapper]}>
+          <Text style={[styles.titleMain, { color: primary }]}>
             Facts from {query || label}
           </Text>
         </View>
@@ -119,7 +117,6 @@ and facts should separated by #$`,
 }
 
 const styles = StyleSheet.create({
-
   titleWrapper: {
     backgroundColor: "rgba(0,0,0,0.6)",
     borderWidth: 8,
