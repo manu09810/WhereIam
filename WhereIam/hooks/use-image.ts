@@ -35,11 +35,11 @@ export const useImage = (countryData: any, region?: string | null) => {
 
   useEffect(() => {
     if (region && countryData?.name?.common) {
-      fetchUnsplashImage(`${region} ${countryData.name.common}`).then(
+      fetchUnsplashImage(`${region} ${countryData.name.common} landscape`).then(
         (img) => setRegionImage(img)
       );
     } else {
-      setRegionImage(null); // reset to avoid fallback showing the country image
+      setRegionImage(null); 
     }
   }, [region, countryData]);
 

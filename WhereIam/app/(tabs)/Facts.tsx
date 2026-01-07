@@ -1,28 +1,32 @@
-import {
-  Platform,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
+import React from "react";
+import DataCard from "@/components/Datacard";
 import { useLocation } from "@/context/LocationContext";
+import { useRouter } from "expo-router";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { getReadableTextColor } from "@/constants/functions";
 
 export default function Facts() {
-  const value = useLocation();
-  const { backgroundImage, averageColor } = value;
+  const router = useRouter();
+  const {
+    countryData,
+    city,
+    region,
+    backgroundImage,
+    themeColors,
+    averageColor,
+  } = useLocation();
+
+  const primary = themeColors?.[0] || averageColor || "#007aff";
+  const secondary = themeColors?.[4] || "#f2f2f2";
+  const buttonText = getReadableTextColor(primary);
+
+  const countryName = countryData?.name?.common || "";
+  const regionName = region || "";
+  const cityName = city || "";
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: averageColor || "#fff" }]}
-    >
+    <SafeAreaView style={[styles.container]}>
       {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
@@ -31,7 +35,67 @@ export default function Facts() {
         />
       )}
 
-      <ScrollView contentContainerStyle={styles.content}></ScrollView>
+      <View style={styles.content}>
+        <View style={[styles.titleWrapper, { borderColor: secondary }]}>
+          <Text style={[styles.titleMain, { color: primary }]}>Facts</Text>
+          <Text style={[styles.titleSub, { color: buttonText }]}>
+            Facts about each site
+          </Text>
+
+          <View style={{ width: "100%", paddingHorizontal: 6, marginTop: 16 }}>
+            <DataCard
+              value={`Country Facts: ${countryName || "—"}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/FactsDetail",
+                  params: {
+                    query: countryName || "",
+                    label: "country",
+                  },
+                })
+              }
+              accentColor={primary}
+              textColor={buttonText}
+              height={50}
+              block={true}
+            />
+
+            <DataCard
+              value={`Region Facts: ${regionName || "—"}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/FactsDetail",
+                  params: {
+                    query: regionName + ", " + countryName,
+                    label: "region",
+                  },
+                })
+              }
+              accentColor={primary}
+              textColor={buttonText}
+              height={50}
+              block={true}
+            />
+
+            <DataCard
+              value={`City Facts: ${cityName || "—"}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/FactsDetail",
+                  params: {
+                    query: cityName + ", " + countryName,
+                    label: "city",
+                  },
+                })
+              }
+              accentColor={primary}
+              textColor={buttonText}
+              height={50}
+              block={true}
+            />
+          </View>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -42,22 +106,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   content: {
-    padding: 16,
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
   },
-  titleContainer: {
-    flexDirection: "row",
+  titleWrapper: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderWidth: 8,
     alignItems: "center",
-    gap: 8,
+    marginBottom: 18,
+    paddingHorizontal: 6,
+    borderRadius: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  titleMain: {
+    marginTop: 16,
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    textAlign: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  titleSub: {
+    fontSize: 18,
+    marginTop: 6,
+    textAlign: "center",
+    marginBottom: 12,
   },
 });
