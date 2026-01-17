@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getReadableTextColor, shortenLink } from "@/constants/functions";
 import { getFromCache, setOnCache } from "@/constants/cache";
 
+
 type NewsResult = {
   title: string;
   snippet: string;
@@ -37,14 +38,13 @@ export default function NewsDetail() {
   const { backgroundImage, regionImage, themeColors, averageColor } =
     useLocation();
   const bgToUse =
-    label === "Country" ? backgroundImage : regionImage || backgroundImage;
+    label === "country" ? backgroundImage : regionImage || backgroundImage;
 
   const primary = themeColors?.[0] || averageColor || "#007aff";
   const titleColor = primary;
   const pageBg = averageColor || "#fff";
   const cardBg = themeColors?.[3] || "#f2f2f2";
   const cardText = getReadableTextColor(cardBg);
-  const textOnPrimary = getReadableTextColor(primary);
 
   const [results, setResults] = useState<NewsResult[]>([]);
   const [loading, setLoading] = useState(true);
