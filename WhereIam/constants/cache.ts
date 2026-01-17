@@ -38,3 +38,17 @@ export async function setOnCache(
   }
   return DataAI;
 }
+
+export async function deleteGeneralCache(
+  labelArray: string[],
+  typeOfMedia: string
+) {
+  await Promise.all(
+    labelArray.map(async (element) => {
+      const cacheKey = `${element}-${typeOfMedia}`;
+      await AsyncStorage.removeItem(cacheKey);
+      await AsyncStorage.removeItem(`${cacheKey}-location`);
+      await AsyncStorage.removeItem(`${cacheKey}-timestamp`);
+    })
+  );
+}
