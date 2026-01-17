@@ -180,11 +180,7 @@ const styles = StyleSheet.create({
     padding: 18,
     backgroundColor: "#fff",
   },
-  backButton: {
-    fontSize: 16,
-    marginBottom: 10,
-    paddingVertical: 4,
-  },
+
   titleWrapper: {
     alignItems: "center",
     marginBottom: 18,
