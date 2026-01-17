@@ -7,6 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextView from "@/components/textView";
 import { getFromCache, setOnCache } from "@/constants/cache";
+import { BackButton } from "@/components/BackButton";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_GEMINI_KEY,
@@ -93,12 +94,7 @@ and facts should separated by #$`,
       )}
 
       <SafeAreaView style={[{ flex: 1, backgroundColor: "transparent" }]}>
-        <Text
-          style={[styles.backButton, { color: buttonColor }]}
-          onPress={() => router.back()}
-        >
-          ← Back
-        </Text>
+        <BackButton colorButton={buttonColor}></BackButton>
         <View style={[styles.titleWrapper]}>
           <Text style={[styles.titleMain, { color: primary }]}>
             Facts from {query || label}
@@ -151,11 +147,5 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     marginTop: "auto",
-  },
-  backButton: {
-    fontSize: 16,
-    fontWeight: "600",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
   },
 });
