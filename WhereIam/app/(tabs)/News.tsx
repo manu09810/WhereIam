@@ -3,6 +3,7 @@ import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useAudioPlayer } from "expo-audio";
+import { deleteGeneralCache } from "@/constants/cache";
 import {
   Image,
   StyleSheet,
@@ -115,6 +116,7 @@ export default function News() {
             <Switch
               value={localNews}
               onValueChange={() => {
+                deleteGeneralCache(["country","region","city"],"news")
                 setLocalNews(!localNews);
                 setTimeout(() => {
                   player.seekTo(0);
@@ -135,7 +137,7 @@ export default function News() {
                   pathname: "/NewsDetail",
                   params: {
                     query: `"${countryName || ""}"`,
-                    label: "Country",
+                    label: "country",
                     lang: localNews ? langCode : "en",
                     locationName: countryName,
                   },
@@ -154,7 +156,7 @@ export default function News() {
                     pathname: "/NewsDetail",
                     params: {
                       query: `"${regionName || ""}" ${countryName}`,
-                      label: "City / Region",
+                      label: "city",
                       lang: localNews ? langCode : "en",
                       locationName: regionName,
                     },
@@ -173,7 +175,7 @@ export default function News() {
                       pathname: "/NewsDetail",
                       params: {
                         query: `"${regionName || ""}" ${countryName}`,
-                        label: "Region",
+                        label: "region",
                         lang: localNews ? langCode : "en",
                         locationName: regionName,
                       },
@@ -192,7 +194,7 @@ export default function News() {
                         query: `"${cityName || ""}" ${
                           regionName || ""
                         } ${countryName}`,
-                        label: "City",
+                        label: "city",
                         lang: localNews ? langCode : "en",
                         locationName: cityName,
                       },
