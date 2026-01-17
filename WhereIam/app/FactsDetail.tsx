@@ -6,17 +6,16 @@ import { getReadableTextColor } from "@/constants/functions";
 import { GoogleGenAI } from "@google/genai";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextView from "@/components/textView";
-import { Background } from "@react-navigation/elements";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const ai = new GoogleGenAI({
   apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_GEMINI_KEY,
 });
 
 export default function FactsDetail() {
-  const { query, label, lang } = useLocalSearchParams<{
+  const { query, label, locationName } = useLocalSearchParams<{
     query?: string;
     label?: string;
-    lang?: string;
+    locationName: string;
   }>();
   const {
     backgroundImage,
@@ -39,7 +38,6 @@ export default function FactsDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
   const queryName = (query as string) || countryData?.name?.common;
 
   useEffect(() => {
@@ -49,24 +47,35 @@ export default function FactsDetail() {
       try {
         setLoading(true);
         setError(null);
+        const cachedData = await AsyncStorage.getItem(locationName);
+        if (cachedData && mounted) {
+          setResponse(cachedData);
+          setLoading(false);
+          return;
+        }
         const res = await ai.models.generateContent({
           model: "gemini-2.5-flash",
           contents: `Give 5 hyper interesting and easy to average user about ${queryName}. THINK HARD about Each fact should be ~100 characters.
 and facts should separated by #$`,
         });
-        if (mounted) setResponse(res);
+        if (mounted) {
+          const text = res.text ?? "";
+          setResponse(text);
+          await AsyncStorage.setItem(locationName, text);
+        }
       } catch (e: any) {
         if (mounted) setError(e?.message ?? String(e));
       } finally {
         if (mounted) setLoading(false);
       }
     })();
+
     return () => {
       mounted = false;
     };
-  }, [queryName]);
-
-  const array = (response?.text ?? "").split("#$");
+  }, [queryName, locationName]);
+  console.log(response?.text);
+  const array = (response ?? "").split("#$");
 
   return (
     <View style={{ flex: 1 }}>
@@ -104,7 +113,7 @@ and facts should separated by #$`,
           </View>
         )}
 
-        {!loading && response?.text && (
+        {!loading && response && (
           <View style={{ padding: 16 }}>
             <TextView texts={array} bulletColor={primary} />
           </View>
