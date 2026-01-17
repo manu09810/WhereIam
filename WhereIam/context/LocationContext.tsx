@@ -1,6 +1,7 @@
 import { useCountry } from "@/hooks/use-country";
 import { useImage } from "@/hooks/use-image";
 import { useUserLocation } from "@/hooks/use-location";
+import { averageColors } from "@/constants/functions";
 import { getColors } from "react-native-image-colors";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -27,35 +28,7 @@ const LocationContext = createContext<LocationContextType | undefined>(
   undefined
 );
 
-// Utility functions
-function hexToRgb(hex: string): [number, number, number] {
-  const r = parseInt(hex.substr(1, 2), 16);
-  const g = parseInt(hex.substr(3, 2), 16);
-  const b = parseInt(hex.substr(5, 2), 16);
-  return [r, g, b];
-}
-
-function rgbToHex([r, g, b]: [number, number, number]): string {
-  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-}
-
-function averageColors(colors: string[]): string {
-  const total = colors.length;
-  const sum = colors.reduce(
-    (acc, hex) => {
-      const [r, g, b] = hexToRgb(hex);
-      return [acc[0] + r, acc[1] + g, acc[2] + b];
-    },
-    [0, 0, 0]
-  );
-
-  const avg = sum.map((val) => Math.round(val / total)) as [
-    number,
-    number,
-    number
-  ];
-  return rgbToHex(avg);
-}
+// Remove the utility functions from here (hexToRgb, rgbToHex, averageColors)
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
   const locationData = useUserLocation();

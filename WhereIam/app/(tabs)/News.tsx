@@ -127,7 +127,7 @@ export default function News() {
             />
           </View>
 
-          <View style={{ width: "100%", paddingHorizontal: 6, height: 250}}>
+          <View style={{ width: "100%", paddingHorizontal: 6, height: 250 }}>
             <DataCard
               value={`Country news: ${countryName}`}
               onPress={() =>
@@ -137,6 +137,7 @@ export default function News() {
                     query: `"${countryName || ""}"`,
                     label: "Country",
                     lang: localNews ? langCode : "en",
+                    locationName: countryName,
                   },
                 })
               }
@@ -155,6 +156,7 @@ export default function News() {
                       query: `"${regionName || ""}" ${countryName}`,
                       label: "City / Region",
                       lang: localNews ? langCode : "en",
+                      locationName: regionName,
                     },
                   })
                 }
@@ -173,6 +175,7 @@ export default function News() {
                         query: `"${regionName || ""}" ${countryName}`,
                         label: "Region",
                         lang: localNews ? langCode : "en",
+                        locationName: regionName,
                       },
                     })
                   }
@@ -191,6 +194,7 @@ export default function News() {
                         } ${countryName}`,
                         label: "City",
                         lang: localNews ? langCode : "en",
+                        locationName: cityName,
                       },
                     })
                   }

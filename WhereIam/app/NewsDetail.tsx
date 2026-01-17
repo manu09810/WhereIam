@@ -13,6 +13,7 @@ import {
 import { useLocation } from "@/context/LocationContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getReadableTextColor, shortenLink } from "@/constants/functions";
+import { getFromCache, setOnCache } from "@/constants/cache";
 
 type NewsResult = {
   title: string;
@@ -26,14 +27,12 @@ type GoogleSearchItem = {
   link: string;
 };
 
-// Añadir helper para acortar links
-
-
 export default function NewsDetail() {
-  const { query, label, lang } = useLocalSearchParams<{
+  const { query, label, lang, locationName } = useLocalSearchParams<{
     query?: string;
-    label?: string;
+    label: string;
     lang?: string;
+    locationName: string;
   }>();
   const { backgroundImage, regionImage, themeColors, averageColor } =
     useLocation();
@@ -58,34 +57,44 @@ export default function NewsDetail() {
     const fetchNews = async () => {
       setLoading(true);
       setError(null);
-      try {
-        const lrParam = lang ? `&lr=lang_${lang}` : "";
-        const url = `https://www.googleapis.com/customsearch/v1?key=${
-          process.env.EXPO_PUBLIC_GOOGLE_API_KEY
-        }&cx=${
-          process.env.EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID
-        }&q=${encodeURIComponent(query + " news")}${lrParam}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.items && data.items.length > 0) {
-          setResults(
-            data.items.map((item: GoogleSearchItem) => ({
+      const cache = await getFromCache(label, "news", locationName);
+      if (cache) {
+        setResults(JSON.parse(cache));
+        setLoading(false);
+      } else {
+        try {
+          const lrParam = lang ? `&lr=lang_${lang}` : "";
+          const url = `https://www.googleapis.com/customsearch/v1?key=${
+            process.env.EXPO_PUBLIC_GOOGLE_API_KEY
+          }&cx=${
+            process.env.EXPO_PUBLIC_GOOGLE_SEARCH_ENGINE_ID
+          }&q=${encodeURIComponent(query + " news")}${lrParam}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          if (data.items && data.items.length > 0) {
+            const newsItems = data.items.map((item: GoogleSearchItem) => ({
               title: item.title,
               snippet: item.snippet,
               link: item.link,
-            }))
-          );
-        } else {
-          setResults([]);
-          setError("No news found.");
+            }));
+            setResults(newsItems);
+            await setOnCache(
+              JSON.stringify(newsItems),
+              label,
+              "news",
+              locationName
+            );
+          } else {
+            setResults([]);
+            setError("No news found.");
+          }
+        } catch {
+          setError("Failed to fetch news.");
+        } finally {
+          setLoading(false);
         }
-      } catch {
-        setError("Failed to fetch news.");
-      } finally {
-        setLoading(false);
       }
     };
-
     fetchNews();
   }, [query, lang]);
 

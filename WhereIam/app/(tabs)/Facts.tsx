@@ -51,6 +51,7 @@ export default function Facts() {
                   params: {
                     query: countryName || "",
                     label: "country",
+                    locationName: countryName,
                   },
                 })
               }
@@ -68,6 +69,7 @@ export default function Facts() {
                   params: {
                     query: regionName + ", " + countryName,
                     label: "region",
+                    locationName: regionName,
                   },
                 })
               }
@@ -85,6 +87,7 @@ export default function Facts() {
                   params: {
                     query: cityName + ", " + countryName,
                     label: "city",
+                    locationName: cityName,
                   },
                 })
               }
