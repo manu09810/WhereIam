@@ -14,7 +14,7 @@ import { useLocation } from "@/context/LocationContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getReadableTextColor, shortenLink } from "@/constants/functions";
 import { getFromCache, setOnCache } from "@/constants/cache";
-
+import { BackButton } from "@/components/BackButton";
 
 type NewsResult = {
   title: string;
@@ -107,9 +107,7 @@ export default function NewsDetail() {
           blurRadius={3}
         />
       )}
-      <TouchableOpacity onPress={() => router.back()}>
-        <Text style={[styles.backButton, { color: primary }]}>← Back</Text>
-      </TouchableOpacity>
+      <BackButton colorButton={cardBg}></BackButton>
 
       <View style={styles.titleWrapper}>
         <Text
@@ -182,11 +180,7 @@ const styles = StyleSheet.create({
     padding: 18,
     backgroundColor: "#fff",
   },
-  backButton: {
-    fontSize: 16,
-    marginBottom: 10,
-    paddingVertical: 4,
-  },
+
   titleWrapper: {
     alignItems: "center",
     marginBottom: 18,
