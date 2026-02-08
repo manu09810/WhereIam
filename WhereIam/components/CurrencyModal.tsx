@@ -24,13 +24,15 @@ export const CurrencyModal = ({
   onClose,
   currency,
 }: CurrencyModalProps) => {
-  const { themeColors } = useLocation(); // Usa los colores del contexto
+  const { themeColors } = useLocation();
   const [amount, setAmount] = useState<string>("");
   const [converted, setConverted] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [toUSD, setToUSD] = useState(true); // Nuevo estado
+  const [toUSD, setToUSD] = useState(true); 
   const access_key = process.env.EXPO_PUBLIC_EXCHANGERATE_API_KEY;
+  const exist = async () => {
+    
 
   const handleConvert = async () => {
     if (!currency || !amount || isNaN(Number(amount))) {
@@ -44,11 +46,13 @@ export const CurrencyModal = ({
       const from = toUSD ? currency : "USD";
       const to = toUSD ? "USD" : currency;
       const response = await fetch(
-        `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}&access_key=${access_key}`
+        `https://juanmalorenzo.com/api/${from}/${to}/100`,
+        //
       );
       const data = await response.json();
-      if (data.result !== undefined) {
-        setConverted(data.result);
+      
+      if (typeof data === "number" && !isNaN(data)) {
+        setConverted(data);
       } else {
         setError("Conversion failed.");
       }
@@ -158,7 +162,7 @@ export const CurrencyModal = ({
                 padding: 12,
                 fontSize: 18,
                 marginBottom: 16,
-                backgroundColor: "#fff", 
+                backgroundColor: "#fff",
                 color: "#1a1a1a",
               }}
             />
@@ -166,7 +170,7 @@ export const CurrencyModal = ({
             <TouchableOpacity
               onPress={handleConvert}
               style={{
-                backgroundColor: "#fff", 
+                backgroundColor: "#fff",
                 borderRadius: 8,
                 padding: 14,
                 alignItems: "center",

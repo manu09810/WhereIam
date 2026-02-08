@@ -94,6 +94,9 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     }
   }, [country.countryData?.cca2]);
 
+
+  
+
   let normalizedRegion =
     locationData.region?.trim() ||
     locationData.city?.trim() ||
