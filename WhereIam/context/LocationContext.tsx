@@ -95,6 +95,13 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
   }, [country.countryData?.cca2]);
 
 
+   useEffect(() => {
+    if (country.countryData?.currency) {
+      setFlagImage(
+        `https://juanmalorenzo.com/api/${country.countryData?.currency}`
+      );
+    }
+  }, [country.countryData?.cca2]);
   
 
   let normalizedRegion =
