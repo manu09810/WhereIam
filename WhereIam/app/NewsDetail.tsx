@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
 import {
   ActivityIndicator,
   Image,
@@ -10,9 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+const PAGE_SIZE = 3;
 import { useLocation } from "@/context/LocationContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getReadableTextColor, shortenLink } from "@/constants/functions";
+import { getReadableTextColor } from "@/constants/functions";
 import { getFromCache, setOnCache } from "@/constants/cache";
 import { BackButton } from "@/components/BackButton";
 
@@ -41,15 +43,21 @@ export default function NewsDetail() {
     label === "country" ? backgroundImage : regionImage || backgroundImage;
 
   const primary = themeColors?.[0] || averageColor || "#007aff";
-  const titleColor = primary;
-  const pageBg = averageColor || "#fff";
-  const cardBg = themeColors?.[3] || "#f2f2f2";
-  const cardText = getReadableTextColor(cardBg);
+  const buttonColor = getReadableTextColor(primary);
 
   const [results, setResults] = useState<NewsResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [page, setPage] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+
+  const totalPages = Math.ceil(results.length / PAGE_SIZE);
+  const pageItems = results.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  const goToPage = (next: number) => {
+    setPage(next);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
 
   useEffect(() => {
     if (!query) return;
@@ -78,6 +86,7 @@ export default function NewsDetail() {
               link: item.link,
             }));
             setResults(newsItems);
+            setPage(0);
             await setOnCache(
               JSON.stringify(newsItems),
               label,
@@ -99,140 +108,208 @@ export default function NewsDetail() {
   }, [query, lang]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: pageBg }]}>
+    <View style={{ flex: 1 }}>
       {bgToUse && (
         <Image
           source={{ uri: bgToUse }}
           style={StyleSheet.absoluteFillObject}
-          blurRadius={3}
+          blurRadius={8}
         />
       )}
-      <BackButton colorButton={cardBg}></BackButton>
 
-      <View style={styles.titleWrapper}>
-        <Text
-          style={[
-            styles.header,
-            {
-              color: titleColor,
-              textShadowColor: `${primary}22`,
-              textShadowRadius: 6,
-              textShadowOffset: { width: 0, height: 2 },
-            },
-          ]}
+      <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
+        <BackButton colorButton={buttonColor} />
+
+        <ScrollView
+          ref={scrollRef}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
         >
-          {label} News
-        </Text>
-        {query ? (
-          <Text
-            style={[styles.subHeader, { color: getReadableTextColor(pageBg) }]}
-          >
-            {query}
-          </Text>
-        ) : null}
-        <View style={[styles.titleAccent, { backgroundColor: primary }]} />
-      </View>
+          <View style={styles.titleWrapper}>
+            <Text style={styles.titleLabel}>NEWS ABOUT</Text>
+            <Text style={[styles.titleMain, { color: primary }]}>
+              {locationName || label}
+            </Text>
+          </View>
 
-      {loading && <ActivityIndicator color={primary} />}
-      {error && <Text style={[styles.error, { color: primary }]}>{error}</Text>}
-      {!loading && !error && results.length === 0 && (
-        <Text style={[styles.emptyState, { color: cardText }]}>
-          No results available
-        </Text>
-      )}
-      {results.length > 0 && (
-        <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-          {results.map((item, idx) => (
+          {loading && (
+            <ActivityIndicator size="large" color={primary} style={styles.loader} />
+          )}
+
+          {error && !loading && (
+            <Text style={styles.errorText}>{error}</Text>
+          )}
+
+          {!loading && !error && results.length === 0 && (
+            <Text style={styles.emptyText}>No results available</Text>
+          )}
+
+          {pageItems.map((item, idx) => (
             <TouchableOpacity
               key={idx}
               onPress={() => Linking.openURL(item.link)}
+              activeOpacity={0.72}
             >
-              <View
-                style={[
-                  styles.resultContainer,
-                  { backgroundColor: cardBg, borderColor: `${primary}40` },
-                ]}
-              >
-                <Text style={[styles.title, { color: cardText }]}>
-                  {item.title}
-                </Text>
-                <Text style={[styles.snippet, { color: cardText }]}>
-                  {item.snippet}
-                </Text>
-                <Text
-                  style={[styles.link, { color: primary }]}
-                  numberOfLines={1}
-                  ellipsizeMode="middle"
-                >
-                  {shortenLink(item.link, 60)}
-                </Text>
+              <View style={styles.card}>
+                <View
+                  style={[styles.cardAccent, { backgroundColor: primary }]}
+                />
+                <View style={styles.cardBody}>
+                  <Text style={styles.cardTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.cardSnippet} numberOfLines={3}>
+                    {item.snippet}
+                  </Text>
+                </View>
               </View>
             </TouchableOpacity>
           ))}
+
+          {Array.from({ length: PAGE_SIZE - pageItems.length }).map((_, idx) => (
+            <View key={`placeholder-${idx}`} style={styles.cardPlaceholder} />
+          ))}
+
+          {totalPages > 1 && (
+            <View style={styles.pagination}>
+              <TouchableOpacity
+                onPress={() => goToPage(page - 1)}
+                disabled={page === 0}
+                activeOpacity={0.7}
+                style={[
+                  styles.pageBtn,
+                  { borderColor: primary, opacity: page === 0 ? 0.3 : 1 },
+                ]}
+              >
+                <Text style={[styles.pageBtnText, { color: primary }]}>←</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.pageIndicator}>
+                {page + 1} / {totalPages}
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => goToPage(page + 1)}
+                disabled={page === totalPages - 1}
+                activeOpacity={0.7}
+                style={[
+                  styles.pageBtn,
+                  {
+                    borderColor: primary,
+                    opacity: page === totalPages - 1 ? 0.3 : 1,
+                  },
+                ]}
+              >
+                <Text style={[styles.pageBtnText, { color: primary }]}>→</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
-      )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 18,
-    backgroundColor: "#fff",
-  },
 
+const styles = StyleSheet.create({
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 32,
+  },
   titleWrapper: {
     alignItems: "center",
-    marginBottom: 18,
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
+    paddingBottom: 20,
   },
-  header: {
-    fontSize: 26,
-    fontWeight: "800",
-    textAlign: "center",
-    letterSpacing: -0.5,
-  },
-  subHeader: {
-    fontSize: 13,
-    marginTop: 6,
-    opacity: 0.85,
-    textAlign: "center",
-  },
-  titleAccent: {
-    height: 6,
-    width: 96,
-    borderRadius: 3,
-    marginTop: 12,
-    opacity: 0.95,
-  },
-  error: {
-    color: "red",
-    marginBottom: 12,
-    textAlign: "center",
-  },
-  emptyState: {
-    textAlign: "center",
-    color: "#999",
-    marginTop: 20,
-  },
-  resultContainer: {
-    marginHorizontal: 6,
-    marginBottom: 18,
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-  },
-  title: {
-    fontWeight: "700",
-    fontSize: 15,
+  titleLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 3,
+    color: "rgba(255,255,255,0.6)",
     marginBottom: 6,
   },
-  snippet: {
+  titleMain: {
+    fontSize: 34,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    textAlign: "center",
+  },
+  loader: {
+    marginTop: 40,
+  },
+  errorText: {
+    color: "rgba(255,80,80,0.9)",
+    textAlign: "center",
     fontSize: 14,
+    fontWeight: "600",
+  },
+  emptyText: {
+    color: "rgba(255,255,255,0.55)",
+    textAlign: "center",
+    fontSize: 15,
+    marginTop: 20,
+  },
+  card: {
+    backgroundColor: "rgba(0,0,0,0.36)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.12)",
+    borderRadius: 18,
+    marginBottom: 10,
+    flexDirection: "row",
+    overflow: "hidden",
+    height: 130,
+  },
+  cardPlaceholder: {
+    height: 130,
+    marginBottom: 10,
+  },
+  cardAccent: {
+    width: 4,
+    borderTopLeftRadius: 18,
+    borderBottomLeftRadius: 18,
+    opacity: 0.85,
+  },
+  cardBody: {
+    flex: 1,
+    padding: 14,
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "rgba(255,255,255,0.95)",
+    marginBottom: 6,
+    lineHeight: 20,
+  },
+  cardSnippet: {
+    fontSize: 13,
+    color: "rgba(255,255,255,0.60)",
+    lineHeight: 18,
     marginBottom: 8,
   },
-  link: {
-    fontSize: 12,
-    textDecorationLine: "underline",
+  pagination: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 8,
+  },
+  pageBtn: {
+    backgroundColor: "rgba(0,0,0,0.36)",
+    borderWidth: 1,
+    borderRadius: 50,
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pageBtnText: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  pageIndicator: {
+    color: "rgba(255,255,255,0.55)",
+    fontSize: 13,
+    fontWeight: "600",
+    letterSpacing: 1,
   },
 });

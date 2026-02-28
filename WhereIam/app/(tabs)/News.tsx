@@ -60,11 +60,6 @@ export default function News() {
   const regionName = region;
   const cityName = city;
 
-  const isCityRegionSame =
-    cityName &&
-    regionName &&
-    cityName.toLowerCase() === regionName.toLowerCase();
-
   const rawCode = (isoCountryCode || countryData?.cca2 || "") as
     | string
     | undefined;
@@ -144,65 +139,43 @@ export default function News() {
               block={true}
             />
 
-            {isCityRegionSame ? (
-              <DataCard
-                value={`City / Region: ${regionName}`}
-                onPress={() =>
-                  router.push({
-                    pathname: "/NewsDetail",
-                    params: {
-                      query: `"${regionName || ""}" ${countryName}`,
-                      label: "city",
-                      lang: localNews ? langCode : "en",
-                      locationName: regionName,
-                    },
-                  })
-                }
-                accentColor={primary}
-                textColor={buttonText}
-                height={56}
-                block={true}
-              />
-            ) : (
-              <>
-                <DataCard
-                  value={`Region: ${regionName}`}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/NewsDetail",
-                      params: {
-                        query: `"${regionName || ""}" ${countryName}`,
-                        label: "region",
-                        lang: localNews ? langCode : "en",
-                        locationName: regionName,
-                      },
-                    })
-                  }
-                  accentColor={primary}
-                  textColor={buttonText}
-                  height={56}
-                  block={true}
-                />
-                <DataCard
-                  value={`City: ${cityName}`}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/NewsDetail",
-                      params: {
-                        query: `"${cityName || ""}" ${regionName || ""} ${countryName}`,
-                        label: "city",
-                        lang: localNews ? langCode : "en",
-                        locationName: cityName,
-                      },
-                    })
-                  }
-                  accentColor={primary}
-                  textColor={buttonText}
-                  height={56}
-                  block={true}
-                />
-              </>
-            )}
+            <DataCard
+              value={`Region: ${regionName || "—"}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/NewsDetail",
+                  params: {
+                    query: `"${regionName || ""}" ${countryName}`,
+                    label: "region",
+                    lang: localNews ? langCode : "en",
+                    locationName: regionName,
+                  },
+                })
+              }
+              accentColor={primary}
+              textColor={buttonText}
+              height={56}
+              block={true}
+            />
+
+            <DataCard
+              value={`City: ${cityName || "—"}`}
+              onPress={() =>
+                router.push({
+                  pathname: "/NewsDetail",
+                  params: {
+                    query: `"${cityName || ""}" ${regionName || ""} ${countryName}`,
+                    label: "city",
+                    lang: localNews ? langCode : "en",
+                    locationName: cityName,
+                  },
+                })
+              }
+              accentColor={primary}
+              textColor={buttonText}
+              height={56}
+              block={true}
+            />
           </View>
         </View>
       </View>
@@ -226,7 +199,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
     paddingHorizontal: 12,
-    paddingTop: 24,
+    paddingTop: 16,
     paddingBottom: 16,
     borderRadius: 24,
     shadowColor: "#000",
@@ -246,13 +219,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: "center",
     opacity: 0.85,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   switchRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 12,
     gap: 10,
   },
   switchLabel: {
