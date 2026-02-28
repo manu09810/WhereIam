@@ -9,9 +9,7 @@ import {
   StyleSheet,
   Switch,
   Text,
-  TouchableOpacity,
   View,
-  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // @ts-ignore
@@ -70,7 +68,6 @@ export default function News() {
   const rawCode = (isoCountryCode || countryData?.cca2 || "") as
     | string
     | undefined;
-  // ensure we have a 2-letter ISO alpha-2 code, lowercase
   const countryCode =
     rawCode && rawCode.length >= 2 ? rawCode.slice(0, 2).toLowerCase() : null;
   const countriesProp = countryCode ? [countryCode] : [];
@@ -87,7 +84,7 @@ export default function News() {
   });
 
   return (
-    <SafeAreaView style={[styles.container]}>
+    <SafeAreaView style={styles.container}>
       {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
@@ -96,27 +93,25 @@ export default function News() {
         />
       )}
       <View style={styles.content}>
-        <View style={[styles.titleWrapper, { borderColor: secondary }]}>
+        <View style={styles.card}>
           <Text style={[styles.titleMain, { color: primary }]}>
-            News Search
+            News
           </Text>
           <Text style={[styles.titleSub, { color: buttonText }]}>
             Search local or international news
           </Text>
 
           <View style={styles.switchRow}>
-            <View style={{ height: 24, width: 180, justifyContent: "center" }}>
-              <Text
-                numberOfLines={1}
-                style={[styles.switchLabel, { color: buttonText }]}
-              >
-                {localNews ? "Local News" : "International News"}
-              </Text>
-            </View>
+            <Text
+              numberOfLines={1}
+              style={[styles.switchLabel, { color: buttonText }]}
+            >
+              {localNews ? "Local News" : "International"}
+            </Text>
             <Switch
               value={localNews}
               onValueChange={() => {
-                deleteGeneralCache(["country","region","city"],"news")
+                deleteGeneralCache(["country", "region", "city"], "news");
                 setLocalNews(!localNews);
                 setTimeout(() => {
                   player.seekTo(0);
@@ -124,14 +119,14 @@ export default function News() {
                 }, 200);
               }}
               thumbColor={thumbOn}
-              trackColor={{ false: "#ccc", true: trackOn }}
+              trackColor={{ false: "rgba(255,255,255,0.25)", true: trackOn }}
               style={{ flexShrink: 0 }}
             />
           </View>
 
-          <View style={{ width: "100%", paddingHorizontal: 6, height: 250 }}>
+          <View style={styles.buttonList}>
             <DataCard
-              value={`Country news: ${countryName}`}
+              value={`Country: ${countryName}`}
               onPress={() =>
                 router.push({
                   pathname: "/NewsDetail",
@@ -145,12 +140,13 @@ export default function News() {
               }
               accentColor={primary}
               textColor={buttonText}
-              height={50}
+              height={56}
+              block={true}
             />
 
             {isCityRegionSame ? (
               <DataCard
-                value={`City / Region News: ${regionName}`}
+                value={`City / Region: ${regionName}`}
                 onPress={() =>
                   router.push({
                     pathname: "/NewsDetail",
@@ -164,12 +160,13 @@ export default function News() {
                 }
                 accentColor={primary}
                 textColor={buttonText}
-                height={50}
+                height={56}
+                block={true}
               />
             ) : (
               <>
                 <DataCard
-                  value={`Region News: ${regionName}`}
+                  value={`Region: ${regionName}`}
                   onPress={() =>
                     router.push({
                       pathname: "/NewsDetail",
@@ -183,17 +180,16 @@ export default function News() {
                   }
                   accentColor={primary}
                   textColor={buttonText}
-                  height={50}
+                  height={56}
+                  block={true}
                 />
                 <DataCard
-                  value={`City News: ${cityName}`}
+                  value={`City: ${cityName}`}
                   onPress={() =>
                     router.push({
                       pathname: "/NewsDetail",
                       params: {
-                        query: `"${cityName || ""}" ${
-                          regionName || ""
-                        } ${countryName}`,
+                        query: `"${cityName || ""}" ${regionName || ""} ${countryName}`,
                         label: "city",
                         lang: localNews ? langCode : "en",
                         locationName: cityName,
@@ -202,7 +198,8 @@ export default function News() {
                   }
                   accentColor={primary}
                   textColor={buttonText}
-                  height={50}
+                  height={56}
+                  block={true}
                 />
               </>
             )}
@@ -218,73 +215,53 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
-  countryHighlight: {
-    position: "absolute",
-    left: "50%",
-    top: "50%",
-    pointerEvents: "none",
-  },
-
   content: {
     flex: 1,
-    padding: 24,
+    padding: 20,
     justifyContent: "center",
   },
-  titleWrapper: {
-    backgroundColor: "rgba(0,0,0,0.5)",
-
-    borderWidth: 8,
+  card: {
+    backgroundColor: "rgba(0,0,0,0.36)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
-    marginBottom: 18,
-    paddingHorizontal: 6,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingTop: 24,
+    paddingBottom: 16,
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+    elevation: 8,
   },
   titleMain: {
-    marginTop: 16,
-    opacity: 1,
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "800",
     letterSpacing: -0.5,
     textAlign: "center",
+    marginBottom: 6,
   },
   titleSub: {
-    fontSize: 20,
-    marginTop: 6,
-    opacity: 0.9,
+    fontSize: 15,
     textAlign: "center",
-    marginBottom: 15,
-  },
-  titleAccent: {
-    height: 6,
-    width: 96,
-    borderRadius: 3,
-    marginTop: 12,
+    opacity: 0.85,
+    marginBottom: 16,
   },
   switchRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
     justifyContent: "center",
+    marginBottom: 20,
+    gap: 10,
   },
   switchLabel: {
-    fontSize: 16,
-    marginRight: 12,
-    fontWeight: "500",
+    fontSize: 15,
+    fontWeight: "600",
+    width: 140,
+    textAlign: "right",
   },
-  button: {
-    backgroundColor: "#007aff",
-    padding: 18,
-    borderRadius: 10,
-    marginBottom: 18,
-  },
-  largeButton: {
-    padding: 28,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    textAlign: "center",
-    fontSize: 17,
+  buttonList: {
+    width: "100%",
   },
 });

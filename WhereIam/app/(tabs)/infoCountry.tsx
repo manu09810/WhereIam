@@ -17,6 +17,7 @@ import {
   View,
 } from "react-native";
 import { MapIcon } from "react-native-heroicons/outline";
+import Svg, { Defs, LinearGradient, Stop, Rect } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
@@ -75,7 +76,6 @@ export default function InfoCountryScreen() {
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string | null>(null);
 
-  // Fetch local time
   useEffect(() => {
     const timezone =
       locationTimezone ||
@@ -92,7 +92,7 @@ export default function InfoCountryScreen() {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
-        timeZone: tz, // tz es el timezone del país/región
+        timeZone: tz,
       });
       setCurrentTime(time);
     } catch (error) {
@@ -102,24 +102,19 @@ export default function InfoCountryScreen() {
   };
 
   const openWikipedia = (query) => {
-    const wikipediaUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(
-      query
-    )}`;
+    const wikipediaUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(query)}`;
     Linking.openURL(wikipediaUrl).catch((err) =>
       console.log("Error opening Wikipedia:", err)
     );
   };
 
   const openGoogleMaps = (query: string): void => {
-    const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(
-      query
-    )}`;
+    const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
     Linking.openURL(mapsUrl).catch((err: Error) =>
       console.log("Error opening Google Maps:", err)
     );
   };
 
-  // --- guards después de hooks ---
   if (isLoadingCountry || !countryData) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -146,21 +141,15 @@ export default function InfoCountryScreen() {
     ? (countryData.population / 1000000).toFixed(1)
     : "N/A";
   const capital = countryData?.capital?.[0] || "N/A";
-
   const continent = countryData.continents?.[0] || "N/A";
   const timezone = countryData.timezones?.[0] || "N/A";
   const currencyCode = countryData.currencies
     ? Object.keys(countryData.currencies)[0]
     : null;
 
-  const latlngArr = Array.isArray(countryData?.latlng)
-    ? countryData.latlng
-    : [];
-  const countryLatitude =
-    typeof latlngArr[0] === "number" ? latlngArr[0] : null;
-  const countryLongitude =
-    typeof latlngArr[1] === "number" ? latlngArr[1] : null;
-
+  const latlngArr = Array.isArray(countryData?.latlng) ? countryData.latlng : [];
+  const countryLatitude = typeof latlngArr[0] === "number" ? latlngArr[0] : null;
+  const countryLongitude = typeof latlngArr[1] === "number" ? latlngArr[1] : null;
   const latNum = userLatitude !== null ? userLatitude : countryLatitude;
   const lonNum = userLongitude !== null ? userLongitude : countryLongitude;
 
@@ -170,6 +159,11 @@ export default function InfoCountryScreen() {
   const accentColorHour = themeColors?.[1] || "#007aff";
   const accentColorText = themeColors?.[3] || getReadableTextColor(accentColor);
   const accentColorTimeText = getReadableTextColor(accentColorHour);
+  const isLightHour = accentColorTimeText === "#111111";
+  const dimmedTimeText = isLightHour
+    ? "rgba(17,17,17,0.5)"
+    : "rgba(255,255,255,0.58)";
+
   const isCityRegionSame =
     city && region && city.toLowerCase() === region.toLowerCase();
 
@@ -198,20 +192,98 @@ export default function InfoCountryScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
         <StatusBar hidden />
         <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
-          {/* Mapa con imagen de región */}
+
+          {/* ── Country Hero: flag + name overlay ── */}
+          <Pressable
+            onPress={() => openWikipedia(countryName)}
+            style={{
+              height: 240,
+              marginHorizontal: 12,
+              marginTop: 16,
+              marginBottom: 6,
+              borderRadius: 22,
+              overflow: "hidden",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.28,
+              shadowRadius: 16,
+              elevation: 10,
+            }}
+          >
+            {flagImage ? (
+              <Image
+                source={{ uri: flagImage }}
+                style={{ position: "absolute", width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={{ flex: 1, backgroundColor: accentColor }} />
+            )}
+            {/* Dark gradient at bottom for text legibility */}
+            <Svg
+              pointerEvents="none"
+              style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "70%" }}
+              width="100%"
+              height="100%"
+            >
+              <Defs>
+                <LinearGradient id="flagGrad" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0" stopColor="#000000" stopOpacity="0" />
+                  <Stop offset="1" stopColor="#000000" stopOpacity="0.65" />
+                </LinearGradient>
+              </Defs>
+              <Rect width="100%" height="100%" fill="url(#flagGrad)" />
+            </Svg>
+            <View
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: 18,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 10,
+                  color: "rgba(255,255,255,0.6)",
+                  fontWeight: "700",
+                  letterSpacing: 2,
+                  textTransform: "uppercase",
+                  marginBottom: 4,
+                }}
+              >
+                Country
+              </Text>
+              <Text
+                style={{
+                  fontSize: 30,
+                  color: "#fff",
+                  fontWeight: "800",
+                  letterSpacing: -0.5,
+                  textShadowColor: "rgba(0,0,0,0.4)",
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 6,
+                }}
+              >
+                {countryName}
+              </Text>
+            </View>
+          </Pressable>
+
+          {/* ── Map Widget ── */}
           <View
             style={{
-              height: 180,
+              height: 170,
               marginHorizontal: 12,
-              borderRadius: 16,
+              marginBottom: 6,
+              borderRadius: 18,
               overflow: "hidden",
-              backgroundColor: "#f0f0f0",
-              borderWidth: 1,
-              borderColor: "#1a1a1a",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 8,
-              marginTop: 16,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.15,
+              shadowRadius: 10,
+              elevation: 5,
             }}
           >
             <Pressable
@@ -228,6 +300,7 @@ export default function InfoCountryScreen() {
                 height: "100%",
                 alignItems: "center",
                 justifyContent: "center",
+                backgroundColor: "#d0d0d0",
               }}
             >
               {mapImage ? (
@@ -237,96 +310,111 @@ export default function InfoCountryScreen() {
                   resizeMode="cover"
                 />
               ) : (
-                <MapIcon color="#1a1a1a" size={64} />
+                <MapIcon color="#888" size={56} />
               )}
+              {/* Open Maps pill */}
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  top: 12,
+                  right: 12,
+                  backgroundColor: "rgba(0,0,0,0.48)",
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  borderRadius: 20,
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontSize: 11, fontWeight: "600" }}
+                >
+                  Open Maps
+                </Text>
+              </View>
             </Pressable>
           </View>
 
-          {/* Nombre del país */}
-
-          <DataCard
-            label="Country"
-            value={countryName}
-            onPress={() => openWikipedia(countryName)}
-            accentColor={accentColor}
-            textColor={accentColorText}
-            fontSize={32}
-            height={150}
-          />
-
-          {/* Bandera */}
+          {/* ── Local Time ── */}
           <View
             style={{
-              height: 200,
-              overflow: "hidden",
-              backgroundColor: "#fff",
-              borderRadius: 16,
               marginHorizontal: 12,
-
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 3,
+              marginBottom: 6,
+              backgroundColor: accentColorHour,
+              borderRadius: 18,
+              padding: 18,
+              borderWidth: 1,
+              borderColor: isLightHour
+                ? "rgba(0,0,0,0.07)"
+                : "rgba(255,255,255,0.2)",
+              shadowColor: accentColorHour,
+              shadowOffset: { width: 0, height: 5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 12,
+              elevation: 6,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              overflow: "hidden",
             }}
           >
-            {flagImage && (
-              <Image
-                source={{ uri: flagImage }}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                }}
-              />
-            )}
-          </View>
-
-          {/* Local Time */}
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {/* Top highlight */}
             <View
+              pointerEvents="none"
               style={{
-                flex: 1,
-                backgroundColor: accentColorHour,
-                borderRadius: 16,
-                padding: 10,
-                marginHorizontal: 6,
-                marginVertical: 12,
-                borderWidth: 1,
-                borderColor: accentColorHour,
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: 100,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "45%",
+                backgroundColor: isLightHour
+                  ? "rgba(255,255,255,0.45)"
+                  : "rgba(255,255,255,0.1)",
+                borderTopLeftRadius: 18,
+                borderTopRightRadius: 18,
               }}
-            >
+            />
+            <View>
               <Text
                 style={{
-                  fontSize: 18,
-                  color: accentColorTimeText,
-                  fontWeight: "600",
-                  marginBottom: 10,
+                  fontSize: 10,
+                  color: dimmedTimeText,
+                  fontWeight: "700",
+                  letterSpacing: 2,
                   textTransform: "uppercase",
-                  letterSpacing: 1,
-                  textAlign: "center",
+                  marginBottom: 4,
                 }}
               >
                 Local Time
               </Text>
               <Text
                 style={{
-                  fontSize: 54,
+                  fontSize: 52,
                   color: accentColorTimeText,
-                  fontWeight: "bold",
-                  letterSpacing: 2,
-                  textAlign: "center",
+                  fontWeight: "800",
+                  letterSpacing: -1,
                 }}
               >
-                {currentTime ? currentTime : "Loading..."}
+                {currentTime ?? "--:--"}
               </Text>
             </View>
+            {timezone !== "N/A" && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: dimmedTimeText,
+                  fontWeight: "600",
+                  maxWidth: 90,
+                  textAlign: "right",
+                }}
+              >
+                {timezone}
+              </Text>
+            )}
           </View>
 
-          <View style={{ paddingHorizontal: 12 }}>
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          {/* ── Data Grid ── */}
+          <View style={{ paddingHorizontal: 6 }}>
+            <View style={{ flexDirection: "row" }}>
               <DataCard
                 label="Capital"
                 value={capital}
@@ -343,13 +431,12 @@ export default function InfoCountryScreen() {
               />
             </View>
 
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <View style={{ flexDirection: "row" }}>
               <DataCard
                 label="Languages"
                 value={languages.length > 0 ? languages.join(", ") : "N/A"}
                 onPress={() => {
                   if (languages.length > 0) {
-                    // Busca el código ISO del primer idioma
                     const langCodes = countryData?.languages
                       ? Object.keys(countryData.languages)
                       : [];
@@ -369,7 +456,7 @@ export default function InfoCountryScreen() {
               />
             </View>
 
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <View style={{ flexDirection: "row" }}>
               <DataCard
                 label="Continent"
                 value={continent}
@@ -393,9 +480,10 @@ export default function InfoCountryScreen() {
                 onPress={() => city && city !== "N/A" && openWikipedia(city)}
                 accentColor={accentColor}
                 textColor={accentColorText}
+                block={true}
               />
             ) : (
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <View style={{ flexDirection: "row" }}>
                 <DataCard
                   label="City"
                   value={city || "N/A"}
@@ -415,42 +503,18 @@ export default function InfoCountryScreen() {
               </View>
             )}
 
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              <DataCard
-                label="Weather"
-                value="Tap to view"
-                onPress={() => setWeatherModalVisible(true)}
-                accentColor={accentColor}
-                textColor={accentColorText}
-              />
-            </View>
+            <DataCard
+              label="Weather"
+              value="Tap to view"
+              onPress={() => setWeatherModalVisible(true)}
+              accentColor={accentColor}
+              textColor={accentColorText}
+              block={true}
+              height={60}
+            />
           </View>
 
-          {/*  {themeColors && (
-            <View
-              style={{
-                flexDirection: "row",
-                marginVertical: 8,
-                paddingHorizontal: 12,
-              }}
-            >
-              {themeColors.map((color, idx) => (
-                <View
-                  key={idx}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: color,
-                    marginRight: 8,
-                    borderWidth: 1,
-                    borderColor: "#ccc",
-                  }}
-                />
-              ))}
-            </View> */}
-
-          <View style={{ height: 20 }} />
+          <View style={{ height: 24 }} />
         </ScrollView>
 
         <WeatherModal

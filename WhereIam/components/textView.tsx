@@ -1,17 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-function TextView({ 
-  texts, 
+function TextView({
+  texts,
   bulletColor = "#007aff",
   textColor = "#222",
-  fontSize = 16
+  fontSize = 16,
+  containerBg = "rgba(255,255,255,0.92)",
 
-}: { 
+}: {
   texts?: string[];
   bulletColor?: string;
   textColor?: string;
   fontSize?: number;
+  containerBg?: string;
 }) {
   const items = (texts &&
     texts.length &&
@@ -24,7 +26,7 @@ function TextView({
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: containerBg }]}>
       {items.map((t, i) => (
         <View key={i} style={styles.row}>
           <View style={[styles.bullet, { backgroundColor: bulletColor }]}>
@@ -40,8 +42,7 @@ function TextView({
 const styles = StyleSheet.create({
   container: {
     padding: 12,
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    borderRadius: 16,
     shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowOffset: { width: 0, height: 6 },
