@@ -3,8 +3,9 @@ import { WeatherModal } from "@/components/WeatherModal";
 import { TranslateModal } from "@/components/TranslateModal";
 import { useLocation } from "@/context/LocationContext";
 import DataCard from "@/components/Datacard";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
+  Alert,
   ActivityIndicator,
   Dimensions,
   Image,
@@ -58,6 +59,9 @@ export default function InfoCountryScreen() {
       console.log("Error opening Wikipedia:", err),
     );
   };
+
+  const showWIP = () =>
+    Alert.alert("🚧 Work in Progress", "This feature is coming soon!");
 
   if (isLoadingCountry || !countryData) {
     return (
@@ -131,6 +135,19 @@ export default function InfoCountryScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
         <StatusBar hidden />
         <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
+          {/* ── Local Time ── */}
+          <TimeWidget
+            timezone={
+              locationTimezone ||
+              countryData?.timezones?.find((tz) => tz.includes("/")) ||
+              countryData?.timezones?.[0] ||
+              "N/A"
+            }
+            accentColor={accentColor}
+            flagImage={flagImage}
+            countryName={countryName}
+          />
+
           {/* ── Hero: Map ── */}
           <Pressable
             onPress={() => {
@@ -208,38 +225,8 @@ export default function InfoCountryScreen() {
             </View>
           </Pressable>
 
-          {/* ── Local Time ── */}
-          <TimeWidget
-            timezone={
-              locationTimezone ||
-              countryData?.timezones?.find((tz) => tz.includes("/")) ||
-              countryData?.timezones?.[0] ||
-              "N/A"
-            }
-            accentColor={accentColorHour}
-            flagImage={flagImage}
-            countryName={countryName}
-          />
-
           {/* ── Data Grid ── */}
           <View style={{ paddingHorizontal: SPACING.sm }}>
-            <View style={{ flexDirection: "row" }}>
-              <DataCard
-                label="Capital"
-                value={capital}
-                onPress={() => capital !== "N/A" && openWikipedia(capital)}
-                accentColor={accentColor}
-                textColor={accentColorText}
-              />
-              <DataCard
-                label="Currency"
-                value={currencies}
-                onPress={() => setCurrencyModalVisible(true)}
-                accentColor={accentColor}
-                textColor={accentColorText}
-              />
-            </View>
-
             <View style={{ flexDirection: "row" }}>
               <DataCard
                 label="Languages"
@@ -257,9 +244,9 @@ export default function InfoCountryScreen() {
                 textColor={accentColorText}
               />
               <DataCard
-                label="Population"
-                value={`${population}M`}
-                onPress={undefined}
+                label="Currency"
+                value={currencies}
+                onPress={() => setCurrencyModalVisible(true)}
                 accentColor={accentColor}
                 textColor={accentColorText}
               />
@@ -274,43 +261,49 @@ export default function InfoCountryScreen() {
                 textColor={accentColorText}
               />
               <DataCard
-                label="Timezone"
-                value={timezone}
-                onPress={undefined}
+                label="Capital"
+                value={capital}
+                onPress={() => capital !== "N/A" && openWikipedia(capital)}
                 accentColor={accentColor}
                 textColor={accentColorText}
               />
             </View>
 
-            {isCityRegionSame ? (
+            <View style={{ flexDirection: "row" }}>
               <DataCard
-                label="City / Region"
-                value={city}
+                label="Region"
+                value={region || "N/A"}
+                onPress={() =>
+                  region && region !== "N/A" && openWikipedia(region)
+                }
+                accentColor={accentColor}
+                textColor={accentColorText}
+              />
+              <DataCard
+                label="City"
+                value={city || "N/A"}
                 onPress={() => city && city !== "N/A" && openWikipedia(city)}
                 accentColor={accentColor}
                 textColor={accentColorText}
-                block={true}
               />
-            ) : (
-              <View style={{ flexDirection: "row" }}>
-                <DataCard
-                  label="City"
-                  value={city || "N/A"}
-                  onPress={() => city && city !== "N/A" && openWikipedia(city)}
-                  accentColor={accentColor}
-                  textColor={accentColorText}
-                />
-                <DataCard
-                  label="Region"
-                  value={region || "N/A"}
-                  onPress={() =>
-                    region && region !== "N/A" && openWikipedia(region)
-                  }
-                  accentColor={accentColor}
-                  textColor={accentColorText}
-                />
-              </View>
-            )}
+            </View>
+
+            <View style={{ flexDirection: "row" }}>
+              <DataCard
+                label="Timezone"
+                value={timezone}
+                onPress={showWIP}
+                accentColor={accentColor}
+                textColor={accentColorText}
+              />
+              <DataCard
+                label="Population"
+                value={`${population}M`}
+                onPress={showWIP}
+                accentColor={accentColor}
+                textColor={accentColorText}
+              />
+            </View>
 
             <DataCard
               label="Weather"
