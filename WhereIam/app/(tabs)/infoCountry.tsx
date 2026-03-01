@@ -20,6 +20,14 @@ import { MapIcon } from "react-native-heroicons/outline";
 import Svg, { Defs, LinearGradient, Stop, Rect } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getReadableTextColor } from "@/constants/functions";
+import {
+  ALPHA,
+  FONT_SIZE,
+  RADIUS,
+  SHADOW,
+  SIZE,
+  SPACING,
+} from "@/constants/theme";
 const { width, height } = Dimensions.get("window");
 export default function InfoCountryScreen() {
   const {
@@ -133,7 +141,7 @@ export default function InfoCountryScreen() {
   const accentColorTimeText = getReadableTextColor(accentColorHour);
   const isLightHour = accentColorTimeText === "#111111";
   const dimmedTimeText = isLightHour
-    ? "rgba(17,17,17,0.5)"
+    ? ALPHA.lightDimText
     : "rgba(255,255,255,0.58)";
 
   const isCityRegionSame =
@@ -154,7 +162,7 @@ export default function InfoCountryScreen() {
             height,
             top: 0,
             left: 0,
-            opacity: 0.88,
+            opacity: ALPHA.imageBg,
             zIndex: -1,
           }}
           blurRadius={3}
@@ -168,17 +176,13 @@ export default function InfoCountryScreen() {
           <Pressable
             onPress={() => openWikipedia(countryName)}
             style={{
-              height: 240,
-              marginHorizontal: 12,
-              marginTop: 16,
-              marginBottom: 6,
-              borderRadius: 22,
+              height: SIZE.heroCard,
+              marginHorizontal: SPACING.container,
+              marginTop: SPACING.xxl,
+              marginBottom: SPACING.sm,
+              borderRadius: RADIUS.hero,
               overflow: "hidden",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.28,
-              shadowRadius: 16,
-              elevation: 10,
+              ...SHADOW.hero,
             }}
           >
             {flagImage ? (
@@ -217,24 +221,24 @@ export default function InfoCountryScreen() {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                padding: 18,
+                padding: SPACING.inner,
               }}
             >
               <Text
                 style={{
-                  fontSize: 10,
+                  fontSize: FONT_SIZE.caption,
                   color: "rgba(255,255,255,0.6)",
                   fontWeight: "700",
                   letterSpacing: 2,
                   textTransform: "uppercase",
-                  marginBottom: 4,
+                  marginBottom: SPACING.xs,
                 }}
               >
                 Country
               </Text>
               <Text
                 style={{
-                  fontSize: 30,
+                  fontSize: FONT_SIZE.display,
                   color: "#fff",
                   fontWeight: "800",
                   letterSpacing: -0.5,
@@ -251,16 +255,13 @@ export default function InfoCountryScreen() {
           {/* ── Map Widget ── */}
           <View
             style={{
-              height: 170,
-              marginHorizontal: 12,
-              marginBottom: 6,
-              borderRadius: 18,
+              height: SIZE.mapWidget,
+              marginHorizontal: SPACING.container,
+              marginBottom: SPACING.sm,
+              borderRadius: RADIUS.widget,
               overflow: "hidden",
+              ...SHADOW.widget,
               shadowColor: "#000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 10,
-              elevation: 5,
             }}
           >
             <Pressable
@@ -294,16 +295,16 @@ export default function InfoCountryScreen() {
                 pointerEvents="none"
                 style={{
                   position: "absolute",
-                  top: 12,
-                  right: 12,
+                  top: SPACING.container,
+                  right: SPACING.container,
                   backgroundColor: "rgba(0,0,0,0.48)",
-                  paddingHorizontal: 10,
+                  paddingHorizontal: SPACING.lg,
                   paddingVertical: 5,
-                  borderRadius: 20,
+                  borderRadius: RADIUS.large,
                 }}
               >
                 <Text
-                  style={{ color: "#fff", fontSize: 11, fontWeight: "600" }}
+                  style={{ color: "#fff", fontSize: FONT_SIZE.label, fontWeight: "600" }}
                 >
                   Open Maps
                 </Text>
@@ -314,20 +315,17 @@ export default function InfoCountryScreen() {
           {/* ── Local Time ── */}
           <View
             style={{
-              marginHorizontal: 12,
-              marginBottom: 6,
+              marginHorizontal: SPACING.container,
+              marginBottom: SPACING.sm,
               backgroundColor: accentColorHour,
-              borderRadius: 18,
-              padding: 18,
+              borderRadius: RADIUS.widget,
+              padding: SPACING.inner,
               borderWidth: 1,
               borderColor: isLightHour
-                ? "rgba(0,0,0,0.07)"
+                ? ALPHA.lightCardBorder
                 : "rgba(255,255,255,0.2)",
+              ...SHADOW.widget,
               shadowColor: accentColorHour,
-              shadowOffset: { width: 0, height: 5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 12,
-              elevation: 6,
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
@@ -346,26 +344,26 @@ export default function InfoCountryScreen() {
                 backgroundColor: isLightHour
                   ? "rgba(255,255,255,0.45)"
                   : "rgba(255,255,255,0.1)",
-                borderTopLeftRadius: 18,
-                borderTopRightRadius: 18,
+                borderTopLeftRadius: RADIUS.widget,
+                borderTopRightRadius: RADIUS.widget,
               }}
             />
             <View>
               <Text
                 style={{
-                  fontSize: 10,
+                  fontSize: FONT_SIZE.caption,
                   color: dimmedTimeText,
                   fontWeight: "700",
                   letterSpacing: 2,
                   textTransform: "uppercase",
-                  marginBottom: 4,
+                  marginBottom: SPACING.xs,
                 }}
               >
                 Local Time
               </Text>
               <Text
                 style={{
-                  fontSize: 52,
+                  fontSize: FONT_SIZE.clock,
                   color: accentColorTimeText,
                   fontWeight: "800",
                   letterSpacing: -1,
@@ -377,7 +375,7 @@ export default function InfoCountryScreen() {
             {timezone !== "N/A" && (
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: FONT_SIZE.micro,
                   color: dimmedTimeText,
                   fontWeight: "600",
                   maxWidth: 90,
@@ -390,7 +388,7 @@ export default function InfoCountryScreen() {
           </View>
 
           {/* ── Data Grid ── */}
-          <View style={{ paddingHorizontal: 6 }}>
+          <View style={{ paddingHorizontal: SPACING.sm }}>
             <View style={{ flexDirection: "row" }}>
               <DataCard
                 label="Capital"
@@ -491,7 +489,7 @@ export default function InfoCountryScreen() {
             />
           </View>
 
-          <View style={{ height: 24 }} />
+          <View style={{ height: SPACING.sheet }} />
         </ScrollView>
 
         <WeatherModal

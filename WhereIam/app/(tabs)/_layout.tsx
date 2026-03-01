@@ -9,6 +9,7 @@ import {
 import { HapticTab } from "@/components/haptic-tab";
 import { useLocation } from "@/context/LocationContext";
 import { getReadableTextColor } from "@/constants/functions";
+import { ALPHA, SIZE, SPACING } from "@/constants/theme";
 
 export default function TabLayout() {
   const { themeColors, averageColor } = useLocation();
@@ -22,7 +23,7 @@ export default function TabLayout() {
 
     setTabBarBackground(bg);
     setTabIconColor(icon);
-    setTabBorderColor("rgba(0,0,0,0.08)");
+    setTabBorderColor(ALPHA.lightBorder);
   }, [themeColors, averageColor]);
 
   return (
@@ -32,9 +33,9 @@ export default function TabLayout() {
         tabBarInactiveTintColor: tabIconColor,
         tabBarStyle: {
           backgroundColor: tabBarBackground,
-          height: 80,
-          paddingBottom: 6,
-          paddingTop: 8,
+          height: SIZE.tabBar,
+          paddingBottom: SPACING.sm,
+          paddingTop: SPACING.md,
           borderTopWidth: 1,
           borderTopColor: tabBorderColor,
         },

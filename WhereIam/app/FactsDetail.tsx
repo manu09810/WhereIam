@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import TextView from "@/components/textView";
 import { getFromCache, setOnCache } from "@/constants/cache";
 import { BackButton } from "@/components/BackButton";
+import { FONT_SIZE, SPACING } from "@/constants/theme";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.EXPO_PUBLIC_GOOGLE_API_GEMINI_KEY,
@@ -127,23 +128,23 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: "flex-start",
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: SPACING.xxl,
+    paddingTop: SPACING.xxl,
   },
   titleWrapper: {
     alignItems: "center",
-    paddingHorizontal: 8,
+    paddingHorizontal: SPACING.md,
     paddingBottom: 70,
   },
   titleLabel: {
-    fontSize: 11,
+    fontSize: FONT_SIZE.label,
     fontWeight: "600",
     letterSpacing: 3,
     color: "rgba(255,255,255,0.6)",
-    marginBottom: 6,
+    marginBottom: SPACING.sm,
   },
   titleMain: {
-    fontSize: 34,
+    fontSize: FONT_SIZE.headline,
     fontWeight: "800",
     letterSpacing: -0.5,
     textAlign: "center",

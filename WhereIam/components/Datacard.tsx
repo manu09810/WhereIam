@@ -2,17 +2,18 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { useAudioPlayer } from "expo-audio";
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from "react-native-svg";
+import { getReadableTextColor } from "@/constants/functions";
+import {
+  ALPHA,
+  FONT_SIZE,
+  RADIUS,
+  SHADOW,
+  SIZE,
+  SPACING,
+  TIMING,
+} from "@/constants/theme";
 
 const source = require("../assets/sounds/pop-up-something-160353.mp3");
-
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#ffffff";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
 
 const contrastRatio = (fg: string, bg: string) => {
   const toL = (hex: string) => {
@@ -63,15 +64,12 @@ export default function DataCard({
   const player = useAudioPlayer(source);
 
   const isLight = readable === "#111111";
-  const highlightColor = isLight
-    ? "rgba(255,255,255,0.48)"
-    : "rgba(255,255,255,0.11)";
-  const highlightOpacity = isLight ? 0.48 : 0.11;
+  const highlightOpacity = isLight ? ALPHA.highlight : 0.11;
   const labelColor = isLight
     ? "rgba(17,17,17,0.48)"
     : "rgba(255,255,255,0.58)";
   const borderColor = isLight
-    ? "rgba(0,0,0,0.07)"
+    ? ALPHA.lightCardBorder
     : "rgba(255,255,255,0.2)";
 
   const handlePressIn = () => {
@@ -80,7 +78,7 @@ export default function DataCard({
       setTimeout(() => {
         player.seekTo(0);
         player.play();
-      }, 300);
+      }, TIMING.soundDelay);
     } catch {}
     onPressIn?.();
   };
@@ -93,20 +91,17 @@ export default function DataCard({
         flex: block ? 0 : 1,
         width: block ? "100%" : undefined,
         backgroundColor: accentColor,
-        borderRadius: 18,
-        padding: 14,
-        marginHorizontal: 6,
-        marginVertical: 6,
+        borderRadius: RADIUS.widget,
+        padding: SPACING.xl,
+        marginHorizontal: SPACING.sm,
+        marginVertical: SPACING.sm,
         borderWidth: 1,
         borderColor,
         alignItems: "center",
         justifyContent: "center",
         minHeight: height ?? 100,
+        ...SHADOW.widget,
         shadowColor: accentColor,
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-        elevation: 6,
         opacity: pressed ? 0.8 : 1,
         transform: [{ scale: pressed ? 0.975 : 1 }],
         overflow: "hidden",
@@ -121,8 +116,8 @@ export default function DataCard({
           left: 0,
           right: 0,
           height: "40%",
-          borderTopLeftRadius: 18,
-          borderTopRightRadius: 18,
+          borderTopLeftRadius: RADIUS.widget,
+          borderTopRightRadius: RADIUS.widget,
           overflow: "hidden",
         }}
       >
@@ -144,12 +139,12 @@ export default function DataCard({
       {label && (
         <Text
           style={{
-            fontSize: 10,
+            fontSize: FONT_SIZE.caption,
             color: labelColor,
             fontWeight: "700",
             letterSpacing: 2,
             textTransform: "uppercase",
-            marginBottom: value ? 8 : 0,
+            marginBottom: value ? SPACING.md : 0,
             textAlign: "center",
           }}
         >
@@ -159,11 +154,11 @@ export default function DataCard({
       {value && (
         <Text
           style={{
-            fontSize: fontSize ?? 18,
+            fontSize: fontSize ?? FONT_SIZE.subheading,
             color: valueColor,
             fontWeight: "700",
             textAlign: "center",
-            lineHeight: (fontSize ?? 18) * 1.25,
+            lineHeight: (fontSize ?? FONT_SIZE.subheading) * 1.25,
           }}
         >
           {value}

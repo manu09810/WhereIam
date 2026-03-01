@@ -1,11 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import {
+  FONT_SIZE,
+  LINE_HEIGHT,
+  RADIUS,
+  SHADOW,
+  SIZE,
+  SPACING,
+} from "@/constants/theme";
 
 function TextView({
   texts,
   bulletColor = "#007aff",
   textColor = "#222",
-  fontSize = 16,
+  fontSize = FONT_SIZE.input,
   containerBg = "rgba(255,255,255,0.92)",
 
 }: {
@@ -41,39 +49,35 @@ function TextView({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 12,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 12,
-    elevation: 3,
+    padding: SPACING.container,
+    borderRadius: RADIUS.card,
+    ...SHADOW.subtle,
   },
   row: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 12,
+    marginBottom: SPACING.container,
   },
   bullet: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: SIZE.bullet,
+    height: SIZE.bullet,
+    borderRadius: SIZE.bullet / 2,
     backgroundColor: "#007aff",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: SPACING.container,
   },
   bulletText: {
     color: "#fff",
     fontWeight: "700",
-    fontSize: 13,
+    fontSize: FONT_SIZE.errorText,
   },
   text: {
     flex: 1,
     color: "#222",
-    fontSize: 16,
-    lineHeight: 20,
-    marginBottom: 6, 
+    fontSize: FONT_SIZE.input,
+    lineHeight: LINE_HEIGHT.body,
+    marginBottom: SPACING.sm,
   },
 });
 

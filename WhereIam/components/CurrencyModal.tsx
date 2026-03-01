@@ -1,4 +1,13 @@
 import { useLocation } from "@/context/LocationContext";
+import { getReadableTextColor } from "@/constants/functions";
+import {
+  ALPHA,
+  FONT_SIZE,
+  MODAL,
+  RADIUS,
+  SIZE,
+  SPACING,
+} from "@/constants/theme";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -13,7 +22,6 @@ import {
 import { XMarkIcon } from "react-native-heroicons/solid";
 import { ArrowsRightLeftIcon } from "react-native-heroicons/outline";
 import { useCurrency } from "@/hooks/use-currency";
-import { getReadableTextColor } from "@/constants/functions";
 
 interface CurrencyModalProps {
   visible: boolean;
@@ -41,16 +49,16 @@ export const CurrencyModal = ({
   const sheetBg = themeColors?.[0] || "#ffffff";
   const textColor = getReadableTextColor(sheetBg);
   const isLight = textColor === "#111111";
-  const cardBg = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.12)";
-  const cardBorder = isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.16)";
-  const dimText = isLight ? "rgba(17,17,17,0.5)" : "rgba(255,255,255,0.55)";
-  const inputBg = isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.1)";
-  const inputBorder = isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.22)";
+  const cardBg = isLight ? ALPHA.lightCard : ALPHA.darkCard;
+  const cardBorder = isLight ? ALPHA.lightCardBorder : ALPHA.darkCardBorder;
+  const dimText = isLight ? ALPHA.lightDimText : ALPHA.darkDimText;
+  const inputBg = isLight ? ALPHA.lightInput : ALPHA.darkInput;
+  const inputBorder = isLight ? ALPHA.lightInputBorder : ALPHA.darkInputBorder;
   const btnBg = textColor;
   const btnText = isLight ? "#ffffff" : "#111111";
 
   const handleConvert = async () => {
-   if (!currency || !amount || isNaN(Number(amount))) {
+    if (!currency || !amount || isNaN(Number(amount))) {
       setError("Please enter a valid amount.");
       return;
     }
@@ -92,37 +100,33 @@ export const CurrencyModal = ({
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: ALPHA.overlayBg,
             justifyContent: "flex-end",
           }}
         >
           <View
             style={{
               backgroundColor: sheetBg,
-              borderTopLeftRadius: 28,
-              borderTopRightRadius: 28,
+              borderTopLeftRadius: RADIUS.sheet,
+              borderTopRightRadius: RADIUS.sheet,
               borderTopWidth: 1,
               borderLeftWidth: 1,
               borderRightWidth: 1,
-              borderColor: isLight
-                ? "rgba(0,0,0,0.08)"
-                : "rgba(255,255,255,0.15)",
-              padding: 24,
-              paddingBottom: Platform.OS === "ios" ? 40 : 24,
-              minHeight: 320,
+              borderColor: isLight ? ALPHA.lightBorder : ALPHA.darkBorder,
+              padding: SPACING.sheet,
+              paddingBottom: Platform.OS === "ios" ? SPACING.iosBottom : SPACING.sheet,
+              minHeight: MODAL.minHeight,
             }}
           >
             {/* Drag handle */}
             <View
               style={{
-                width: 40,
-                height: 4,
-                borderRadius: 2,
-                backgroundColor: isLight
-                  ? "rgba(0,0,0,0.15)"
-                  : "rgba(255,255,255,0.3)",
+                width: SIZE.handleWidth,
+                height: SIZE.handleHeight,
+                borderRadius: RADIUS.handle,
+                backgroundColor: isLight ? ALPHA.lightHandle : ALPHA.darkHandle,
                 alignSelf: "center",
-                marginBottom: 20,
+                marginBottom: SPACING.xxxl,
               }}
             />
 
@@ -132,32 +136,30 @@ export const CurrencyModal = ({
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: 20,
+                marginBottom: SPACING.xxxl,
               }}
             >
               <Text
-                style={{ fontSize: 22, fontWeight: "800", color: textColor }}
+                style={{ fontSize: FONT_SIZE.title, fontWeight: "800", color: textColor }}
               >
                 Currency
               </Text>
               <TouchableOpacity
                 onPress={onClose}
                 style={{
-                  backgroundColor: isLight
-                    ? "rgba(0,0,0,0.08)"
-                    : "rgba(255,255,255,0.15)",
-                  borderRadius: 50,
-                  padding: 8,
+                  backgroundColor: isLight ? ALPHA.lightBorder : ALPHA.darkBorder,
+                  borderRadius: RADIUS.closeBtn,
+                  padding: SPACING.md,
                 }}
               >
-                <XMarkIcon size={22} color={textColor} />
+                <XMarkIcon size={SIZE.icon} color={textColor} />
               </TouchableOpacity>
             </View>
 
             {isLoading ? (
               <View
                 style={{
-                  paddingVertical: 48,
+                  paddingVertical: SPACING.sectionGap,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -167,14 +169,14 @@ export const CurrencyModal = ({
             ) : !currencyExists ? (
               <View
                 style={{
-                  paddingVertical: 48,
+                  paddingVertical: SPACING.sectionGap,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 16,
+                    fontSize: FONT_SIZE.input,
                     color: dimText,
                     textAlign: "center",
                   }}
@@ -194,36 +196,36 @@ export const CurrencyModal = ({
                     backgroundColor: cardBg,
                     borderWidth: 1,
                     borderColor: cardBorder,
-                    borderRadius: 16,
-                    paddingVertical: 10,
-                    paddingHorizontal: 18,
-                    marginBottom: 20,
+                    borderRadius: RADIUS.card,
+                    paddingVertical: SPACING.lg,
+                    paddingHorizontal: SPACING.inner,
+                    marginBottom: SPACING.xxxl,
                     alignSelf: "center",
-                    gap: 10,
+                    gap: SPACING.lg,
                   }}
                 >
                   <Text
                     style={{
                       fontWeight: "700",
-                      fontSize: 15,
+                      fontSize: FONT_SIZE.body,
                       color: textColor,
                       letterSpacing: 0.5,
                     }}
                   >
                     {toUSD ? `${currency} → USD` : `USD → ${currency}`}
                   </Text>
-                  <ArrowsRightLeftIcon size={18} color={textColor} />
+                  <ArrowsRightLeftIcon size={SIZE.switchIcon} color={textColor} />
                 </TouchableOpacity>
 
                 {/* Label */}
                 <Text
                   style={{
-                    fontSize: 11,
+                    fontSize: FONT_SIZE.label,
                     color: dimText,
                     fontWeight: "700",
                     letterSpacing: 2,
                     textTransform: "uppercase",
-                    marginBottom: 8,
+                    marginBottom: SPACING.md,
                   }}
                 >
                   {toUSD ? `Amount in ${currency}` : "Amount in USD"}
@@ -240,11 +242,11 @@ export const CurrencyModal = ({
                     backgroundColor: inputBg,
                     borderWidth: 1,
                     borderColor: inputBorder,
-                    borderRadius: 14,
-                    padding: 14,
-                    fontSize: 20,
+                    borderRadius: RADIUS.input,
+                    padding: SPACING.xl,
+                    fontSize: FONT_SIZE.large,
                     fontWeight: "700",
-                    marginBottom: 14,
+                    marginBottom: SPACING.xl,
                     color: textColor,
                   }}
                 />
@@ -254,11 +256,11 @@ export const CurrencyModal = ({
                   onPress={handleConvert}
                   style={{
                     backgroundColor: btnBg,
-                    borderRadius: 14,
-                    padding: 15,
+                    borderRadius: RADIUS.input,
+                    padding: MODAL.convertPadding,
                     alignItems: "center",
-                    marginBottom: 14,
-                    opacity: loading ? 0.6 : 1,
+                    marginBottom: SPACING.xl,
+                    opacity: loading ? ALPHA.loadingOpacity : 1,
                   }}
                   disabled={loading}
                 >
@@ -269,7 +271,7 @@ export const CurrencyModal = ({
                       style={{
                         color: btnText,
                         fontWeight: "700",
-                        fontSize: 16,
+                        fontSize: FONT_SIZE.input,
                         letterSpacing: 0.3,
                       }}
                     >
@@ -285,38 +287,38 @@ export const CurrencyModal = ({
                       backgroundColor: cardBg,
                       borderWidth: 1,
                       borderColor: cardBorder,
-                      borderRadius: 16,
-                      padding: 16,
+                      borderRadius: RADIUS.card,
+                      padding: SPACING.xxl,
                       alignItems: "center",
                     }}
                   >
                     <Text
                       style={{
-                        fontSize: 11,
+                        fontSize: FONT_SIZE.label,
                         color: dimText,
                         fontWeight: "700",
                         letterSpacing: 2,
                         textTransform: "uppercase",
-                        marginBottom: 6,
+                        marginBottom: SPACING.sm,
                       }}
                     >
                       Result
                     </Text>
                     <Text
                       style={{
-                        fontSize: 28,
+                        fontSize: FONT_SIZE.result,
                         fontWeight: "800",
                         color: textColor,
                         letterSpacing: -0.5,
                       }}
                     >
                       {converted.toFixed(2)}{" "}
-                      <Text style={{ fontSize: 16, fontWeight: "600" }}>
+                      <Text style={{ fontSize: FONT_SIZE.input, fontWeight: "600" }}>
                         {toUSD ? "USD" : currency}
                       </Text>
                     </Text>
                     <Text
-                      style={{ fontSize: 13, color: dimText, marginTop: 4 }}
+                      style={{ fontSize: FONT_SIZE.errorText, color: dimText, marginTop: SPACING.xs }}
                     >
                       from {amount} {toUSD ? currency : "USD"}
                     </Text>
@@ -327,9 +329,9 @@ export const CurrencyModal = ({
                   <Text
                     style={{
                       color: dimText,
-                      marginTop: 10,
+                      marginTop: SPACING.lg,
                       textAlign: "center",
-                      fontSize: 14,
+                      fontSize: FONT_SIZE.error,
                     }}
                   >
                     {error}

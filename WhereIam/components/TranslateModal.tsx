@@ -12,6 +12,16 @@ import {
 import { XMarkIcon } from "react-native-heroicons/solid";
 import { ArrowsRightLeftIcon } from "react-native-heroicons/outline";
 import { useLocation } from "@/context/LocationContext";
+import { getReadableTextColor } from "@/constants/functions";
+import {
+  ALPHA,
+  FONT_SIZE,
+  LINE_HEIGHT,
+  MODAL,
+  RADIUS,
+  SIZE,
+  SPACING,
+} from "@/constants/theme";
 // @ts-ignore
 const { iso6392 } = require("iso-639-2");
 
@@ -21,15 +31,6 @@ interface TranslateModalProps {
   language: string;
   textLanguage: string;
 }
-
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#111111";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
 
 export const TranslateModal = ({
   visible,
@@ -48,11 +49,11 @@ export const TranslateModal = ({
   const sheetBg = themeColors?.[0] || "#ffffff";
   const textColor = getReadableTextColor(sheetBg);
   const isLight = textColor === "#111111";
-  const cardBg = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.12)";
-  const cardBorder = isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.16)";
-  const dimText = isLight ? "rgba(17,17,17,0.5)" : "rgba(255,255,255,0.55)";
-  const inputBg = isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.1)";
-  const inputBorder = isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.22)";
+  const cardBg = isLight ? ALPHA.lightCard : ALPHA.darkCard;
+  const cardBorder = isLight ? ALPHA.lightCardBorder : ALPHA.darkCardBorder;
+  const dimText = isLight ? ALPHA.lightDimText : ALPHA.darkDimText;
+  const inputBg = isLight ? ALPHA.lightInput : ALPHA.darkInput;
+  const inputBorder = isLight ? ALPHA.lightInputBorder : ALPHA.darkInputBorder;
   const btnBg = textColor;
   const btnText = isLight ? "#ffffff" : "#111111";
 
@@ -118,37 +119,33 @@ export const TranslateModal = ({
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: ALPHA.overlayBg,
             justifyContent: "flex-end",
           }}
         >
           <View
             style={{
               backgroundColor: sheetBg,
-              borderTopLeftRadius: 28,
-              borderTopRightRadius: 28,
+              borderTopLeftRadius: RADIUS.sheet,
+              borderTopRightRadius: RADIUS.sheet,
               borderTopWidth: 1,
               borderLeftWidth: 1,
               borderRightWidth: 1,
-              borderColor: isLight
-                ? "rgba(0,0,0,0.08)"
-                : "rgba(255,255,255,0.15)",
-              padding: 24,
-              paddingBottom: Platform.OS === "ios" ? 40 : 24,
-              minHeight: 320,
+              borderColor: isLight ? ALPHA.lightBorder : ALPHA.darkBorder,
+              padding: SPACING.sheet,
+              paddingBottom: Platform.OS === "ios" ? SPACING.iosBottom : SPACING.sheet,
+              minHeight: MODAL.minHeight,
             }}
           >
             {/* Drag handle */}
             <View
               style={{
-                width: 40,
-                height: 4,
-                borderRadius: 2,
-                backgroundColor: isLight
-                  ? "rgba(0,0,0,0.15)"
-                  : "rgba(255,255,255,0.3)",
+                width: SIZE.handleWidth,
+                height: SIZE.handleHeight,
+                borderRadius: RADIUS.handle,
+                backgroundColor: isLight ? ALPHA.lightHandle : ALPHA.darkHandle,
                 alignSelf: "center",
-                marginBottom: 20,
+                marginBottom: SPACING.xxxl,
               }}
             />
 
@@ -158,30 +155,28 @@ export const TranslateModal = ({
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: 20,
+                marginBottom: SPACING.xxxl,
               }}
             >
               <View>
                 <Text
-                  style={{ fontSize: 22, fontWeight: "800", color: textColor }}
+                  style={{ fontSize: FONT_SIZE.title, fontWeight: "800", color: textColor }}
                 >
                   Translate
                 </Text>
-                <Text style={{ fontSize: 13, color: dimText, marginTop: 2 }}>
+                <Text style={{ fontSize: FONT_SIZE.errorText, color: dimText, marginTop: 2 }}>
                   {textLanguage}
                 </Text>
               </View>
               <TouchableOpacity
                 onPress={onClose}
                 style={{
-                  backgroundColor: isLight
-                    ? "rgba(0,0,0,0.08)"
-                    : "rgba(255,255,255,0.15)",
-                  borderRadius: 50,
-                  padding: 8,
+                  backgroundColor: isLight ? ALPHA.lightBorder : ALPHA.darkBorder,
+                  borderRadius: RADIUS.closeBtn,
+                  padding: SPACING.md,
                 }}
               >
-                <XMarkIcon size={22} color={textColor} />
+                <XMarkIcon size={SIZE.icon} color={textColor} />
               </TouchableOpacity>
             </View>
 
@@ -199,18 +194,18 @@ export const TranslateModal = ({
                 backgroundColor: cardBg,
                 borderWidth: 1,
                 borderColor: cardBorder,
-                borderRadius: 16,
-                paddingVertical: 10,
-                paddingHorizontal: 18,
-                marginBottom: 20,
+                borderRadius: RADIUS.card,
+                paddingVertical: SPACING.lg,
+                paddingHorizontal: SPACING.inner,
+                marginBottom: SPACING.xxxl,
                 alignSelf: "center",
-                gap: 10,
+                gap: SPACING.lg,
               }}
             >
               <Text
                 style={{
                   fontWeight: "700",
-                  fontSize: 15,
+                  fontSize: FONT_SIZE.body,
                   color: textColor,
                   letterSpacing: 0.5,
                 }}
@@ -219,18 +214,18 @@ export const TranslateModal = ({
                   ? `${isoLang.toUpperCase()} → EN`
                   : `EN → ${isoLang.toUpperCase()}`}
               </Text>
-              <ArrowsRightLeftIcon size={18} color={textColor} />
+              <ArrowsRightLeftIcon size={SIZE.switchIcon} color={textColor} />
             </TouchableOpacity>
 
             {/* Label */}
             <Text
               style={{
-                fontSize: 11,
+                fontSize: FONT_SIZE.label,
                 color: dimText,
                 fontWeight: "700",
                 letterSpacing: 2,
                 textTransform: "uppercase",
-                marginBottom: 8,
+                marginBottom: SPACING.md,
               }}
             >
               {toEnglish
@@ -252,11 +247,11 @@ export const TranslateModal = ({
                 backgroundColor: inputBg,
                 borderWidth: 1,
                 borderColor: inputBorder,
-                borderRadius: 14,
-                padding: 14,
-                fontSize: 18,
+                borderRadius: RADIUS.input,
+                padding: SPACING.xl,
+                fontSize: FONT_SIZE.subheading,
                 fontWeight: "600",
-                marginBottom: 14,
+                marginBottom: SPACING.xl,
                 color: textColor,
               }}
             />
@@ -266,11 +261,11 @@ export const TranslateModal = ({
               onPress={handleTranslate}
               style={{
                 backgroundColor: btnBg,
-                borderRadius: 14,
-                padding: 15,
+                borderRadius: RADIUS.input,
+                padding: MODAL.convertPadding,
                 alignItems: "center",
-                marginBottom: 14,
-                opacity: loading ? 0.6 : 1,
+                marginBottom: SPACING.xl,
+                opacity: loading ? ALPHA.loadingOpacity : 1,
               }}
               disabled={loading}
             >
@@ -281,7 +276,7 @@ export const TranslateModal = ({
                   style={{
                     color: btnText,
                     fontWeight: "700",
-                    fontSize: 16,
+                    fontSize: FONT_SIZE.input,
                     letterSpacing: 0.3,
                   }}
                 >
@@ -297,28 +292,28 @@ export const TranslateModal = ({
                   backgroundColor: cardBg,
                   borderWidth: 1,
                   borderColor: cardBorder,
-                  borderRadius: 16,
-                  padding: 16,
+                  borderRadius: RADIUS.card,
+                  padding: SPACING.xxl,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 10,
+                    fontSize: FONT_SIZE.caption,
                     color: dimText,
                     fontWeight: "700",
                     letterSpacing: 2,
                     textTransform: "uppercase",
-                    marginBottom: 8,
+                    marginBottom: SPACING.md,
                   }}
                 >
                   Translation
                 </Text>
                 <Text
                   style={{
-                    fontSize: 20,
+                    fontSize: FONT_SIZE.large,
                     color: textColor,
                     fontWeight: "600",
-                    lineHeight: 28,
+                    lineHeight: LINE_HEIGHT.loose,
                   }}
                 >
                   {translated}
@@ -330,9 +325,9 @@ export const TranslateModal = ({
               <Text
                 style={{
                   color: dimText,
-                  marginTop: 10,
+                  marginTop: SPACING.lg,
                   textAlign: "center",
-                  fontSize: 14,
+                  fontSize: FONT_SIZE.error,
                 }}
               >
                 {error}
