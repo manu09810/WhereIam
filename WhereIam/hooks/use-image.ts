@@ -10,8 +10,8 @@ export const useImage = (countryData: any, region?: string | null) => {
     try {
       const response = await fetch(
         `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
-          query
-        )}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`
+          query,
+        )}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`,
       );
       const data = await response.json();
       if (data.results && data.results.length > 0) {
@@ -26,20 +26,20 @@ export const useImage = (countryData: any, region?: string | null) => {
 
   useEffect(() => {
     if (countryData?.name?.common) {
-      fetchUnsplashImage(`${countryData.name.common} landscape`).then((img) =>
-        setBackgroundImage(img)
+      fetchUnsplashImage(`${countryData.name.common} `).then((img) =>
+        setBackgroundImage(img),
       );
     }
   }, [countryData]);
-  console.log(region)
+  console.log(region);
 
   useEffect(() => {
     if (region && countryData?.name?.common) {
-      fetchUnsplashImage(`${region} ${countryData.name.common} landscape`).then(
-        (img) => setRegionImage(img)
+      fetchUnsplashImage(`${region} ${countryData.name.common} `).then((img) =>
+        setRegionImage(img),
       );
     } else {
-      setRegionImage(null); 
+      setRegionImage(null);
     }
   }, [region, countryData]);
 

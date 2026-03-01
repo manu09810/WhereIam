@@ -8,16 +8,7 @@ import {
 
 import { HapticTab } from "@/components/haptic-tab";
 import { useLocation } from "@/context/LocationContext";
-
-// Helper de contraste
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#111";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
+import { getReadableTextColor } from "@/constants/functions";
 
 export default function TabLayout() {
   const { themeColors, averageColor } = useLocation();
@@ -41,9 +32,9 @@ export default function TabLayout() {
         tabBarInactiveTintColor: tabIconColor,
         tabBarStyle: {
           backgroundColor: tabBarBackground,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 6,
+          height: 80,
+          paddingBottom: 6,
+          paddingTop: 8,
           borderTopWidth: 1,
           borderTopColor: tabBorderColor,
         },
@@ -52,19 +43,19 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="News"
+        options={{
+          title: "Local News",
+          tabBarIcon: ({ color }) => <NewspaperIcon size={30} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="infoCountry"
         options={{
           title: "Country Info",
           tabBarIcon: ({ color }) => (
-            <InformationCircleIcon size={28} color={color} />
+            <InformationCircleIcon size={35} color={color} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="News"
-        options={{
-          title: "Local News",
-          tabBarIcon: ({ color }) => <NewspaperIcon size={28} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -72,7 +63,7 @@ export default function TabLayout() {
         options={{
           title: "Facts",
           tabBarIcon: ({ color }) => (
-            <QuestionMarkCircleIcon size={28} color={color} />
+            <QuestionMarkCircleIcon size={30} color={color} />
           ),
         }}
       />

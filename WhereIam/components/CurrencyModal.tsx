@@ -13,21 +13,13 @@ import {
 import { XMarkIcon } from "react-native-heroicons/solid";
 import { ArrowsRightLeftIcon } from "react-native-heroicons/outline";
 import { useCurrency } from "@/hooks/use-currency";
+import { getReadableTextColor } from "@/constants/functions";
 
 interface CurrencyModalProps {
   visible: boolean;
   onClose: () => void;
   currency: string | null;
 }
-
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#111111";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
 
 export const CurrencyModal = ({
   visible,
@@ -54,12 +46,11 @@ export const CurrencyModal = ({
   const dimText = isLight ? "rgba(17,17,17,0.5)" : "rgba(255,255,255,0.55)";
   const inputBg = isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.1)";
   const inputBorder = isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.22)";
-  // Inverted button: textColor as bg, sheetBg as text
   const btnBg = textColor;
   const btnText = isLight ? "#ffffff" : "#111111";
 
   const handleConvert = async () => {
-    if (!currency || !amount || isNaN(Number(amount))) {
+   if (!currency || !amount || isNaN(Number(amount))) {
       setError("Please enter a valid amount.");
       return;
     }
@@ -70,7 +61,7 @@ export const CurrencyModal = ({
       const from = toUSD ? currency : "USD";
       const to = toUSD ? "USD" : currency;
       const response = await fetch(
-        `https://juanmalorenzo.com/api/${from}/${to}/${amount}`
+        `https://juanmalorenzo.com/api/${from}/${to}/${amount}`,
       );
       const data = await response.json();
       if (typeof data === "number" && !isNaN(data)) {
@@ -324,7 +315,9 @@ export const CurrencyModal = ({
                         {toUSD ? "USD" : currency}
                       </Text>
                     </Text>
-                    <Text style={{ fontSize: 13, color: dimText, marginTop: 4 }}>
+                    <Text
+                      style={{ fontSize: 13, color: dimText, marginTop: 4 }}
+                    >
                       from {amount} {toUSD ? currency : "USD"}
                     </Text>
                   </View>

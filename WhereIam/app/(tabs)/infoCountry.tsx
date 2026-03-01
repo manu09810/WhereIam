@@ -19,39 +19,8 @@ import {
 import { MapIcon } from "react-native-heroicons/outline";
 import Svg, { Defs, LinearGradient, Stop, Rect } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { getReadableTextColor } from "@/constants/functions";
 const { width, height } = Dimensions.get("window");
-
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#ffffff";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
-
-const contrastRatio = (fg: string, bg: string) => {
-  const toL = (hex: string) => {
-    const r = parseInt(hex.substr(1, 2), 16) / 255;
-    const g = parseInt(hex.substr(3, 2), 16) / 255;
-    const b = parseInt(hex.substr(5, 2), 16) / 255;
-    const c = [r, g, b].map((v) =>
-      v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
-    );
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-  };
-  const L1 = toL(fg) + 0.05;
-  const L2 = toL(bg) + 0.05;
-  return L1 > L2 ? L1 / L2 : L2 / L1;
-};
-
-const pickAccessibleTextColor = (bg: string, preferred?: string) => {
-  const fallback = getReadableTextColor(bg);
-  if (preferred && contrastRatio(preferred, bg) >= 3) return preferred;
-  return fallback;
-};
-
 export default function InfoCountryScreen() {
   const {
     countryData,
@@ -66,7 +35,6 @@ export default function InfoCountryScreen() {
     regionImage,
     flagImage,
     themeColors,
-    averageColor,
   } = useLocation();
 
   const countryName = countryData?.name?.common || "N/A";
@@ -104,14 +72,14 @@ export default function InfoCountryScreen() {
   const openWikipedia = (query) => {
     const wikipediaUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(query)}`;
     Linking.openURL(wikipediaUrl).catch((err) =>
-      console.log("Error opening Wikipedia:", err)
+      console.log("Error opening Wikipedia:", err),
     );
   };
 
   const openGoogleMaps = (query: string): void => {
     const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
     Linking.openURL(mapsUrl).catch((err: Error) =>
-      console.log("Error opening Google Maps:", err)
+      console.log("Error opening Google Maps:", err),
     );
   };
 
@@ -147,9 +115,13 @@ export default function InfoCountryScreen() {
     ? Object.keys(countryData.currencies)[0]
     : null;
 
-  const latlngArr = Array.isArray(countryData?.latlng) ? countryData.latlng : [];
-  const countryLatitude = typeof latlngArr[0] === "number" ? latlngArr[0] : null;
-  const countryLongitude = typeof latlngArr[1] === "number" ? latlngArr[1] : null;
+  const latlngArr = Array.isArray(countryData?.latlng)
+    ? countryData.latlng
+    : [];
+  const countryLatitude =
+    typeof latlngArr[0] === "number" ? latlngArr[0] : null;
+  const countryLongitude =
+    typeof latlngArr[1] === "number" ? latlngArr[1] : null;
   const latNum = userLatitude !== null ? userLatitude : countryLatitude;
   const lonNum = userLongitude !== null ? userLongitude : countryLongitude;
 
@@ -192,7 +164,6 @@ export default function InfoCountryScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
         <StatusBar hidden />
         <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
-
           {/* ── Country Hero: flag + name overlay ── */}
           <Pressable
             onPress={() => openWikipedia(countryName)}
@@ -222,7 +193,13 @@ export default function InfoCountryScreen() {
             {/* Dark gradient at bottom for text legibility */}
             <Svg
               pointerEvents="none"
-              style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "70%" }}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "70%",
+              }}
               width="100%"
               height="100%"
             >
@@ -291,7 +268,7 @@ export default function InfoCountryScreen() {
                 if (latNum !== null && lonNum !== null) {
                   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`;
                   Linking.openURL(mapsUrl).catch((err) =>
-                    console.log("Error opening Google Maps:", err)
+                    console.log("Error opening Google Maps:", err),
                   );
                 }
               }}

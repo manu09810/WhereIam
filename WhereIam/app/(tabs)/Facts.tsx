@@ -16,10 +16,8 @@ export default function Facts() {
     themeColors,
     averageColor,
   } = useLocation();
-
   const primary = themeColors?.[0] || averageColor || "#007aff";
   const buttonText = getReadableTextColor(primary);
-
   const countryName = countryData?.name?.common || "";
   const regionName = region || "";
   const cityName = city || "";
