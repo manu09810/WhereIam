@@ -59,7 +59,7 @@ export const SIZE = {
   switchIcon: 18,
   bullet: 28,
   paginationBtn: 44,
-  tabBar: 80,
+  tabBar: 70,
   newsCard: 130,
   mapWidget: 170,
   heroCard: 240,
@@ -87,6 +87,7 @@ export const ALPHA = {
   lightInputBorder: "rgba(0,0,0,0.12)",
   darkInputBorder: "rgba(255,255,255,0.22)",
   nearWhiteText: "rgba(255,255,255,0.95)",
+  tabBarInactive: "rgba(0,0,0,0.53)",
 } as const;
 
 export const LINE_HEIGHT = {
