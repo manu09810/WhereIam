@@ -3,7 +3,6 @@ import { WeatherModal } from "@/components/WeatherModal";
 import { TranslateModal } from "@/components/TranslateModal";
 import { useLocation } from "@/context/LocationContext";
 import DataCard from "@/components/Datacard";
-
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,7 +15,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { MapIcon } from "react-native-heroicons/outline";
 import Svg, { Defs, LinearGradient, Stop, Rect } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getReadableTextColor } from "@/constants/functions";
@@ -29,7 +27,9 @@ import {
   SPACING,
 } from "@/constants/theme";
 import TimeWidget from "@/components/ui/TimeWidget";
+
 const { width, height } = Dimensions.get("window");
+
 export default function InfoCountryScreen() {
   const {
     countryData,
@@ -51,44 +51,11 @@ export default function InfoCountryScreen() {
   const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
   const [translateModalVisible, setTranslateModalVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState<string | null>(null);
 
-  useEffect(() => {
-    const timezone =
-      locationTimezone ||
-      countryData?.timezones?.find((tz) => tz.includes("/")) ||
-      countryData?.timezones?.[0];
-    if (timezone && timezone !== "N/A" && timezone.includes("/")) {
-      CurrentTime(timezone);
-    }
-  }, [countryData, locationTimezone]);
-
-  const CurrentTime = (tz: string) => {
-    try {
-      const time = new Date().toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: tz,
-      });
-      setCurrentTime(time);
-    } catch (error) {
-      setCurrentTime(null);
-      console.log("Error fetching time:", error);
-    }
-  };
-
-  const openWikipedia = (query) => {
+  const openWikipedia = (query: string) => {
     const wikipediaUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(query)}`;
     Linking.openURL(wikipediaUrl).catch((err) =>
       console.log("Error opening Wikipedia:", err),
-    );
-  };
-
-  const openGoogleMaps = (query: string): void => {
-    const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
-    Linking.openURL(mapsUrl).catch((err: Error) =>
-      console.log("Error opening Google Maps:", err),
     );
   };
 
@@ -139,18 +106,9 @@ export default function InfoCountryScreen() {
   const accentColor = themeColors?.[0] || "#007aff";
   const accentColorHour = themeColors?.[1] || "#007aff";
   const accentColorText = themeColors?.[3] || getReadableTextColor(accentColor);
-  const accentColorTimeText = getReadableTextColor(accentColorHour);
-  const isLightHour = accentColorTimeText === "#111111";
-  const dimmedTimeText = isLightHour
-    ? ALPHA.lightDimText
-    : "rgba(255,255,255,0.58)";
 
   const isCityRegionSame =
     city && region && city.toLowerCase() === region.toLowerCase();
-
-  // Export these for use in other components
-  (global as any).flagAccentColor = accentColor;
-  (global as any).flagAccentColorHour = accentColorHour;
 
   return (
     <View style={{ flex: 1 }}>
@@ -173,7 +131,7 @@ export default function InfoCountryScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
         <StatusBar hidden />
         <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
-          {/* ── Hero: Map + Flag pill + Country name ── */}
+          {/* ── Hero: Map ── */}
           <Pressable
             onPress={() => {
               if (latNum !== null && lonNum !== null) {
@@ -248,47 +206,6 @@ export default function InfoCountryScreen() {
                 Open Maps
               </Text>
             </View>
-
-            {/* Country name + flag pill at bottom */}
-            <View
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                padding: SPACING.inner,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: SPACING.md,
-              }}
-            >
-              {flagImage && (
-                <Image
-                  source={{ uri: flagImage }}
-                  style={{
-                    width: 36,
-                    height: 24,
-                    borderRadius: RADIUS.handle,
-                    borderWidth: 1,
-                    borderColor: "rgba(255,255,255,0.3)",
-                  }}
-                  resizeMode="cover"
-                />
-              )}
-              <Text
-                style={{
-                  fontSize: FONT_SIZE.display,
-                  color: "#fff",
-                  fontWeight: "800",
-                  letterSpacing: -0.5,
-                  textShadowColor: "rgba(0,0,0,0.4)",
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 6,
-                }}
-              >
-                {countryName}
-              </Text>
-            </View>
           </Pressable>
 
           {/* ── Local Time ── */}
@@ -300,6 +217,8 @@ export default function InfoCountryScreen() {
               "N/A"
             }
             accentColor={accentColorHour}
+            flagImage={flagImage}
+            countryName={countryName}
           />
 
           {/* ── Data Grid ── */}

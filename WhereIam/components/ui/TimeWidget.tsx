@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Image } from "react-native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { ALPHA, FONT_SIZE, RADIUS, SPACING } from "@/constants/theme";
@@ -8,9 +8,16 @@ import { getReadableTextColor, hexToRgba } from "@/constants/functions";
 interface TimeWidgetProps {
   timezone: string;
   accentColor: string;
+  flagImage?: string | null;
+  countryName?: string | null;
 }
 
-export default function TimeWidget({ timezone, accentColor }: TimeWidgetProps) {
+export default function TimeWidget({
+  timezone,
+  accentColor,
+  flagImage,
+  countryName,
+}: TimeWidgetProps) {
   const [currentTime, setCurrentTime] = useState<string | null>(null);
 
   const textColor = getReadableTextColor(accentColor);
@@ -163,6 +170,44 @@ export default function TimeWidget({ timezone, accentColor }: TimeWidgetProps) {
         >
           {currentTime ?? "--:--"}
         </Text>
+
+        {/* === Flag + Country name === */}
+        {(flagImage || countryName) && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: SPACING.md,
+              marginTop: SPACING.lg,
+            }}
+          >
+            {flagImage && (
+              <Image
+                source={{ uri: flagImage }}
+                style={{
+                  width: 36,
+                  height: 24,
+                  borderRadius: RADIUS.handle,
+                  borderWidth: 1,
+                  borderColor: "rgba(255,255,255,0.3)",
+                }}
+                resizeMode="cover"
+              />
+            )}
+            {countryName && (
+              <Text
+                style={{
+                  fontSize: FONT_SIZE.errorText,
+                  color: ALPHA.darkDimText,
+                  fontWeight: "600",
+                  letterSpacing: 0.3,
+                }}
+              >
+                {countryName}
+              </Text>
+            )}
+          </View>
+        )}
       </View>
     </View>
   );
