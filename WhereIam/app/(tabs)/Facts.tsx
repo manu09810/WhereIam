@@ -16,17 +16,14 @@ export default function Facts() {
     themeColors,
     averageColor,
   } = useLocation();
-
   const primary = themeColors?.[0] || averageColor || "#007aff";
-  const secondary = themeColors?.[4] || "#f2f2f2";
   const buttonText = getReadableTextColor(primary);
-
   const countryName = countryData?.name?.common || "";
   const regionName = region || "";
   const cityName = city || "";
 
   return (
-    <SafeAreaView style={[styles.container]}>
+    <SafeAreaView style={styles.container}>
       {backgroundImage && (
         <Image
           source={{ uri: backgroundImage }}
@@ -36,15 +33,15 @@ export default function Facts() {
       )}
 
       <View style={styles.content}>
-        <View style={[styles.titleWrapper, { borderColor: secondary }]}>
+        <View style={styles.card}>
           <Text style={[styles.titleMain, { color: primary }]}>Facts</Text>
           <Text style={[styles.titleSub, { color: buttonText }]}>
-            Facts about each site
+            Explore facts about each location
           </Text>
 
-          <View style={{ width: "100%", paddingHorizontal: 6, marginTop: 16 }}>
+          <View style={styles.buttonList}>
             <DataCard
-              value={`Country Facts: ${countryName || "—"}`}
+              value={`Country: ${countryName || "—"}`}
               onPress={() =>
                 router.push({
                   pathname: "/FactsDetail",
@@ -57,12 +54,12 @@ export default function Facts() {
               }
               accentColor={primary}
               textColor={buttonText}
-              height={50}
+              height={56}
               block={true}
             />
 
             <DataCard
-              value={`Region Facts: ${regionName || "—"}`}
+              value={`Region: ${regionName || "—"}`}
               onPress={() =>
                 router.push({
                   pathname: "/FactsDetail",
@@ -75,12 +72,12 @@ export default function Facts() {
               }
               accentColor={primary}
               textColor={buttonText}
-              height={50}
+              height={56}
               block={true}
             />
 
             <DataCard
-              value={`City Facts: ${cityName || "—"}`}
+              value={`City: ${cityName || "—"}`}
               onPress={() =>
                 router.push({
                   pathname: "/FactsDetail",
@@ -93,7 +90,7 @@ export default function Facts() {
               }
               accentColor={primary}
               textColor={buttonText}
-              height={50}
+              height={56}
               block={true}
             />
           </View>
@@ -110,28 +107,38 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 24,
+    padding: 20,
     justifyContent: "center",
   },
-  titleWrapper: {
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderWidth: 8,
+  card: {
+    backgroundColor: "rgba(0,0,0,0.36)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
-    marginBottom: 18,
-    paddingHorizontal: 6,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingTop: 24,
+    paddingBottom: 16,
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+    elevation: 8,
   },
   titleMain: {
-    marginTop: 16,
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "800",
     letterSpacing: -0.5,
     textAlign: "center",
+    marginBottom: 6,
   },
   titleSub: {
-    fontSize: 18,
-    marginTop: 6,
+    fontSize: 15,
     textAlign: "center",
-    marginBottom: 12,
+    opacity: 0.85,
+    marginBottom: 20,
+  },
+  buttonList: {
+    width: "100%",
   },
 });

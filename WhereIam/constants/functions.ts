@@ -33,13 +33,27 @@ export function averageColors(colors: string[]): string {
       const [r, g, b] = hexToRgb(hex);
       return [acc[0] + r, acc[1] + g, acc[2] + b];
     },
-    [0, 0, 0]
+    [0, 0, 0],
   );
 
   const avg = sum.map((val) => Math.round(val / total)) as [
     number,
     number,
-    number
+    number,
   ];
   return rgbToHex(avg);
 }
+export const contrastRatio = (fg: string, bg: string) => {
+  const toL = (hex: string) => {
+    const r = parseInt(hex.substr(1, 2), 16) / 255;
+    const g = parseInt(hex.substr(3, 2), 16) / 255;
+    const b = parseInt(hex.substr(5, 2), 16) / 255;
+    const c = [r, g, b].map((v) =>
+      v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4),
+    );
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  };
+  const L1 = toL(fg) + 0.05;
+  const L2 = toL(bg) + 0.05;
+  return L1 > L2 ? L1 / L2 : L2 / L1;
+};

@@ -89,63 +89,63 @@ and facts should separated by #$`,
         <Image
           source={{ uri: bgToUse }}
           style={StyleSheet.absoluteFillObject}
-          blurRadius={3}
+          blurRadius={8}
         />
       )}
 
-      <SafeAreaView style={[{ flex: 1, backgroundColor: "transparent" }]}>
-        <BackButton colorButton={buttonColor}></BackButton>
-        <View style={[styles.titleWrapper]}>
-          <Text style={[styles.titleMain, { color: primary }]}>
-            Facts from {query || label}
-          </Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
+        <BackButton colorButton={buttonColor} />
+        <View style={styles.body}>
+          <View style={styles.titleWrapper}>
+            <Text style={styles.titleLabel}>FACTS ABOUT</Text>
+            <Text style={[styles.titleMain, { color: primary }]}>
+              {query || label}
+            </Text>
+          </View>
+
+          {loading && <ActivityIndicator size="large" color={primary} />}
+
+          {error && !loading && (
+            <Text style={{ color: "red", textAlign: "center" }}>Error: {error}</Text>
+          )}
+
+          {!loading && response && (
+            <TextView
+              texts={array}
+              bulletColor={primary}
+              textColor="rgba(255,255,255,0.92)"
+              containerBg="rgba(0,0,0,0.30)"
+            />
+          )}
         </View>
-        {loading && (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <ActivityIndicator size="large" color={primary} />
-          </View>
-        )}
-
-        {error && !loading && (
-          <View style={{ padding: 16 }}>
-            <Text style={{ color: "red" }}>Error: {error}</Text>
-          </View>
-        )}
-
-        {!loading && response && (
-          <View style={{ padding: 16 }}>
-            <TextView texts={array} bulletColor={primary} />
-          </View>
-        )}
-
-        <View style={styles.bottomContainer}></View>
       </SafeAreaView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    justifyContent: "flex-start",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
   titleWrapper: {
-    backgroundColor: "rgba(0,0,0,0.6)",
-    borderWidth: 8,
     alignItems: "center",
-    marginBottom: 18,
-    paddingHorizontal: 6,
-    borderRadius: 10,
-    marginTop: 80,
-    paddingVertical: 12,
+    paddingHorizontal: 8,
+    paddingBottom: 70,
+  },
+  titleLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 3,
+    color: "rgba(255,255,255,0.6)",
+    marginBottom: 6,
   },
   titleMain: {
-    fontSize: 28,
+    fontSize: 34,
     fontWeight: "800",
     letterSpacing: -0.5,
     textAlign: "center",
-  },
-  bottomContainer: {
-    padding: 16,
-    alignItems: "center",
-    marginTop: "auto",
   },
 });

@@ -13,6 +13,7 @@ import {
 import { XMarkIcon } from "react-native-heroicons/solid";
 import { ArrowsRightLeftIcon } from "react-native-heroicons/outline";
 import { useCurrency } from "@/hooks/use-currency";
+import { getReadableTextColor } from "@/constants/functions";
 
 interface CurrencyModalProps {
   visible: boolean;
@@ -36,8 +37,20 @@ export const CurrencyModal = ({
     isLoading,
     error: currencyError,
   } = useCurrency(currency);
+
+  const sheetBg = themeColors?.[0] || "#ffffff";
+  const textColor = getReadableTextColor(sheetBg);
+  const isLight = textColor === "#111111";
+  const cardBg = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.12)";
+  const cardBorder = isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.16)";
+  const dimText = isLight ? "rgba(17,17,17,0.5)" : "rgba(255,255,255,0.55)";
+  const inputBg = isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.1)";
+  const inputBorder = isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.22)";
+  const btnBg = textColor;
+  const btnText = isLight ? "#ffffff" : "#111111";
+
   const handleConvert = async () => {
-    if (!currency || !amount || isNaN(Number(amount))) {
+   if (!currency || !amount || isNaN(Number(amount))) {
       setError("Please enter a valid amount.");
       return;
     }
@@ -51,7 +64,6 @@ export const CurrencyModal = ({
         `https://juanmalorenzo.com/api/${from}/${to}/${amount}`,
       );
       const data = await response.json();
-
       if (typeof data === "number" && !isNaN(data)) {
         setConverted(data);
       } else {
@@ -86,159 +98,227 @@ export const CurrencyModal = ({
         >
           <View
             style={{
-              backgroundColor: themeColors?.[0] || "#fff",
-              borderTopLeftRadius: 24,
-              borderTopRightRadius: 24,
+              backgroundColor: sheetBg,
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              borderTopWidth: 1,
+              borderLeftWidth: 1,
+              borderRightWidth: 1,
+              borderColor: isLight
+                ? "rgba(0,0,0,0.08)"
+                : "rgba(255,255,255,0.15)",
               padding: 24,
+              paddingBottom: Platform.OS === "ios" ? 40 : 24,
               minHeight: 320,
             }}
           >
+            {/* Drag handle */}
+            <View
+              style={{
+                width: 40,
+                height: 4,
+                borderRadius: 2,
+                backgroundColor: isLight
+                  ? "rgba(0,0,0,0.15)"
+                  : "rgba(255,255,255,0.3)",
+                alignSelf: "center",
+                marginBottom: 20,
+              }}
+            />
+
             {/* Header */}
             <View
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: 24,
+                marginBottom: 20,
               }}
             >
               <Text
-                style={{ fontSize: 24, fontWeight: "700", color: "#1a1a1a" }}
+                style={{ fontSize: 22, fontWeight: "800", color: textColor }}
               >
-                Currency Converter
+                Currency
               </Text>
               <TouchableOpacity
                 onPress={onClose}
                 style={{
-                  backgroundColor: "#f0f0f0",
+                  backgroundColor: isLight
+                    ? "rgba(0,0,0,0.08)"
+                    : "rgba(255,255,255,0.15)",
                   borderRadius: 50,
                   padding: 8,
                 }}
               >
-                <XMarkIcon size={24} color="#1a1a1a" />
+                <XMarkIcon size={22} color={textColor} />
               </TouchableOpacity>
             </View>
 
             {isLoading ? (
               <View
                 style={{
+                  paddingVertical: 48,
                   alignItems: "center",
                   justifyContent: "center",
-                  flex: 1,
                 }}
               >
-                <ActivityIndicator size="large" color="#1a1a1a" />
+                <ActivityIndicator size="large" color={textColor} />
               </View>
             ) : !currencyExists ? (
               <View
                 style={{
+                  paddingVertical: 48,
                   alignItems: "center",
                   justifyContent: "center",
-                  flex: 1,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 18,
-                    color: "#1a1a1a",
+                    fontSize: 16,
+                    color: dimText,
                     textAlign: "center",
                   }}
                 >
-                  Not available in this region on the MVP
+                  Not available in this region
                 </Text>
               </View>
             ) : (
               <>
-                {/* Switch button */}
-                <View style={{ alignItems: "center", marginBottom: 12 }}>
-                  <TouchableOpacity
-                    onPress={handleSwitch}
+                {/* Direction toggle */}
+                <TouchableOpacity
+                  onPress={handleSwitch}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: cardBg,
+                    borderWidth: 1,
+                    borderColor: cardBorder,
+                    borderRadius: 16,
+                    paddingVertical: 10,
+                    paddingHorizontal: 18,
+                    marginBottom: 20,
+                    alignSelf: "center",
+                    gap: 10,
+                  }}
+                >
+                  <Text
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      backgroundColor: themeColors?.[1] || "#f0f0f0",
-                      borderRadius: 20,
-                      paddingVertical: 6,
-                      paddingHorizontal: 16,
+                      fontWeight: "700",
+                      fontSize: 15,
+                      color: textColor,
+                      letterSpacing: 0.5,
                     }}
                   >
-                    <Text
-                      style={{
-                        fontWeight: "600",
-                        marginRight: 8,
-                        color: "#1a1a1a",
-                      }}
-                    >
-                      {toUSD ? `${currency} → USD` : `USD → ${currency}`}
-                    </Text>
-                    <ArrowsRightLeftIcon size={20} color="#1a1a1a" />
-                  </TouchableOpacity>
-                </View>
+                    {toUSD ? `${currency} → USD` : `USD → ${currency}`}
+                  </Text>
+                  <ArrowsRightLeftIcon size={18} color={textColor} />
+                </TouchableOpacity>
+
+                {/* Label */}
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: dimText,
+                    fontWeight: "700",
+                    letterSpacing: 2,
+                    textTransform: "uppercase",
+                    marginBottom: 8,
+                  }}
+                >
+                  {toUSD ? `Amount in ${currency}` : "Amount in USD"}
+                </Text>
 
                 {/* Input */}
-                <Text
-                  style={{ fontSize: 16, color: "#1a1a1a", marginBottom: 8 }}
-                >
-                  {toUSD
-                    ? `Convert from ${currency} to USD`
-                    : `Convert from USD to ${currency}`}
-                </Text>
                 <TextInput
-                  placeholder={
-                    toUSD ? `Amount in ${currency}` : "Amount in USD"
-                  }
+                  placeholder={toUSD ? `0.00 ${currency}` : "0.00 USD"}
+                  placeholderTextColor={dimText}
                   value={amount}
                   onChangeText={setAmount}
                   keyboardType="numeric"
                   style={{
+                    backgroundColor: inputBg,
                     borderWidth: 1,
-                    borderColor: "#ddd",
-                    borderRadius: 8,
-                    padding: 12,
-                    fontSize: 18,
-                    marginBottom: 16,
-                    backgroundColor: "#fff",
-                    color: "#1a1a1a",
+                    borderColor: inputBorder,
+                    borderRadius: 14,
+                    padding: 14,
+                    fontSize: 20,
+                    fontWeight: "700",
+                    marginBottom: 14,
+                    color: textColor,
                   }}
                 />
 
+                {/* Convert button */}
                 <TouchableOpacity
                   onPress={handleConvert}
                   style={{
-                    backgroundColor: "#fff",
-                    borderRadius: 8,
-                    padding: 14,
+                    backgroundColor: btnBg,
+                    borderRadius: 14,
+                    padding: 15,
                     alignItems: "center",
-                    marginBottom: 16,
-                    borderWidth: 1,
-                    borderColor: "#1a1a1a",
+                    marginBottom: 14,
+                    opacity: loading ? 0.6 : 1,
                   }}
                   disabled={loading}
                 >
-                  <Text
-                    style={{
-                      color: "#1a1a1a",
-                      fontWeight: "700",
-                      fontSize: 16,
-                    }}
-                  >
-                    Convert
-                  </Text>
+                  {loading ? (
+                    <ActivityIndicator size="small" color={btnText} />
+                  ) : (
+                    <Text
+                      style={{
+                        color: btnText,
+                        fontWeight: "700",
+                        fontSize: 16,
+                        letterSpacing: 0.3,
+                      }}
+                    >
+                      Convert
+                    </Text>
+                  )}
                 </TouchableOpacity>
 
-                {loading && (
-                  <ActivityIndicator
-                    size="small"
-                    color="#1a1a1a"
-                    style={{ marginBottom: 12 }}
-                  />
-                )}
-
+                {/* Result */}
                 {converted !== null && !loading && (
-                  <View style={{ alignItems: "center", marginBottom: 8 }}>
-                    <Text style={{ fontSize: 18, color: "#1a1a1a" }}>
-                      {amount} {toUSD ? currency : "USD"} ≈{" "}
-                      {converted.toFixed(2)} {toUSD ? "USD" : currency}
+                  <View
+                    style={{
+                      backgroundColor: cardBg,
+                      borderWidth: 1,
+                      borderColor: cardBorder,
+                      borderRadius: 16,
+                      padding: 16,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        color: dimText,
+                        fontWeight: "700",
+                        letterSpacing: 2,
+                        textTransform: "uppercase",
+                        marginBottom: 6,
+                      }}
+                    >
+                      Result
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 28,
+                        fontWeight: "800",
+                        color: textColor,
+                        letterSpacing: -0.5,
+                      }}
+                    >
+                      {converted.toFixed(2)}{" "}
+                      <Text style={{ fontSize: 16, fontWeight: "600" }}>
+                        {toUSD ? "USD" : currency}
+                      </Text>
+                    </Text>
+                    <Text
+                      style={{ fontSize: 13, color: dimText, marginTop: 4 }}
+                    >
+                      from {amount} {toUSD ? currency : "USD"}
                     </Text>
                   </View>
                 )}
@@ -246,9 +326,10 @@ export const CurrencyModal = ({
                 {error && (
                   <Text
                     style={{
-                      color: "#1a1a1a",
-                      marginTop: 8,
+                      color: dimText,
+                      marginTop: 10,
                       textAlign: "center",
+                      fontSize: 14,
                     }}
                   >
                     {error}
