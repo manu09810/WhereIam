@@ -46,7 +46,7 @@ export default function DataCard({
   };
 
   // Accent tint for the glass — very subtle
-  const accentTint = hexToRgba(accentColor, 0.15);
+  const accentTint = hexToRgba(accentColor, 0.50);
   const accentBorder = hexToRgba(accentColor, 0.45);
   const accentGlow = hexToRgba(accentColor, 0.25);
 

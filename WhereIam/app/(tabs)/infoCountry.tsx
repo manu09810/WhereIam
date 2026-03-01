@@ -28,6 +28,7 @@ import {
   SIZE,
   SPACING,
 } from "@/constants/theme";
+import TimeWidget from "@/components/ui/TimeWidget";
 const { width, height } = Dimensions.get("window");
 export default function InfoCountryScreen() {
   const {
@@ -172,29 +173,37 @@ export default function InfoCountryScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
         <StatusBar hidden />
         <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
-          {/* ── Country Hero: flag + name overlay ── */}
+          {/* ── Hero: Map + Flag pill + Country name ── */}
           <Pressable
-            onPress={() => openWikipedia(countryName)}
+            onPress={() => {
+              if (latNum !== null && lonNum !== null) {
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`;
+                Linking.openURL(mapsUrl).catch((err) =>
+                  console.log("Error opening Google Maps:", err),
+                );
+              }
+            }}
             style={{
-              height: SIZE.heroCard,
+              height: SIZE.mapWidget,
               marginHorizontal: SPACING.container,
-              marginTop: SPACING.xxl,
               marginBottom: SPACING.sm,
-              borderRadius: RADIUS.hero,
+              borderRadius: RADIUS.widget,
               overflow: "hidden",
-              ...SHADOW.hero,
+              ...SHADOW.widget,
+              shadowColor: "#000",
             }}
           >
-            {flagImage ? (
+            {mapImage ? (
               <Image
-                source={{ uri: flagImage }}
-                style={{ position: "absolute", width: "100%", height: "100%" }}
+                source={{ uri: mapImage }}
+                style={{ width: "100%", height: "100%" }}
                 resizeMode="cover"
               />
             ) : (
               <View style={{ flex: 1, backgroundColor: accentColor }} />
             )}
-            {/* Dark gradient at bottom for text legibility */}
+
+            {/* Dark gradient at bottom */}
             <Svg
               pointerEvents="none"
               style={{
@@ -202,19 +211,45 @@ export default function InfoCountryScreen() {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                height: "70%",
+                height: "60%",
               }}
               width="100%"
               height="100%"
             >
               <Defs>
-                <LinearGradient id="flagGrad" x1="0" y1="0" x2="0" y2="1">
+                <LinearGradient id="mapGrad" x1="0" y1="0" x2="0" y2="1">
                   <Stop offset="0" stopColor="#000000" stopOpacity="0" />
                   <Stop offset="1" stopColor="#000000" stopOpacity="0.65" />
                 </LinearGradient>
               </Defs>
-              <Rect width="100%" height="100%" fill="url(#flagGrad)" />
+              <Rect width="100%" height="100%" fill="url(#mapGrad)" />
             </Svg>
+
+            {/* Open Maps pill */}
+            <View
+              pointerEvents="none"
+              style={{
+                position: "absolute",
+                top: SPACING.container,
+                right: SPACING.container,
+                backgroundColor: "rgba(0,0,0,0.48)",
+                paddingHorizontal: SPACING.lg,
+                paddingVertical: 5,
+                borderRadius: RADIUS.large,
+              }}
+            >
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: FONT_SIZE.label,
+                  fontWeight: "600",
+                }}
+              >
+                Open Maps
+              </Text>
+            </View>
+
+            {/* Country name + flag pill at bottom */}
             <View
               style={{
                 position: "absolute",
@@ -222,20 +257,24 @@ export default function InfoCountryScreen() {
                 left: 0,
                 right: 0,
                 padding: SPACING.inner,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: SPACING.md,
               }}
             >
-              <Text
-                style={{
-                  fontSize: FONT_SIZE.caption,
-                  color: "rgba(255,255,255,0.6)",
-                  fontWeight: "700",
-                  letterSpacing: 2,
-                  textTransform: "uppercase",
-                  marginBottom: SPACING.xs,
-                }}
-              >
-                Country
-              </Text>
+              {flagImage && (
+                <Image
+                  source={{ uri: flagImage }}
+                  style={{
+                    width: 36,
+                    height: 24,
+                    borderRadius: RADIUS.handle,
+                    borderWidth: 1,
+                    borderColor: "rgba(255,255,255,0.3)",
+                  }}
+                  resizeMode="cover"
+                />
+              )}
               <Text
                 style={{
                   fontSize: FONT_SIZE.display,
@@ -252,140 +291,16 @@ export default function InfoCountryScreen() {
             </View>
           </Pressable>
 
-          {/* ── Map Widget ── */}
-          <View
-            style={{
-              height: SIZE.mapWidget,
-              marginHorizontal: SPACING.container,
-              marginBottom: SPACING.sm,
-              borderRadius: RADIUS.widget,
-              overflow: "hidden",
-              ...SHADOW.widget,
-              shadowColor: "#000",
-            }}
-          >
-            <Pressable
-              onPress={() => {
-                if (latNum !== null && lonNum !== null) {
-                  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latNum},${lonNum}`;
-                  Linking.openURL(mapsUrl).catch((err) =>
-                    console.log("Error opening Google Maps:", err),
-                  );
-                }
-              }}
-              style={{
-                width: "100%",
-                height: "100%",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#d0d0d0",
-              }}
-            >
-              {mapImage ? (
-                <Image
-                  source={{ uri: mapImage }}
-                  style={{ width: "100%", height: "100%" }}
-                  resizeMode="cover"
-                />
-              ) : (
-                <MapIcon color="#888" size={56} />
-              )}
-              {/* Open Maps pill */}
-              <View
-                pointerEvents="none"
-                style={{
-                  position: "absolute",
-                  top: SPACING.container,
-                  right: SPACING.container,
-                  backgroundColor: "rgba(0,0,0,0.48)",
-                  paddingHorizontal: SPACING.lg,
-                  paddingVertical: 5,
-                  borderRadius: RADIUS.large,
-                }}
-              >
-                <Text
-                  style={{ color: "#fff", fontSize: FONT_SIZE.label, fontWeight: "600" }}
-                >
-                  Open Maps
-                </Text>
-              </View>
-            </Pressable>
-          </View>
-
           {/* ── Local Time ── */}
-          <View
-            style={{
-              marginHorizontal: SPACING.container,
-              marginBottom: SPACING.sm,
-              backgroundColor: accentColorHour,
-              borderRadius: RADIUS.widget,
-              padding: SPACING.inner,
-              borderWidth: 1,
-              borderColor: isLightHour
-                ? ALPHA.lightCardBorder
-                : "rgba(255,255,255,0.2)",
-              ...SHADOW.widget,
-              shadowColor: accentColorHour,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              overflow: "hidden",
-            }}
-          >
-            {/* Top highlight */}
-            <View
-              pointerEvents="none"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "45%",
-                backgroundColor: isLightHour
-                  ? "rgba(255,255,255,0.45)"
-                  : "rgba(255,255,255,0.1)",
-                borderTopLeftRadius: RADIUS.widget,
-                borderTopRightRadius: RADIUS.widget,
-              }}
-            />
-            <View>
-              <Text
-                style={{
-                  fontSize: FONT_SIZE.caption,
-                  color: dimmedTimeText,
-                  fontWeight: "700",
-                  letterSpacing: 2,
-                  textTransform: "uppercase",
-                  marginBottom: SPACING.xs,
-                }}
-              >
-                Local Time
-              </Text>
-              <Text
-                style={{
-                  fontSize: FONT_SIZE.clock,
-                  color: accentColorTimeText,
-                  fontWeight: "800",
-                  letterSpacing: -1,
-                }}
-              >
-                {currentTime ?? "--:--"}
-              </Text>
-            </View>
-            {timezone !== "N/A" && (
-              <Text
-                style={{
-                  fontSize: FONT_SIZE.micro,
-                  color: dimmedTimeText,
-                  fontWeight: "600",
-                  maxWidth: 90,
-                  textAlign: "right",
-                }}
-              >
-                {timezone}
-              </Text>
-            )}
-          </View>
+          <TimeWidget
+            timezone={
+              locationTimezone ||
+              countryData?.timezones?.find((tz) => tz.includes("/")) ||
+              countryData?.timezones?.[0] ||
+              "N/A"
+            }
+            accentColor={accentColorHour}
+          />
 
           {/* ── Data Grid ── */}
           <View style={{ paddingHorizontal: SPACING.sm }}>
