@@ -10,6 +10,8 @@ import { HapticTab } from "@/components/haptic-tab";
 import { useLocation } from "@/context/LocationContext";
 import { getReadableTextColor } from "@/constants/functions";
 import { ALPHA, SIZE, SPACING } from "@/constants/theme";
+import BlurTabBackground from "@/components/ui/BlurTabBackground";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   const { themeColors, averageColor } = useLocation();
@@ -25,21 +27,25 @@ export default function TabLayout() {
     setTabIconColor(icon);
     setTabBorderColor(ALPHA.lightBorder);
   }, [themeColors, averageColor]);
-
+  console.log(tabBorderColor);
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: tabIconColor,
-        tabBarInactiveTintColor: tabIconColor,
+        tabBarInactiveTintColor: ALPHA.tabBarInactive,
         tabBarStyle: {
-          backgroundColor: tabBarBackground,
           height: SIZE.tabBar,
           paddingBottom: SPACING.sm,
           paddingTop: SPACING.md,
           borderTopWidth: 1,
           borderTopColor: tabBorderColor,
+          ...Platform.select({
+            ios: { position: "absolute" },
+            default: {},
+          }),
         },
         headerShown: false,
+        tabBarBackground: BlurTabBackground,
         tabBarButton: HapticTab,
       }}
     >
@@ -55,7 +61,7 @@ export default function TabLayout() {
         options={{
           title: "Country Info",
           tabBarIcon: ({ color }) => (
-            <InformationCircleIcon size={35} color={color} />
+            <InformationCircleIcon size={30} color={color} />
           ),
         }}
       />
