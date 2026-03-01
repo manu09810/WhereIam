@@ -2,6 +2,7 @@ import { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 import { PlatformPressable } from "@react-navigation/elements";
 import { useAudioPlayer } from "expo-audio";
 import * as Haptics from "expo-haptics";
+import { TIMING } from "@/constants/theme";
 const source = require("../assets/sounds/confirm-tap-394001.mp3");
 
 export function HapticTab(props: BottomTabBarButtonProps) {
@@ -17,7 +18,7 @@ export function HapticTab(props: BottomTabBarButtonProps) {
         setTimeout(() => {
           player.seekTo(0);
           player.play();
-        }, 500);
+        }, TIMING.hapticDelay);
       }}
     />
   );

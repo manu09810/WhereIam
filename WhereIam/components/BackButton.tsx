@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Pressable, Text, StyleSheet } from "react-native";
 import { useAudioPlayer } from "expo-audio";
+import { FONT_SIZE, SPACING, TIMING } from "@/constants/theme";
 const source = require("../assets/sounds/confirm-tap-394001.mp3");
 export const BackButton = ({ colorButton }: { colorButton: string }) => {
   const player = useAudioPlayer(source);
@@ -13,7 +14,7 @@ export const BackButton = ({ colorButton }: { colorButton: string }) => {
         player.seekTo(0);
         setTimeout(() => {
           router.back();
-        }, 300);
+        }, TIMING.soundDelay);
       }}
       style={styles.backButton}
     >
@@ -24,9 +25,9 @@ export const BackButton = ({ colorButton }: { colorButton: string }) => {
 
 const styles = StyleSheet.create({
   backButton: {
-    fontSize: 16,
+    fontSize: FONT_SIZE.input,
     fontWeight: "600",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xxl,
   },
 });

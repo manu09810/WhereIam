@@ -1,4 +1,14 @@
 import { useLocation } from "@/context/LocationContext";
+import { getReadableTextColor } from "@/constants/functions";
+import {
+  ALPHA,
+  FONT_SIZE,
+  LINE_HEIGHT,
+  MODAL,
+  RADIUS,
+  SIZE,
+  SPACING,
+} from "@/constants/theme";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -27,15 +37,6 @@ interface WeatherData {
   precipitation: number;
 }
 
-const getReadableTextColor = (hex: string) => {
-  if (!hex || hex.length < 7) return "#111111";
-  const r = parseInt(hex.substr(1, 2), 16) / 255;
-  const g = parseInt(hex.substr(3, 2), 16) / 255;
-  const b = parseInt(hex.substr(5, 2), 16) / 255;
-  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luminance > 0.55 ? "#111111" : "#ffffff";
-};
-
 export const WeatherModal = ({
   visible,
   onClose,
@@ -50,9 +51,9 @@ export const WeatherModal = ({
   const sheetBg = themeColors?.[0] || "#ffffff";
   const textColor = getReadableTextColor(sheetBg);
   const isLight = textColor === "#111111";
-  const cardBg = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.12)";
-  const cardBorder = isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.16)";
-  const dimText = isLight ? "rgba(17,17,17,0.5)" : "rgba(255,255,255,0.55)";
+  const cardBg = isLight ? ALPHA.lightCard : ALPHA.darkCard;
+  const cardBorder = isLight ? ALPHA.lightCardBorder : ALPHA.darkCardBorder;
+  const dimText = isLight ? ALPHA.lightDimText : ALPHA.darkDimText;
 
   useEffect(() => {
     if (visible) {
@@ -102,9 +103,10 @@ export const WeatherModal = ({
       63: "Rain 🌧️",
       65: "Heavy rain ⛈️",
       71: "Light snow 🌨️",
-      73: "Snow 🌨️",
-      75: "Heavy snow ❄️",
+      105: "Snow 🌨️",
+      106: "Heavy snow ❄️",
       95: "Thunderstorm ⛈️",
+      108: "Thunderstorm ⛈️",
     };
     return weatherCodes[code] || "Unknown";
   };
@@ -114,35 +116,33 @@ export const WeatherModal = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: ALPHA.overlayBg,
           justifyContent: "flex-end",
         }}
       >
         <View
           style={{
             backgroundColor: sheetBg,
-            borderTopLeftRadius: 28,
-            borderTopRightRadius: 28,
+            borderTopLeftRadius: RADIUS.sheet,
+            borderTopRightRadius: RADIUS.sheet,
             borderTopWidth: 1,
             borderLeftWidth: 1,
             borderRightWidth: 1,
-            borderColor: isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.15)",
-            padding: 24,
-            paddingBottom: Platform.OS === "ios" ? 40 : 24,
-            minHeight: 400,
+            borderColor: isLight ? ALPHA.lightBorder : ALPHA.darkBorder,
+            padding: SPACING.sheet,
+            paddingBottom: Platform.OS === "ios" ? SPACING.iosBottom : SPACING.sheet,
+            minHeight: MODAL.weatherMinHeight,
           }}
         >
           {/* Drag handle */}
           <View
             style={{
-              width: 40,
-              height: 4,
-              borderRadius: 2,
-              backgroundColor: isLight
-                ? "rgba(0,0,0,0.15)"
-                : "rgba(255,255,255,0.3)",
+              width: SIZE.handleWidth,
+              height: SIZE.handleHeight,
+              borderRadius: RADIUS.handle,
+              backgroundColor: isLight ? ALPHA.lightHandle : ALPHA.darkHandle,
               alignSelf: "center",
-              marginBottom: 20,
+              marginBottom: SPACING.xxxl,
             }}
           />
 
@@ -152,30 +152,28 @@ export const WeatherModal = ({
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: 20,
+              marginBottom: SPACING.xxxl,
             }}
           >
             <View>
               <Text
-                style={{ fontSize: 22, fontWeight: "800", color: textColor }}
+                style={{ fontSize: FONT_SIZE.title, fontWeight: "800", color: textColor }}
               >
                 Weather
               </Text>
-              <Text style={{ fontSize: 13, color: dimText, marginTop: 2 }}>
+              <Text style={{ fontSize: FONT_SIZE.errorText, color: dimText, marginTop: 2 }}>
                 {cityName}
               </Text>
             </View>
             <TouchableOpacity
               onPress={onClose}
               style={{
-                backgroundColor: isLight
-                  ? "rgba(0,0,0,0.08)"
-                  : "rgba(255,255,255,0.15)",
-                borderRadius: 50,
-                padding: 8,
+                backgroundColor: isLight ? ALPHA.lightBorder : ALPHA.darkBorder,
+                borderRadius: RADIUS.closeBtn,
+                padding: SPACING.md,
               }}
             >
-              <XMarkIcon size={22} color={textColor} />
+              <XMarkIcon size={SIZE.icon} color={textColor} />
             </TouchableOpacity>
           </View>
 
@@ -183,7 +181,7 @@ export const WeatherModal = ({
           {loading ? (
             <View
               style={{
-                paddingVertical: 64,
+                paddingVertical: SPACING.emptyState,
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -196,46 +194,51 @@ export const WeatherModal = ({
               <View
                 style={{
                   backgroundColor: cardBg,
-                  borderRadius: 20,
+                  borderRadius: RADIUS.large,
                   borderWidth: 1,
                   borderColor: cardBorder,
-                  padding: 28,
-                  marginBottom: 12,
+                  padding: SPACING.hero,
+                  marginBottom: SPACING.container,
                   alignItems: "center",
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 10,
+                    fontSize: FONT_SIZE.caption,
                     color: dimText,
                     fontWeight: "700",
                     letterSpacing: 2,
                     textTransform: "uppercase",
-                    marginBottom: 8,
+                    marginBottom: SPACING.md,
                   }}
                 >
                   Current Temperature
                 </Text>
                 <Text
                   style={{
-                    fontSize: 72,
+                    fontSize: FONT_SIZE.temperature,
                     fontWeight: "800",
                     color: textColor,
                     letterSpacing: -2,
-                    lineHeight: 80,
+                    lineHeight: LINE_HEIGHT.temperature,
                   }}
                 >
                   {Math.round(weather.temperature)}°
                 </Text>
                 <Text
-                  style={{ fontSize: 18, color: textColor, marginTop: 8, opacity: 0.85 }}
+                  style={{
+                    fontSize: FONT_SIZE.subheading,
+                    color: textColor,
+                    marginTop: SPACING.md,
+                    opacity: ALPHA.subtitle,
+                  }}
                 >
                   {getWeatherDescription(weather.weatherCode)}
                 </Text>
               </View>
 
               {/* Stats row */}
-              <View style={{ flexDirection: "row", gap: 10 }}>
+              <View style={{ flexDirection: "row", gap: SPACING.lg }}>
                 {[
                   { label: "Wind", value: `${weather.windSpeed}`, unit: "km/h" },
                   { label: "Humidity", value: `${weather.humidity}`, unit: "%" },
@@ -246,28 +249,28 @@ export const WeatherModal = ({
                     style={{
                       flex: 1,
                       backgroundColor: cardBg,
-                      borderRadius: 16,
+                      borderRadius: RADIUS.card,
                       borderWidth: 1,
                       borderColor: cardBorder,
-                      padding: 14,
+                      padding: SPACING.xl,
                       alignItems: "center",
                     }}
                   >
                     <Text
                       style={{
-                        fontSize: 10,
+                        fontSize: FONT_SIZE.caption,
                         color: dimText,
                         fontWeight: "700",
                         letterSpacing: 2,
                         textTransform: "uppercase",
-                        marginBottom: 6,
+                        marginBottom: SPACING.sm,
                       }}
                     >
                       {stat.label}
                     </Text>
                     <Text
                       style={{
-                        fontSize: 22,
+                        fontSize: FONT_SIZE.title,
                         fontWeight: "800",
                         color: textColor,
                         letterSpacing: -0.5,
@@ -276,7 +279,7 @@ export const WeatherModal = ({
                       {stat.value}
                     </Text>
                     <Text
-                      style={{ fontSize: 12, color: dimText, marginTop: 2 }}
+                      style={{ fontSize: FONT_SIZE.micro, color: dimText, marginTop: 2 }}
                     >
                       {stat.unit}
                     </Text>
@@ -285,8 +288,8 @@ export const WeatherModal = ({
               </View>
             </ScrollView>
           ) : (
-            <View style={{ paddingVertical: 64, alignItems: "center" }}>
-              <Text style={{ color: dimText, fontSize: 15 }}>
+            <View style={{ paddingVertical: SPACING.emptyState, alignItems: "center" }}>
+              <Text style={{ color: dimText, fontSize: FONT_SIZE.body }}>
                 Unable to load weather data
               </Text>
             </View>

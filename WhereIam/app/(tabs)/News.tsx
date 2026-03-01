@@ -7,6 +7,14 @@ import { deleteGeneralCache } from "@/constants/cache";
 import { Image, StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getReadableTextColor } from "@/constants/functions";
+import {
+  ALPHA,
+  FONT_SIZE,
+  RADIUS,
+  SHADOW,
+  SPACING,
+  TIMING,
+} from "@/constants/theme";
 // @ts-ignore
 const { iso6392 } = require("iso-639-2");
 const source = require("../../assets/sounds/confirm-tap-394001.mp3");
@@ -71,7 +79,7 @@ export default function News() {
                 setTimeout(() => {
                   player.seekTo(0);
                   player.play();
-                }, 200);
+                }, TIMING.switchDelay);
               }}
               thumbColor={switchColor}
               trackColor={{
@@ -153,46 +161,42 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: SPACING.xxxl,
     justifyContent: "center",
   },
   card: {
-    backgroundColor: "rgba(0,0,0,0.36)",
+    backgroundColor: ALPHA.glassBg,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.16)",
+    borderColor: ALPHA.darkCardBorder,
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingTop: 16,
-    paddingBottom: 16,
-    borderRadius: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.22,
-    shadowRadius: 16,
-    elevation: 8,
+    paddingHorizontal: SPACING.container,
+    paddingTop: SPACING.xxl,
+    paddingBottom: SPACING.xxl,
+    borderRadius: RADIUS.page,
+    ...SHADOW.card,
   },
   titleMain: {
-    fontSize: 30,
+    fontSize: FONT_SIZE.display,
     fontWeight: "800",
     letterSpacing: -0.5,
     textAlign: "center",
-    marginBottom: 6,
+    marginBottom: SPACING.sm,
   },
   titleSub: {
-    fontSize: 15,
+    fontSize: FONT_SIZE.body,
     textAlign: "center",
-    opacity: 0.85,
-    marginBottom: 8,
+    opacity: ALPHA.subtitle,
+    marginBottom: SPACING.md,
   },
   switchRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
-    gap: 10,
+    marginBottom: SPACING.container,
+    gap: SPACING.lg,
   },
   switchLabel: {
-    fontSize: 15,
+    fontSize: FONT_SIZE.body,
     fontWeight: "600",
     width: 140,
     textAlign: "right",
