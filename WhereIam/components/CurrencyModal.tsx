@@ -69,7 +69,7 @@ export const CurrencyModal = ({
       const from = toUSD ? currency : "USD";
       const to = toUSD ? "USD" : currency;
       const response = await fetch(
-        `https://juanmalorenzo.com/api/${from}/${to}/${amount}`,
+        `/api/${from}/${to}/${amount}`,
       );
       const data = await response.json();
       if (typeof data === "number" && !isNaN(data)) {

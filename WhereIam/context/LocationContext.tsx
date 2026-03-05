@@ -25,7 +25,7 @@ interface LocationContextType {
 }
 
 const LocationContext = createContext<LocationContextType | undefined>(
-  undefined
+  undefined,
 );
 
 // Remove the utility functions from here (hexToRgb, rgbToHex, averageColors)
@@ -68,7 +68,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       });
       if (result.platform === "android") {
         return [result.dominant, result.average, result.vibrant].filter(
-          Boolean
+          Boolean,
         ) as string[];
       } else if (result.platform === "ios") {
         return [
@@ -89,20 +89,16 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (country.countryData?.cca2) {
       setFlagImage(
-        `https://flagcdn.com/w2560/${country.countryData.cca2.toLowerCase()}.png`
+        `https://flagcdn.com/w2560/${country.countryData.cca2.toLowerCase()}.png`,
       );
     }
   }, [country.countryData?.cca2]);
 
-
-   useEffect(() => {
+  useEffect(() => {
     if (country.countryData?.currency) {
-      setFlagImage(
-        `https://juanmalorenzo.com/api/${country.countryData?.currency}`
-      );
+      setFlagImage(`/api/${country.countryData?.currency}`);
     }
   }, [country.countryData?.cca2]);
-  
 
   let normalizedRegion =
     locationData.region?.trim() ||
@@ -122,14 +118,14 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
 
   const { backgroundImage, regionImage } = useImage(
     country.countryData,
-    normalizedRegion
+    normalizedRegion,
   );
 
   // Calculate theme colors and average from all images
   useEffect(() => {
     const calculateThemeColors = async () => {
       const imagesToProcess = [flagImage, backgroundImage, regionImage].filter(
-        Boolean
+        Boolean,
       ) as string[];
 
       if (imagesToProcess.length === 0) {
@@ -140,13 +136,13 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
 
       // Get all colors from all images
       const allColorsArrays = await Promise.all(
-        imagesToProcess.map((uri) => getImageColors(uri))
+        imagesToProcess.map((uri) => getImageColors(uri)),
       );
       const allColors = allColorsArrays.flat();
 
       // Get dominant colors for averaging
       const dominantColors = await Promise.all(
-        imagesToProcess.map((uri) => getDominantColor(uri))
+        imagesToProcess.map((uri) => getDominantColor(uri)),
       );
       const validDominantColors = dominantColors.filter(Boolean) as string[];
 

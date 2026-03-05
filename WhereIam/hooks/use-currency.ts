@@ -16,7 +16,7 @@ export const useCurrency = (currency: string | null) => {
       try {
         console.log("Requesting currency data for:", currency);
         const response = await fetch(
-          `https://juanmalorenzo.com/api/${currency}`,
+          `/api/${currency}`,
         );
 
         if (!response.ok) {
