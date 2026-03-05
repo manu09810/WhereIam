@@ -211,14 +211,14 @@ export default function InfoCountryScreen() {
                 paddingHorizontal: SPACING.lg,
                 paddingVertical: 5,
                 borderRadius: RADIUS.large,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: SPACING.xs,
               }}
             >
+              <Text style={{ fontSize: FONT_SIZE.label }}>📍</Text>
               <Text
-                style={{
-                  color: "#fff",
-                  fontSize: FONT_SIZE.label,
-                  fontWeight: "600",
-                }}
+                style={{ color: "#fff", fontSize: FONT_SIZE.label, fontWeight: "600" }}
               >
                 Open Maps
               </Text>

@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     borderColor: ALPHA.darkCardBorder,
     alignItems: "center",
     paddingHorizontal: SPACING.container,
-    paddingTop: SPACING.xxl,
+    paddingTop: SPACING.sheet,
     paddingBottom: SPACING.xxl,
     borderRadius: RADIUS.page,
     ...SHADOW.card,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.body,
     textAlign: "center",
     opacity: ALPHA.subtitle,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.xxxl,
   },
   switchRow: {
     flexDirection: "row",
