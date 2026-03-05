@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import {
   ActivityIndicator,
   Image,
   Linking,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -57,14 +56,12 @@ export default function NewsDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-  const scrollRef = useRef<ScrollView>(null);
 
   const totalPages = Math.ceil(results.length / PAGE_SIZE);
   const pageItems = results.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const goToPage = (next: number) => {
     setPage(next);
-    scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   useEffect(() => {
@@ -99,7 +96,7 @@ export default function NewsDetail() {
               JSON.stringify(newsItems),
               label,
               "news",
-              locationName
+              locationName,
             );
           } else {
             setResults([]);
@@ -128,25 +125,23 @@ export default function NewsDetail() {
       <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
         <BackButton colorButton={buttonColor} />
 
-        <ScrollView
-          ref={scrollRef}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <View style={styles.titleWrapper}>
-            <Text style={styles.titleLabel}>NEWS ABOUT</Text>
-            <Text style={[styles.titleMain, { color: primary }]}>
-              {locationName || label}
-            </Text>
-          </View>
+        <View style={styles.titleWrapper}>
+          <Text style={styles.titleLabel}>NEWS ABOUT</Text>
+          <Text style={[styles.titleMain, { color: primary }]}>
+            {locationName || label}
+          </Text>
+        </View>
 
+        <View style={styles.body}>
           {loading && (
-            <ActivityIndicator size="large" color={primary} style={styles.loader} />
+            <ActivityIndicator
+              size="large"
+              color={primary}
+              style={styles.loader}
+            />
           )}
 
-          {error && !loading && (
-            <Text style={styles.errorText}>{error}</Text>
-          )}
+          {error && !loading && <Text style={styles.errorText}>{error}</Text>}
 
           {!loading && !error && results.length === 0 && (
             <Text style={styles.emptyText}>No results available</Text>
@@ -172,10 +167,6 @@ export default function NewsDetail() {
                 </View>
               </View>
             </TouchableOpacity>
-          ))}
-
-          {Array.from({ length: PAGE_SIZE - pageItems.length }).map((_, idx) => (
-            <View key={`placeholder-${idx}`} style={styles.cardPlaceholder} />
           ))}
 
           {totalPages > 1 && (
@@ -212,29 +203,26 @@ export default function NewsDetail() {
               </TouchableOpacity>
             </View>
           )}
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
+  body: {
     paddingHorizontal: SPACING.xxl,
-    paddingTop: SPACING.md,
-    paddingBottom: SPACING.section,
+    paddingTop: SPACING.lg,
   },
   titleWrapper: {
     alignItems: "center",
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.xxxl,
+    paddingBottom: SPACING.sm,
   },
   titleLabel: {
     fontSize: FONT_SIZE.label,
     fontWeight: "600",
     letterSpacing: 3,
     color: "rgba(255,255,255,0.6)",
-    marginBottom: SPACING.sm,
   },
   titleMain: {
     fontSize: FONT_SIZE.headline,
@@ -266,10 +254,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     overflow: "hidden",
     height: SIZE.newsCard,
-  },
-  cardPlaceholder: {
-    height: SIZE.newsCard,
-    marginBottom: SPACING.lg,
   },
   cardAccent: {
     width: SIZE.handleHeight,

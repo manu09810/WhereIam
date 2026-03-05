@@ -61,7 +61,7 @@ export default function FactsDetail() {
 
         const res = await ai.models.generateContent({
           model: "gemini-2.5-flash",
-          contents: `Give 5 hyper interesting and easy to average user about ${queryName}. THINK HARD about Each fact should be ~100 characters.
+          contents: `Give 5  interesting and easy facts about ${queryName}. Each one should be ~100 characters.
 and facts should separated by #$`,
         });
 
@@ -126,8 +126,6 @@ and facts should separated by #$`,
 
 const styles = StyleSheet.create({
   body: {
-    flex: 1,
-    justifyContent: "flex-start",
     paddingHorizontal: SPACING.xxl,
     paddingTop: SPACING.xxl,
   },

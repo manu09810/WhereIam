@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     color: "#222",
     fontSize: FONT_SIZE.input,
     lineHeight: LINE_HEIGHT.body,
-    marginBottom: SPACING.sm,
+    
   },
 });
 
