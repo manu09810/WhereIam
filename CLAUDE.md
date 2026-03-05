@@ -77,7 +77,7 @@ The UI is dynamically themed based on the country's flag/landscape colors. `them
 
 Three modals live in `components/`:
 - `WeatherModal` — calls open-meteo.com with lat/lon
-- `CurrencyModal` — calls `juanmalorenzo.com/api/{currency}` (custom backend for exchange rates)
+- `CurrencyModal` — calls ` (custom backend for exchange rates)
 - `TranslateModal` — translation feature (was Google Translate, being migrated)
 
 ### Path Aliases
@@ -90,7 +90,7 @@ Three modals live in `components/`:
 |-----|---------|
 | restcountries.com/v3.1 | Country metadata |
 | open-meteo.com | Weather (no key needed) |
-| juanmalorenzo.com/api | Currency exchange (custom backend) |
+| | Currency exchange (custom backend) |
 | Unsplash | Country/region landscape photos |
 | flagcdn.com | Country flag images |
 | Google Custom Search | News search |
